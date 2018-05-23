@@ -8,6 +8,13 @@
 pragma solidity 0.4.24;
 
 contract Unique {
+    function isUnique(uint[] input, uint len, uint value) private pure returns(bool) {
+        for(uint i = 0; i < len; i++) {
+            if(input[i] == value) return false;
+        }
+        return true;
+    }
+
     /**
      * @dev Removes all but the first occurrence of each element from a list of
      *      integers, preserving the order of original elements, and returns the list.
@@ -18,5 +25,18 @@ contract Unique {
      * @return The input list, with any duplicate elements removed.
      */
     function uniquify(uint[] input) public pure returns(uint[] ret) {
+        uint ptr = 0;
+        for(uint i = 0; i < input.length; i++) {
+            if(isUnique(input, i, input[i])) {
+                input[ptr++] = input[i];
+            }
+        }
+
+        ret = new uint[](ptr);
+        for(i = 0; i < ret.length; i++) {
+            ret[i] = input[i];
+        }
+
+        return ret;
     }
 }
