@@ -13,24 +13,33 @@ contract Unique {
         public pure
         returns(uint[])
     {
+        uint256 filter = 0;
         uint ptr = 0;
         for(uint i = 0; i < input.length; i++) {
             
             uint256 value = input[i];
             
-            // Check if seen before
             bool unique = true;
-            for(uint j = 0; j < ptr; j++) {
-                if(input[j] == value) {
-                    unique = false;
-                    break;
+            
+            // Check filter
+            uint256 mask = 2**(value % 256);
+            if (filter & mask != 0) {
+                
+                // Check if seen before
+                for(uint j = 0; j < ptr; j++) {
+                    if(input[j] == value) {
+                        unique = false;
+                        break;
+                    }
                 }
+                
             }
             
             // Add to start of list
             if (unique) {
                 input[ptr] = value;
                 ptr++;
+                filter |= mask;
             }
         }
 
