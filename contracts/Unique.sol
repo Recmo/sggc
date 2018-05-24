@@ -8,7 +8,10 @@
 pragma solidity 0.4.24;
 
 contract Unique {
-    function isUnique(uint[] input, uint len, uint value) private pure returns(bool) {
+    function isUnique(uint[] input, uint len, uint value)
+      private pure
+      returns(bool) 
+    {
         for(uint i = 0; i < len; i++) {
             if(input[i] == value) return false;
         }
@@ -24,10 +27,13 @@ contract Unique {
      * @param input The list of integers to uniquify.
      * @return The input list, with any duplicate elements removed.
      */
-    function uniquify(uint[] input) public pure returns(uint[]) {
+    function uniquify(uint[] input)
+      public pure
+      returns(uint[])
+    {
         uint ptr = 0;
         for(uint i = 0; i < input.length; i++) {
-            if(isUnique(input, i, input[i])) {
+            if(isUnique(input, ptr, input[i])) {
                 input[ptr++] = input[i];
             }
         }
