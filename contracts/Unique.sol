@@ -5,7 +5,7 @@
  * https://creativecommons.org/licenses/by-sa/3.0/
  */
 
-pragma solidity 0.4.24;
+pragma solidity ^0.4.23;
 
 contract Unique {
     
@@ -65,12 +65,12 @@ contract Unique {
                 input[ptr] = value;
                 ptr++;
                 filter |= mask;
+                prev5 = prev4;
+                prev4 = prev3;
+                prev3 = prev2;
+                prev2 = prev1;
+                prev1 = value;
             }
-            prev5 = prev4;
-            prev4 = prev3;
-            prev3 = prev2;
-            prev2 = prev1;
-            prev1 = value;
         }
 
         // In-place return
