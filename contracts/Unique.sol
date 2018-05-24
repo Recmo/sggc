@@ -19,6 +19,7 @@ contract Unique {
         uint256 prev2 = prime;
         uint256 prev3 = prime;
         uint256 prev4 = prime;
+        uint256 prev5 = prime;
         uint256 filter = 0;
         uint ptr = 0;
         for(uint i = 0; i < input.length; i++) {
@@ -35,6 +36,9 @@ contract Unique {
                 continue;
             }
             if (value == prev4) {
+                continue;
+            }
+            if (value == prev5) {
                 continue;
             }
             
@@ -62,6 +66,7 @@ contract Unique {
                 ptr++;
                 filter |= mask;
             }
+            prev5 = prev4;
             prev4 = prev3;
             prev3 = prev2;
             prev2 = prev1;
