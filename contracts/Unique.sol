@@ -40,16 +40,6 @@ contract Unique {
             
             bool unique = true;
             
-            // Hash value (high bytes of product with prime)
-            uint256 h;
-            assembly {
-                // Better quality
-                // h := byte(0, mul(value, 97277402779417326246569501968090644759112326288932996378773065725448860767777))
-                
-                // Faster
-                h := and(value, 0xff)
-            }
-            
             // Check filter
             uint256 mask = 2**(value & 0xff);
             if (filter & mask != 0) {
