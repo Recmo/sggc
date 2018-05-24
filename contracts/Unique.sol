@@ -15,14 +15,18 @@ contract Unique {
         public pure
         returns(uint[])
     {
-        uint256 prev = prime;
+        uint256 prev1 = prime;
+        uint256 prev2 = prime;
         uint256 filter = 0;
         uint ptr = 0;
         for(uint i = 0; i < input.length; i++) {
             
             uint256 value = input[i];
             
-            if (value == prev) {
+            if (value == prev1) {
+                continue;
+            }
+            if (value == prev2) {
                 continue;
             }
             
@@ -60,7 +64,8 @@ contract Unique {
                 ptr++;
                 filter |= mask;
             }
-            prev = value;
+            prev2 = prev1;
+            prev1 = value;
         }
 
         // In-place return
