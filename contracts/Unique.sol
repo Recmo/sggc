@@ -18,7 +18,6 @@ contract Unique {
         for(uint i = 0; i < input.length; i++) {
             
             uint256 value = input[i];
-            
             bool unique = true;
             
             // Check filter
