@@ -15,11 +15,17 @@ contract Unique {
         public pure
         returns(uint[])
     {
+        uint256 prev = prime;
         uint256 filter = 0;
         uint ptr = 0;
         for(uint i = 0; i < input.length; i++) {
             
             uint256 value = input[i];
+            
+            if (value == prev) {
+                continue;
+            }
+            
             bool unique = true;
             
             // Hash value (high bytes of product with prime)
@@ -54,6 +60,7 @@ contract Unique {
                 ptr++;
                 filter |= mask;
             }
+            prev = value;
         }
 
         // In-place return
