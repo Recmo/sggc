@@ -8,42 +8,39 @@
 pragma solidity 0.4.24;
 
 contract Unique {
-    function isUnique(uint[] input, uint len, uint value)
-      private pure
-      returns(bool) 
-    {
-        for(uint i = 0; i < len; i++) {
-            if(input[i] == value) return false;
-        }
-        return true;
-    }
-
-    /**
-     * @dev Removes all but the first occurrence of each element from a list of
-     *      integers, preserving the order of original elements, and returns the list.
-     *
-     * The input list may be of any length.
-     *
-     * @param input The list of integers to uniquify.
-     * @return The input list, with any duplicate elements removed.
-     */
+    
     function uniquify(uint[] input)
-      public pure
-      returns(uint[])
+        public pure
+        returns(uint[])
     {
         uint ptr = 0;
         for(uint i = 0; i < input.length; i++) {
-            if(isUnique(input, ptr, input[i])) {
-                input[ptr++] = input[i];
+            
+            uint256 value = input[i];
+            
+            // Check if seen before
+            bool unique = true;
+            for(uint j = 0; j < ptr; j++) {
+                if(input[j] == value) {
+                    unique = false;
+                    break;
+                }
+            }
+            
+            // Add to start of list
+            if (unique) {
+                input[ptr] = value;
+                ptr++;
             }
         }
 
         // In-place return
         assembly {
-          let start := sub(input, 32)
-          mstore(start, 32)
-          mstore(input, ptr)
-          return(start, mul(add(ptr, 2), 32))
+            let start := sub(input, 32)
+            mstore(start, 32)
+            mstore(input, ptr)
+            return(start, mul(add(ptr, 2), 32))
         }
     }
+    
 }
