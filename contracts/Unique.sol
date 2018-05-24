@@ -24,7 +24,7 @@ contract Unique {
      * @param input The list of integers to uniquify.
      * @return The input list, with any duplicate elements removed.
      */
-    function uniquify(uint[] input) public pure returns(uint[] ret) {
+    function uniquify(uint[] input) public pure returns(uint[]) {
         uint ptr = 0;
         for(uint i = 0; i < input.length; i++) {
             if(isUnique(input, i, input[i])) {
@@ -32,11 +32,12 @@ contract Unique {
             }
         }
 
-        ret = new uint[](ptr);
-        for(i = 0; i < ret.length; i++) {
-            ret[i] = input[i];
+        // In-place return
+        assembly {
+          let start := sub(input, 32)
+          mstore(start, 32)
+          mstore(input, ptr)
+          return(start, mul(add(ptr, 2), 32))
         }
-
-        return ret;
     }
 }
