@@ -8,8 +8,12 @@
 pragma solidity 0.4.24;
 
 contract IndexOf {
-    function equals(string haystack, uint i, string needle) private pure returns(bool) {
-        for(uint j = 0; j < bytes(needle).length; j++) {
+    function equals(string haystack, uint i, string needle)
+        private pure
+        returns(bool)
+    {
+        uint256 nl = bytes(needle).length;
+        for(uint j = 0; j < nl; j++) {
             if(bytes(haystack)[i + j] != bytes(needle)[j]) {
                 return false;
             }
@@ -27,11 +31,17 @@ contract IndexOf {
      * @param needle The string to search for.
      * @return The index of `needle` in `haystack`, or -1 if not found.
      */
-    function indexOf(string haystack, string needle) public pure returns(int) {
-        if(bytes(needle).length > bytes(haystack).length) {
+    function indexOf(string haystack, string needle)
+        public pure
+        returns(int)
+    {
+        uint256 hl = bytes(haystack).length;
+        uint256 nl = bytes(needle).length;
+        if(nl > hl) {
             return -1;
         }
-        for(uint i = 0; i <= bytes(haystack).length - bytes(needle).length; i++) {
+        uint256 end = hl - nl;
+        for(uint i = 0; i <= end; i++) {
             if(equals(haystack, i, needle)) {
                 return int(i);
             }
