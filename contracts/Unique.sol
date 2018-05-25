@@ -38,11 +38,11 @@ contract Unique {
                 if sub(value, prev4) {
                 if sub(value, prev5) {
                 
-                
+                let mask
                 let j
                 
                 // Check filter
-                let mask := exp(2, and(value, 0xff))
+                mask := exp(2, and(value, 0xff))
                 jumpi(unique, iszero(and(filter, mask)))
                 
                 
