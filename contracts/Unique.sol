@@ -26,15 +26,21 @@ contract Unique {
             let i := input
             let ptr := i
             let endi := add(i, mul(mload(sub(input, 32)), 32))
-            for {} lt(i, endi) {} {
-                
+            
+            
+            jumpi(oloop_end, eq(i, endi))
+            
+        oloop:
+            {
+                let value
+                    
                 // Read value
-                let value := mload(i)
+                value := mload(i)
                 
                 // Skip if we saw it recently
                 // value != prev <=> value - prev
-                jumpi(oloop_continue, eq(value, prev1))
-                jumpi(oloop_continue, or(or(
+                jumpi(end_block2, eq(value, prev1))
+                jumpi(end_block2, or(or(
                     eq(value, prev2),
                     eq(value, prev3)),
                     eq(value, prev4)))
@@ -50,7 +56,6 @@ contract Unique {
                     
                     // Check if we saw it before
                     j := input
-                    
                     jumpi(unique, eq(j, ptr))
 
                 iloop:
@@ -74,10 +79,14 @@ contract Unique {
                 
                 end_block:
                 }
-                
-            oloop_continue:
-                i := add(i, 32)
+            end_block2:
             }
+                
+        oloop_continue:
+            i := add(i, 32)
+            jumpi(oloop, lt(i, endi))
+        
+        oloop_end:
             
             // In-place return
             {
