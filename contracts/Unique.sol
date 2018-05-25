@@ -50,8 +50,7 @@ contract Unique {
                     let j := add(input, 32)
                     let endj := ptr
                     
-                    iloop_check:
-                        jumpi(iloop_break, iszero(lt(j, endj)))
+                    jumpi(iloop_break, eq(j, endj))
 
                     iloop:
                         if eq(mload(j), value) {
