@@ -21,11 +21,12 @@ contract Unique {
         uint256 prev4 = prime;
         uint256 prev5 = prime;
         uint256 filter = 0;
-        uint ptr = 0;
 
         assembly {
             
+            
             let i := add(input, 32)
+            let ptr := i
             let endi := add(i, mul(mload(input), 32))
             for {} lt(i, endi) {} {
                 
@@ -50,7 +51,7 @@ contract Unique {
                     
                     // Check if we saw it before
                     let j := add(input, 32)
-                    let endj := add(j, mul(ptr, 32))
+                    let endj := ptr
                     for {} lt(j, endj) {} {
                         if eq(mload(j), value) {
                             unique := 0
@@ -64,9 +65,8 @@ contract Unique {
                 
                 if unique {
                     // Add to start of list
-                    let addr := add(mul(ptr, 32), add(input, 32))
-                    mstore(addr, value)
-                    ptr := add(ptr, 1)
+                    mstore(ptr, value)
+                    ptr := add(ptr, 32)
                     
                     // Update filter
                     filter := or(filter, mask)
@@ -88,8 +88,9 @@ contract Unique {
             // In-place return
             let start := sub(input, 32)
             mstore(start, 32)
-            mstore(input, ptr)
-            return(start, mul(add(ptr, 2), 32))
+            let length := sub(div(sub(ptr, input), 32), 1)
+            mstore(input, length)
+            return(start, sub(ptr, start))
         }
     }
     
