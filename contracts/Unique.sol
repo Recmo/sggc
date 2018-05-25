@@ -34,28 +34,28 @@ contract Unique {
                 
                 // Skip if we saw it recently
                 // value != prev <=> value - prev
-                if sub(value, prev1) {
-                if sub(value, prev2) {
-                if sub(value, prev3) {
-                if sub(value, prev4) {
-                if sub(value, prev5) {
-                
-                let mask
-                let j
-                
-                // Check filter if we have not seen it before
-                mask := exp(2, and(value, 0xff))
-                jumpi(unique, iszero(and(filter, mask)))
-                
-                // We *may* have seen it before
-                
-                // Check if we saw it before
-                j := input
-                
-                jumpi(unique, eq(j, ptr))
+                jumpi(oloop_continue, eq(value, prev1))
+                jumpi(oloop_continue, eq(value, prev2))
+                jumpi(oloop_continue, eq(value, prev3))
+                jumpi(oloop_continue, eq(value, prev4))
+                jumpi(oloop_continue, eq(value, prev5))
+                {
+                    let mask
+                    let j
+                    
+                    // Check filter if we have not seen it before
+                    mask := exp(2, and(value, 0xff))
+                    jumpi(unique, iszero(and(filter, mask)))
+                    
+                    // We *may* have seen it before
+                    
+                    // Check if we saw it before
+                    j := input
+                    
+                    jumpi(unique, eq(j, ptr))
 
                 iloop:
-                    jumpi(oloop_continue, eq(mload(j), value))
+                    jumpi(end_block, eq(mload(j), value))
                     j := add(j, 32)
                     jumpi(iloop, lt(j, ptr))
                 
@@ -74,11 +74,10 @@ contract Unique {
                     prev2 := prev1
                     prev1 := value
                 
-                oloop_continue:
+                end_block:
+                }
                 
-                // end of prev checks
-                }}}}}
-                
+            oloop_continue:
                 i := add(i, 32)
             }
             
