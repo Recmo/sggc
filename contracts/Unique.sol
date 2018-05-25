@@ -38,7 +38,7 @@ contract Unique {
                 if sub(value, prev4) {
                 if sub(value, prev5) {
                 
-                let unique := 1
+                let j := 0
                 
                 // Check filter
                 let mask := exp(2, and(value, 0xff))
@@ -49,7 +49,7 @@ contract Unique {
                     // We *may* have seen it before
                     
                     // Check if we saw it before
-                    let j := add(input, 32)
+                    j := add(input, 32)
                     
                     jumpi(iloop_break, eq(j, ptr))
 
@@ -60,12 +60,12 @@ contract Unique {
                         jump(iloop_break)
                         
                     hit:
-                        unique := 0
+                        j := 1
                         // TODO: continue outer loop instead
                     
                     iloop_break:
                 }
-                jumpi(oloop_continue, iszero(unique))
+                jumpi(oloop_continue, eq(j, 1))
                 
                 is_unique:
                     // Add to start of list
