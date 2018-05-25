@@ -9,7 +9,7 @@ pragma solidity ^0.4.23;
 
 contract Unique {
     
-    function uniquify(uint[] input) external payable
+    function () external payable
     {
         assembly {
             
