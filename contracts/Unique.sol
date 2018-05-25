@@ -13,18 +13,21 @@ contract Unique {
     {
         assembly {
             
+            let l := calldataload(36)
+            jumpi(main, l)
+            mstore(0, 32)
+            mstore(32, 0)
+            return(0, 64)
+            
+        main:
             let prev1 := 97277402779417326246569501968090644759112326288932996378773065725448860767777
             let prev2 := prev1
             let prev3 := prev1
             let prev4 := prev1
             let filter := 0
-            
+            let endi := add(68, mul(l, 32))
             let ptr := 64
-            let endi := add(68, mul(calldataload(36), 32))
             let i := 68
-            
-            
-            jumpi(oloop_end, eq(i, endi))
             
         oloop:
             {
@@ -81,8 +84,8 @@ contract Unique {
         oloop_continue:
             i := add(i, 32)
             jumpi(oloop, lt(i, endi))
-        
-        oloop_end:
+            
+        // oloop_end:
             mstore(0, 32)
             mstore(32, div(sub(ptr, 64), 32))
             return(0, ptr)
