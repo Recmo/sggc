@@ -34,9 +34,9 @@ contract Unique {
                 // Skip if we saw it recently
                 // value != prev <=> value - prev
                 jumpi(oloop_continue, eq(value, prev1))
-                jumpi(oloop_continue, eq(value, prev2))
-                jumpi(oloop_continue, or(
-                    eq(value, prev3),
+                jumpi(oloop_continue, or(or(
+                    eq(value, prev2),
+                    eq(value, prev3)),
                     eq(value, prev4)))
                 {
                     let mask
