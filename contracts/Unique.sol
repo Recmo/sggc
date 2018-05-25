@@ -10,7 +10,7 @@ pragma solidity ^0.4.23;
 contract Unique {
     
     function uniquify(uint[] input)
-        public pure
+        public view
         returns(uint[])
     {
         assembly {
@@ -49,15 +49,23 @@ contract Unique {
                     // Check if we saw it before
                     let j := add(input, 32)
                     let endj := ptr
-                    for {} lt(j, endj) {} {
+                    
+                    iloop_check:
+                        jumpi(iloop_break, iszero(lt(j, endj)))
+                        
+                    iloop:
                         if eq(mload(j), value) {
                             unique := 0
                             j := endj // break is not supported :(
                                      // in fact, we want to continue the outer
                                      // loop.
                         }
+                    
+                    iloop_continue:
                         j := add(j, 32)
-                    }
+                        jump(iloop_check)
+                    
+                    iloop_break:
                 }
                 
                 if unique {
