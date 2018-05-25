@@ -48,9 +48,8 @@ contract Unique {
                     
                     // Check if we saw it before
                     let j := add(input, 32)
-                    let endj := ptr
                     
-                    jumpi(iloop_break, eq(j, endj))
+                    jumpi(iloop_break, eq(j, ptr))
 
                     iloop:
                         if eq(mload(j), value) {
@@ -61,7 +60,7 @@ contract Unique {
                     
                     iloop_continue:
                         j := add(j, 32)
-                        jumpi(iloop, lt(j, endj))
+                        jumpi(iloop, lt(j, ptr))
                     
                     iloop_break:
                 }
