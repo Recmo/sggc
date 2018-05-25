@@ -39,8 +39,8 @@ contract Unique {
                 
                 // Skip if we saw it recently
                 // value != prev <=> value - prev
-                jumpi(end_block2, eq(value, prev1))
-                jumpi(end_block2, or(or(
+                jumpi(oblock_end, eq(value, prev1))
+                jumpi(oblock_end, or(or(
                     eq(value, prev2),
                     eq(value, prev3)),
                     eq(value, prev4)))
@@ -59,7 +59,7 @@ contract Unique {
                     jumpi(unique, eq(j, ptr))
 
                 iloop:
-                    jumpi(end_block, eq(mload(j), value))
+                    jumpi(iblock_end, eq(mload(j), value))
                     j := add(j, 32)
                     jumpi(iloop, lt(j, ptr))
                 
@@ -77,9 +77,9 @@ contract Unique {
                     prev2 := prev1
                     prev1 := value
                 
-                end_block:
+                iblock_end:
                 }
-            end_block2:
+            oblock_end:
             }
                 
         oloop_continue:
