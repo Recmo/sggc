@@ -38,36 +38,27 @@ contract Unique {
                 if sub(value, prev4) {
                 if sub(value, prev5) {
                 
-                let j := 0
+                
+                let j
                 
                 // Check filter
                 let mask := exp(2, and(value, 0xff))
-                jumpi(is_unique, iszero(and(filter, mask)))
+                jumpi(unique, iszero(and(filter, mask)))
                 
                 
-                {
-                    // We *may* have seen it before
-                    
-                    // Check if we saw it before
-                    j := add(input, 32)
-                    
-                    jumpi(iloop_break, eq(j, ptr))
+                // We *may* have seen it before
+                
+                // Check if we saw it before
+                j := add(input, 32)
+                
+                jumpi(unique, eq(j, ptr))
 
-                    iloop:
-                        jumpi(hit, eq(mload(j), value))
-                        j := add(j, 32)
-                        jumpi(iloop, lt(j, ptr))
-                        jump(iloop_break)
-                        
-                    hit:
-                        j := 1
-                        // TODO: continue outer loop instead
-                    
-                    iloop_break:
-                }
-                jumpi(oloop_continue, eq(j, 1))
+                iloop:
+                    jumpi(oloop_continue, eq(mload(j), value))
+                    j := add(j, 32)
+                    jumpi(iloop, lt(j, ptr))
                 
-                is_unique:
+                unique:
                     // Add to start of list
                     mstore(ptr, value)
                     ptr := add(ptr, 32)
