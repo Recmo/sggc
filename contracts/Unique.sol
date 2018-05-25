@@ -21,7 +21,6 @@ contract Unique {
             let prev2 := prev1
             let prev3 := prev1
             let prev4 := prev1
-            let prev5 := prev1
             let filter := 0
             
             let i := input
@@ -38,7 +37,6 @@ contract Unique {
                 jumpi(oloop_continue, eq(value, prev2))
                 jumpi(oloop_continue, eq(value, prev3))
                 jumpi(oloop_continue, eq(value, prev4))
-                jumpi(oloop_continue, eq(value, prev5))
                 {
                     let mask
                     let j
@@ -68,7 +66,6 @@ contract Unique {
                     filter := or(filter, mask)
                     
                     // Push recent adds
-                    prev5 := prev4
                     prev4 := prev3
                     prev3 := prev2
                     prev2 := prev1
