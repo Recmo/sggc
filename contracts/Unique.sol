@@ -9,9 +9,7 @@ pragma solidity ^0.4.23;
 
 contract Unique {
     
-    function uniquify(uint[] input)
-        public view
-        returns(uint[])
+    function uniquify(uint[] input) public
     {
         assembly {
             
