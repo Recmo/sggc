@@ -51,10 +51,26 @@ contract Unique {
                 // We *may* have seen it before
                 
                 // Check if seen before
+                /*
                 for(uint j = 0; j < ptr; j++) {
                     if(input[j] == value) {
                         unique = false;
                         break;
+                    }
+                }
+                */
+                
+                assembly {
+                    let j := 0
+                    for {} lt(j, ptr) {} {
+                        let addr := add(mul(j, 32), add(input, 32))
+                        if eq(mload(addr), value) {
+                            unique := 0
+                            j := ptr // break is not supported :(
+                                     // in fact, we want to continue the outer
+                                     // loop.
+                        }
+                        j := add(j, 1)
                     }
                 }
                 
