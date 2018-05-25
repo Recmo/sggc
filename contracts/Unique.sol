@@ -9,11 +9,9 @@ pragma solidity ^0.4.23;
 
 contract Unique {
     
-    function uniquify(uint[] input) public payable
+    function uniquify(uint[] input) external payable
     {
         assembly {
-            
-            input := add(input, 32)
             
             let prev1 := 97277402779417326246569501968090644759112326288932996378773065725448860767777
             let prev2 := prev1
@@ -21,9 +19,9 @@ contract Unique {
             let prev4 := prev1
             let filter := 0
             
-            let i := input
-            let ptr := i
-            let endi := add(i, mul(mload(sub(input, 32)), 32))
+            let i := 68
+            let ptr := 64
+            let endi := add(i, mul(calldataload(36), 32))
             
             
             jumpi(oloop_end, eq(i, endi))
@@ -33,7 +31,7 @@ contract Unique {
                 let value
                     
                 // Read value
-                value := mload(i)
+                value := calldataload(i)
                 
                 // Skip if we saw it recently
                 // value != prev <=> value - prev
@@ -53,7 +51,7 @@ contract Unique {
                     // We *may* have seen it before
                     
                     // Check if we saw it before
-                    j := input
+                    j := 64
                     jumpi(unique, eq(j, ptr))
 
                 iloop:
@@ -85,15 +83,9 @@ contract Unique {
             jumpi(oloop, lt(i, endi))
         
         oloop_end:
-            
-            // In-place return
-            {
-                let start := sub(input, 64)
-                mstore(start, 32)
-                let length := div(sub(ptr, input), 32)
-                mstore(sub(input, 32), length)
-                return(start, sub(ptr, start))
-            }
+            mstore(0, 32)
+            mstore(32, div(sub(ptr, 64), 32))
+            return(0, ptr)
         }
     }
     
