@@ -52,11 +52,10 @@ contract Unique {
                     jumpi(iloop_break, eq(j, ptr))
 
                     iloop:
-                        if eq(mload(j), value) {
-                            unique := 0
-                            jump(iloop_break)
-                            // TODO: continue outer loop instead
-                        }
+                        jumpi(iloop_continue, sub(mload(j), value))
+                    
+                        unique := 0
+                        jump(iloop_break) // TODO: continue outer loop instead
                     
                     iloop_continue:
                         j := add(j, 32)
