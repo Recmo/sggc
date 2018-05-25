@@ -44,23 +44,15 @@ contract Unique {
             
             bool unique = true;
             
-            // Check filter
-            uint256 mask = 2**(value & 0xff);
-            if (filter & mask != 0) {
-                
-                // We *may* have seen it before
-                
-                // Check if seen before
-                /*
-                for(uint j = 0; j < ptr; j++) {
-                    if(input[j] == value) {
-                        unique = false;
-                        break;
-                    }
-                }
-                */
-                
-                assembly {
+            uint256 mask;
+            assembly {
+                // Check filter
+                mask := exp(2, and(value, 0xff))
+                if and(filter, mask) {
+                    
+                    // We *may* have seen it before
+                    
+                    // Check if we saw it before
                     let j := add(input, 32)
                     let end := add(j, mul(ptr, 32))
                     for {} lt(j, end) {} {
@@ -72,8 +64,8 @@ contract Unique {
                         }
                         j := add(j, 32)
                     }
+
                 }
-                
             }
             
             // Add to start of list
