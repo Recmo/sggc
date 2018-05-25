@@ -24,9 +24,14 @@ contract Unique {
         uint ptr = 0;
         for(uint i = 0; i < input.length; i++) {
             
-            uint256 value = input[i];
-            
             assembly {
+                
+                // Read value
+                let value
+                {
+                    let addri := add(mul(i, 32), add(input, 32))
+                    value := mload(addri)
+                }
                 
                 // Skip if we saw it recently
                 // value != prev <=> value - prev
