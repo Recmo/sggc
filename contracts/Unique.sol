@@ -52,7 +52,7 @@ contract Unique {
                     
                     iloop_check:
                         jumpi(iloop_break, iszero(lt(j, endj)))
-                        
+
                     iloop:
                         if eq(mload(j), value) {
                             unique := 0
@@ -63,7 +63,7 @@ contract Unique {
                     
                     iloop_continue:
                         j := add(j, 32)
-                        jump(iloop_check)
+                        jumpi(iloop, lt(j, endj))
                     
                     iloop_break:
                 }
