@@ -15,6 +15,8 @@ contract Unique {
     {
         assembly {
             
+            input := add(input, 32)
+            
             let prev1 := 97277402779417326246569501968090644759112326288932996378773065725448860767777
             let prev2 := prev1
             let prev3 := prev1
@@ -22,9 +24,9 @@ contract Unique {
             let prev5 := prev1
             let filter := 0
             
-            let i := add(input, 32)
+            let i := input
             let ptr := i
-            let endi := add(i, mul(mload(input), 32))
+            let endi := add(i, mul(mload(sub(input, 32)), 32))
             for {} lt(i, endi) {} {
                 
                 // Read value
@@ -41,15 +43,14 @@ contract Unique {
                 let mask
                 let j
                 
-                // Check filter
+                // Check filter if we have not seen it before
                 mask := exp(2, and(value, 0xff))
                 jumpi(unique, iszero(and(filter, mask)))
-                
                 
                 // We *may* have seen it before
                 
                 // Check if we saw it before
-                j := add(input, 32)
+                j := input
                 
                 jumpi(unique, eq(j, ptr))
 
@@ -82,11 +83,13 @@ contract Unique {
             }
             
             // In-place return
-            let start := sub(input, 32)
-            mstore(start, 32)
-            let length := sub(div(sub(ptr, input), 32), 1)
-            mstore(input, length)
-            return(start, sub(ptr, start))
+            {
+                let start := sub(input, 64)
+                mstore(start, 32)
+                let length := div(sub(ptr, input), 32)
+                mstore(sub(input, 32), length)
+                return(start, sub(ptr, start))
+            }
         }
     }
     
