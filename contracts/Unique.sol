@@ -26,23 +26,15 @@ contract Unique {
             
             uint256 value = input[i];
             
-            if (value == prev1) {
-                continue;
-            }
-            if (value == prev2) {
-                continue;
-            }
-            if (value == prev3) {
-                continue;
-            }
-            if (value == prev4) {
-                continue;
-            }
-            if (value == prev5) {
-                continue;
-            }
-            
             assembly {
+                
+                // Skip if we saw it recently
+                // value != prev <=> value - prev
+                if sub(value, prev1) {
+                if sub(value, prev2) {
+                if sub(value, prev3) {
+                if sub(value, prev4) {
+                if sub(value, prev5) {
                 
                 let unique := 1
                 
@@ -82,6 +74,10 @@ contract Unique {
                     prev2 := prev1
                     prev1 := value
                 }
+                
+                // end of prev checks
+                }}}}}
+
             }
         }
 
