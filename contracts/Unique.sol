@@ -9,21 +9,18 @@ pragma solidity ^0.4.23;
 
 contract Unique {
     
-    uint256 constant prime = 97277402779417326246569501968090644759112326288932996378773065725448860767777;
-    
     function uniquify(uint[] input)
         public pure
         returns(uint[])
     {
-        uint256 prev1 = prime;
-        uint256 prev2 = prime;
-        uint256 prev3 = prime;
-        uint256 prev4 = prime;
-        uint256 prev5 = prime;
-        uint256 filter = 0;
-
         assembly {
             
+            let prev1 := 97277402779417326246569501968090644759112326288932996378773065725448860767777
+            let prev2 := prev1
+            let prev3 := prev1
+            let prev4 := prev1
+            let prev5 := prev1
+            let filter := 0
             
             let i := add(input, 32)
             let ptr := i
