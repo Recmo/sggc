@@ -54,14 +54,14 @@ contract Unique {
                     jumpi(iloop_break, eq(j, ptr))
 
                     iloop:
-                        jumpi(iloop_continue, sub(mload(j), value))
-                    
-                        unique := 0
-                        jump(iloop_break) // TODO: continue outer loop instead
-                    
-                    iloop_continue:
+                        jumpi(hit, eq(mload(j), value))
                         j := add(j, 32)
                         jumpi(iloop, lt(j, ptr))
+                        jump(iloop_break)
+                        
+                    hit:
+                        unique := 0
+                        // TODO: continue outer loop instead
                     
                     iloop_break:
                 }
