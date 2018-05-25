@@ -56,9 +56,8 @@ contract Unique {
                     iloop:
                         if eq(mload(j), value) {
                             unique := 0
-                            j := endj // break is not supported :(
-                                     // in fact, we want to continue the outer
-                                     // loop.
+                            jump(iloop_break)
+                            // TODO: continue outer loop instead
                         }
                     
                     iloop_continue:
