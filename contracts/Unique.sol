@@ -61,16 +61,16 @@ contract Unique {
                 */
                 
                 assembly {
-                    let j := 0
-                    for {} lt(j, ptr) {} {
-                        let addr := add(mul(j, 32), add(input, 32))
-                        if eq(mload(addr), value) {
+                    let j := add(input, 32)
+                    let end := add(j, mul(ptr, 32))
+                    for {} lt(j, end) {} {
+                        if eq(mload(j), value) {
                             unique := 0
-                            j := ptr // break is not supported :(
+                            j := end // break is not supported :(
                                      // in fact, we want to continue the outer
                                      // loop.
                         }
-                        j := add(j, 1)
+                        j := add(j, 32)
                     }
                 }
                 
