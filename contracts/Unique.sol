@@ -19,9 +19,9 @@ contract Unique {
             let prev4 := prev1
             let filter := 0
             
-            let i := 68
             let ptr := 64
-            let endi := add(i, mul(calldataload(36), 32))
+            let endi := add(68, mul(calldataload(36), 32))
+            let i := 68
             
             
             jumpi(oloop_end, eq(i, endi))
