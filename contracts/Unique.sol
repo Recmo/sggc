@@ -22,9 +22,12 @@ contract Unique {
         uint256 prev5 = prime;
         uint256 filter = 0;
         uint ptr = 0;
-        for(uint i = 0; i < input.length; i++) {
+
+        assembly {
             
-            assembly {
+            let l := mload(input)
+            let i := 0
+            for {} lt(i, l) {} {
                 
                 // Read value
                 let value
@@ -82,7 +85,8 @@ contract Unique {
                 
                 // end of prev checks
                 }}}}}
-
+                
+                i := add(i, 1)
             }
         }
 
