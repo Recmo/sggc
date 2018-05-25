@@ -42,7 +42,7 @@ contract Unique {
                 
                 // Check filter
                 let mask := exp(2, and(value, 0xff))
-                jumpi(skip, iszero(and(filter, mask)))
+                jumpi(is_unique, iszero(and(filter, mask)))
                 
                 
                 {
@@ -65,9 +65,9 @@ contract Unique {
                     
                     iloop_break:
                 }
-                skip:
+                jumpi(oloop_continue, iszero(unique))
                 
-                if unique {
+                is_unique:
                     // Add to start of list
                     mstore(ptr, value)
                     ptr := add(ptr, 32)
@@ -81,7 +81,8 @@ contract Unique {
                     prev3 := prev2
                     prev2 := prev1
                     prev1 := value
-                }
+                
+                oloop_continue:
                 
                 // end of prev checks
                 }}}}}
