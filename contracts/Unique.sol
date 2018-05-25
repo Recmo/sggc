@@ -84,10 +84,8 @@ contract Unique {
                 
                 i := add(i, 32)
             }
-        }
-
-        // In-place return
-        assembly {
+            
+            // In-place return
             let start := sub(input, 32)
             mstore(start, 32)
             mstore(input, ptr)
