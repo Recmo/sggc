@@ -25,16 +25,12 @@ contract Unique {
 
         assembly {
             
-            let l := mload(input)
-            let i := 0
-            for {} lt(i, l) {} {
+            let i := add(input, 32)
+            let endi := add(i, mul(mload(input), 32))
+            for {} lt(i, endi) {} {
                 
                 // Read value
-                let value
-                {
-                    let addri := add(mul(i, 32), add(input, 32))
-                    value := mload(addri)
-                }
+                let value := mload(i)
                 
                 // Skip if we saw it recently
                 // value != prev <=> value - prev
@@ -54,11 +50,11 @@ contract Unique {
                     
                     // Check if we saw it before
                     let j := add(input, 32)
-                    let end := add(j, mul(ptr, 32))
-                    for {} lt(j, end) {} {
+                    let endj := add(j, mul(ptr, 32))
+                    for {} lt(j, endj) {} {
                         if eq(mload(j), value) {
                             unique := 0
-                            j := end // break is not supported :(
+                            j := endj // break is not supported :(
                                      // in fact, we want to continue the outer
                                      // loop.
                         }
@@ -86,7 +82,7 @@ contract Unique {
                 // end of prev checks
                 }}}}}
                 
-                i := add(i, 1)
+                i := add(i, 32)
             }
         }
 
