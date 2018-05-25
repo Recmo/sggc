@@ -8,19 +8,6 @@
 pragma solidity 0.4.24;
 
 contract IndexOf {
-    function equals(string haystack, uint i, string needle)
-        private pure
-        returns(bool)
-    {
-        uint256 nl = bytes(needle).length;
-        for(uint j = 0; j < nl; j++) {
-            if(bytes(haystack)[i + j] != bytes(needle)[j]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /**
      * @dev Returns the index of the first occurrence of `needle` in `haystack`,
      *      or -1 if `needle` is not found in `haystack`.
@@ -42,7 +29,15 @@ contract IndexOf {
         }
         uint256 end = hl - nl;
         for(uint i = 0; i <= end; i++) {
-            if(equals(haystack, i, needle)) {
+            
+            bool found = true;
+            for(uint j = 0; j < nl; j++) {
+                if(bytes(haystack)[i + j] != bytes(needle)[j]) {
+                    found = false;
+                    break;
+                }
+            }
+            if(found) {
                 return int(i);
             }
         }
