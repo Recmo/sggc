@@ -42,8 +42,10 @@ contract Unique {
                 
                 // Check filter
                 let mask := exp(2, and(value, 0xff))
-                if and(filter, mask) {
-                    
+                jumpi(skip, iszero(and(filter, mask)))
+                
+                
+                {
                     // We *may* have seen it before
                     
                     // Check if we saw it before
@@ -63,6 +65,7 @@ contract Unique {
                     
                     iloop_break:
                 }
+                skip:
                 
                 if unique {
                     // Add to start of list
