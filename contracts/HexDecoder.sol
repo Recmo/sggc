@@ -73,16 +73,25 @@ contract HexDecoder {
             a = (a & lowNibs) + (9 * ((a / 64) & bit1));
             
             a = ((a * f1) / s1) & byten1;
-            a = ((a * f2) / s2) & byten2;
-            a = ((a * f3) / s3) & byten3;
-            a = ((a * f4) / s4) & byten4;
-            a = ((a * f5) / s5) & byten5;
-            
-            a *= s;
             
             assembly {
                 let oaddr := add(i, add(output, 32))
-                mstore(oaddr, a)
+                mstore8(oaddr, byte(1, a))
+                mstore8(add(oaddr, 1), byte(3, a))
+                mstore8(add(oaddr, 2), byte(5, a))
+                mstore8(add(oaddr, 3), byte(7, a))
+                mstore8(add(oaddr, 4), byte(9, a))
+                mstore8(add(oaddr, 5), byte(11, a))
+                mstore8(add(oaddr, 6), byte(13, a))
+                mstore8(add(oaddr, 7), byte(15, a))
+                mstore8(add(oaddr, 8), byte(17, a))
+                mstore8(add(oaddr, 9), byte(19, a))
+                mstore8(add(oaddr, 10), byte(21, a))
+                mstore8(add(oaddr, 11), byte(23, a))
+                mstore8(add(oaddr, 12), byte(25, a))
+                mstore8(add(oaddr, 13), byte(27, a))
+                mstore8(add(oaddr, 14), byte(29, a))
+                mstore8(add(oaddr, 15), byte(31, a))
             }
         }
     }
