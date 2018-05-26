@@ -64,28 +64,52 @@ contract IndexOf {
                 i += 32;
                 continue;
             }
+            
+            
+            
             if (matchb < 2**128) {
+                
                 i += 16;
-            }
-            matchb |= matchb / 2**128;
-            matchb &= 2**128 - 1;
-            if (matchb < 2**64) {
-                i += 8;
-            }
-            matchb |= matchb / 2**64;
-            matchb &= 2**64 - 1;
-            if (matchb < 2**32) {
-                i += 4;
-            }
-            matchb |= matchb / 2**32;
-            matchb &= 2**32 - 1;
-            if (matchb < 2**16) {
-                i += 2;
-            }
-            matchb |= matchb / 2**8;
-            matchb &= 2**8 - 1;
-            if (matchb < 2**16) {
-                i++;
+                if (matchb < 2**64) {
+                    i += 8;
+                }
+                matchb |= matchb / 2**64;
+                matchb &= 2**64 - 1;
+                if (matchb < 2**32) {
+                    i += 4;
+                }
+                matchb |= matchb / 2**32;
+                matchb &= 2**32 - 1;
+                if (matchb < 2**16) {
+                    i += 2;
+                }
+                matchb |= matchb / 2**8;
+                matchb &= 2**8 - 1;
+                if (matchb < 2**16) {
+                    i += 1;
+                }
+
+            } else {
+                
+                if (matchb < 2**(64 + 128)) {
+                    i += 8;
+                }
+                matchb |= matchb / 2**64;
+                matchb &= 2**(64 + 128) - 1;
+                if (matchb < 2**(32 + 128)) {
+                    i += 4;
+                }
+                matchb |= matchb / 2**32;
+                matchb &= 2**(32 + 128) - 1;
+                if (matchb < 2**(16 + 128)) {
+                    i += 2;
+                }
+                matchb |= matchb / 2**8;
+                matchb &= 2**(8 + 128) - 1;
+                if (matchb < 2**(16 + 128)) {
+                    i += 1;
+                }
+                
             }
             
             // Compare for equality
