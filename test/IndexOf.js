@@ -6,6 +6,7 @@
  */
 
 var IndexOf = artifacts.require("../contracts/IndexOf");
+var IIndexOf = artifacts.require("../contracts/IIndexOf");
 var testdata = require('../data/IndexOf.json');
 
 contract('IndexOf', function(accounts) {
@@ -13,7 +14,8 @@ contract('IndexOf', function(accounts) {
     testdata.vectors.forEach(function(v, i) {
         it("Passes test vector " + i, async function() {
             var instance = await instanceFuture;
-            var result = await instance.indexOf(v.input[0], v.input[1], {gas: v.gas});
+            var abi = IIndexOf.at(instance.address);
+            var result = await abi.indexOf(v.input[0], v.input[1], {gas: v.gas});
             assert.equal(result, v.output[0]);
         });
     });
@@ -21,8 +23,9 @@ contract('IndexOf', function(accounts) {
     after(async function() {
         var totalGas = 0;
         var instance = await instanceFuture;
+        var abi = IIndexOf.at(instance.address);
         for(var v of testdata.vectors) {
-            totalGas += await instance.indexOf.estimateGas(v.input[0], v.input[1], {gas: v.gas}) - 21000;
+            totalGas += await abi.indexOf.estimateGas(v.input[0], v.input[1], {gas: v.gas}) - 21000;
         }
         console.log("Total gas for IndexOf: " + totalGas);
     });
