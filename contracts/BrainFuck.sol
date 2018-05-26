@@ -22,21 +22,23 @@ contract BrainFuck {
         
         // Create lookup table
         // From high to low since we have overlaping writes
-        mstore(mul(0x5d, 16), close)
-        mstore(mul(0x5b, 16), open)
-        mstore(mul(0x3e, 16), right)
-        mstore(mul(0x3c, 16), left)
-        mstore(mul(0x2e, 16), output)
-        mstore(mul(0x2d, 16), decr)
-        mstore(mul(0x2c, 16), input)
-        mstore(mul(0x2b, 16), incr)
-
+        mstore(mul(0x5d, 16), sub(close, exit))
+        mstore(mul(0x5b, 16), sub(open, exit))
+        mstore(mul(0x3e, 16), sub(right, exit))
+        mstore(mul(0x3c, 16), sub(left, exit))
+        mstore(mul(0x2e, 16), sub(output, exit))
+        mstore(mul(0x2d, 16), sub(decr, exit))
+        mstore(mul(0x2c, 16), sub(input, exit))
+        mstore(mul(0x2b, 16), sub(incr, exit))
+        
         source := 0x45 // offset left 31 bytes
         eof := add(calldataload(0x44), 0x45)
-        pp := 2080 // WARNING: Overlaps with lookup table for high ascii
+        pp := 2080 // WARNING: Overlaps with lookup table for extended ascii
         stack := 0 // WARNING: Overlaps with lookup table
                    // If stack gets very deep or source has a very low
                    // character this will fail.
+        
+        // TODO: Instructions fit one byte if we subtract reset
         
         for {} lt(source, eof) {} {
             
@@ -45,8 +47,8 @@ contract BrainFuck {
             
             if inst {
             
-                mstore(pp, inst)
-                pp := add(pp, 32)
+                mstore8(pp, inst)
+                pp := add(pp, 1)
                 
                 if eq(inst, open) {
                     pp := add(pp, 32)
@@ -62,10 +64,8 @@ contract BrainFuck {
                     mstore(stack, 0)
                 }
             }
-            
             source := add(source, 1)
         }
-        mstore(pp, exit)
         
         // Clear lookup table
         mstore(mul(0x3e, 16), 0)
@@ -76,7 +76,6 @@ contract BrainFuck {
         mstore(mul(0x2c, 16), 0)
         mstore(mul(0x5b, 16), 0)
         mstore(mul(0x5d, 16), 0)
-
         
         //
         // BrainFuck virtual machine in the Ethereum virtual machine
@@ -93,57 +92,57 @@ contract BrainFuck {
         ip := add(calldataload(36), 5) // offset left 31 bytes
         op := 1056
         pp := 2080
-        jump(mload(pp))
+        jump(add(mload(pp), exit))
         
-    right: // >
-        tp := add(tp, 1)
-        pp := add(pp, 32)
-        jump(mload(pp))
-    
-    left: // <
-        tp := sub(tp, 1)
-        pp := add(pp, 32)
-        jump(mload(pp))
-    
-    incr: // +
-        mstore8(tp, add(mload(sub(tp, 31)), 1))
-        pp := add(pp, 32)
-        jump(mload(pp))
-    
-    decr: // -
-        mstore8(tp, sub(mload(sub(tp, 31)), 1))
-        pp := add(pp, 32)
-        jump(mload(pp))
-    
-    output: // .
-        mstore8(op, mload(sub(tp, 31)))
-        op := add(op, 1)
-        pp := add(pp, 32)
-        jump(mload(pp))
-    
-    input: // ,
-        mstore8(tp, calldataload(ip))
-        ip := add(ip, 1)
-        pp := add(pp, 32)
-        jump(mload(pp))
-    
-    open: // [
-        jumpi(take, iszero(and(mload(sub(tp, 31)), 0xff))) 
-        pp := add(pp, 64)
-        jump(mload(pp))
-    
-    close: // ]
-        jumpi(take, and(mload(sub(tp, 31)), 0xff)) 
-        pp := add(pp, 64)
-        jump(mload(pp))
-    
-    take:
-        pp := mload(add(pp, 32))
-        jump(mload(pp))
-    
     exit: // EOF
         mstore(992, 32)
         mstore(1024, sub(op, 1056))
         return(992, and(sub(op, 961), not(0x1F)))
+        
+    right: // >
+        tp := add(tp, 1)
+        pp := add(pp, 1)
+        jump(add(and(mload(sub(pp, 31)), 0xff), exit))
+    
+    left: // <
+        tp := sub(tp, 1)
+        pp := add(pp, 1)
+        jump(add(and(mload(sub(pp, 31)), 0xff), exit))
+    
+    incr: // +
+        mstore8(tp, add(mload(sub(tp, 31)), 1))
+        pp := add(pp, 1)
+        jump(add(and(mload(sub(pp, 31)), 0xff), exit))
+    
+    decr: // -
+        mstore8(tp, sub(mload(sub(tp, 31)), 1))
+        pp := add(pp, 1)
+        jump(add(and(mload(sub(pp, 31)), 0xff), exit))
+    
+    output: // .
+        mstore8(op, mload(sub(tp, 31)))
+        op := add(op, 1)
+        pp := add(pp, 1)
+        jump(add(and(mload(sub(pp, 31)), 0xff), exit))
+    
+    input: // ,
+        mstore8(tp, calldataload(ip))
+        ip := add(ip, 1)
+        pp := add(pp, 1)
+        jump(add(and(mload(sub(pp, 31)), 0xff), exit))
+    
+    open: // [
+        jumpi(take, iszero(and(mload(sub(tp, 31)), 0xff))) 
+        pp := add(pp, 33)
+        jump(add(and(mload(sub(pp, 31)), 0xff), exit))
+    
+    close: // ]
+        jumpi(take, and(mload(sub(tp, 31)), 0xff)) 
+        pp := add(pp, 33)
+        jump(add(and(mload(sub(pp, 31)), 0xff), exit))
+    
+    take:
+        pp := mload(add(pp, 1))
+        jump(add(and(mload(sub(pp, 31)), 0xff), exit))
     }}
 }
