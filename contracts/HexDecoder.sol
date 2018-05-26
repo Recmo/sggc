@@ -5,7 +5,7 @@
  * https://creativecommons.org/licenses/by-sa/3.0/
  */
 
-pragma solidity 0.4.24;
+pragma solidity ^0.4.23;
 
 // 0  0011 0000 -> 0000
 // 1  0011 0001 -> 0001
@@ -68,19 +68,37 @@ contract HexDecoder {
             assembly {
                 let iaddr := add(mul(i, 2), add(input, 32))
                 a := mload(iaddr)
-            }
-            
-            a = (a & lowNibs) + (9 * ((a / 64) & bit1));
-            
-            a = ((a * f1) / s1) & byten1;
-            a = ((a * f2) / s2) & byten2;
-            a = ((a * f3) / s3) & byten3;
-            a = ((a * f4) / s4) & byten4;
-            a = ((a * f5) / s5) & byten5;
-            
-            a *= s;
-            
-            assembly {
+                
+                //a = (a & lowNibs) + (9 * ((a / 64) & bit1));
+                a := add(and(a,
+0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F
+                ), mul(9, and(div(a, 64),
+0x0101010101010101010101010101010101010101010101010101010101010101
+                )))
+                
+                // a = ((a * f1) / s1) & byten1;
+                a := and(div(mul(a, 0x11), 0x10),
+0x00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF
+                )
+                a := and(div(mul(a, 0x101), 0x100),
+0x0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF
+                )
+                a := and(div(mul(a, 0x10001), 0x10000),
+0x00000000FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF
+                )
+                a := and(div(mul(a, 0x100000001), 0x100000000),
+0x0000000000000000FFFFFFFFFFFFFFFF0000000000000000FFFFFFFFFFFFFFFF
+                )
+                a := and(div(mul(a, 0x10000000000000001), 0x10000000000000000),
+0x00000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                )
+                
+                // a *= s;
+                a := mul(a,
+0x0000000000000000000000000000000100000000000000000000000000000000
+                )
+                
+                // Store
                 let oaddr := add(i, add(output, 32))
                 mstore(oaddr, a)
             }
