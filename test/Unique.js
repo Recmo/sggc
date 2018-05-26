@@ -6,6 +6,7 @@
  */
 
 var Unique = artifacts.require("../contracts/Unique");
+var IUnique = artifacts.require("../contracts/IUnique");
 var testdata = require('../data/Unique.json');
 
 contract('Unique', function(accounts) {
@@ -13,7 +14,8 @@ contract('Unique', function(accounts) {
     testdata.vectors.forEach(function(v, i) {
         it("Passes test vector " + i, async function() {
             var instance = await instanceFuture;
-            var result = await instance.uniquify(v.input[0], {gas: v.gas});
+            var abi = IUnique.at(instance.address);
+            var result = await abi.uniquify(v.input[0], {gas: v.gas});
             assert.deepEqual(result.map(x => x.toNumber()), v.output[0]);
         });
     });
@@ -21,8 +23,9 @@ contract('Unique', function(accounts) {
     after(async function() {
         var totalGas = 0;
         var instance = await instanceFuture;
+        var abi = IUnique.at(instance.address);
         for(var v of testdata.vectors) {
-            totalGas += await instance.uniquify.estimateGas(v.input[0], {gas: v.gas}) - 21000;
+            totalGas += await abi.uniquify.estimateGas(v.input[0], {gas: v.gas}) - 21000;
         }
         console.log("Total gas for Unique: " + totalGas);
     });

@@ -6,6 +6,7 @@
  */
 
 var Sort = artifacts.require("../contracts/Sort");
+var ISort = artifacts.require("../contracts/ISort");
 var testdata = require('../data/Sort.json');
 
 contract('Sort', function(accounts) {
@@ -13,7 +14,8 @@ contract('Sort', function(accounts) {
     testdata.vectors.forEach(function(v, i) {
         it("Passes test vector " + i, async function() {
             var instance = await instanceFuture;
-            var result = await instance.sort(v.input[0], {gas: v.gas});
+            var abi = ISort.at(instance.address);
+            var result = await abi.sort(v.input[0], {gas: v.gas});
             assert.deepEqual(result.map(x => x.toNumber()), v.output[0]);
         });
     });
@@ -21,8 +23,9 @@ contract('Sort', function(accounts) {
     after(async function() {
         var totalGas = 0;
         var instance = await instanceFuture;
+        var abi = ISort.at(instance.address);
         for(var v of testdata.vectors) {
-            totalGas += await instance.sort.estimateGas(v.input[0], {gas: v.gas}) - 21000;
+            totalGas += await abi.sort.estimateGas(v.input[0], {gas: v.gas}) - 21000;
         }
         console.log("Total gas for Sort: " + totalGas);
     });

@@ -6,6 +6,7 @@
  */
 
 var BrainFuck = artifacts.require("../contracts/BrainFuck");
+var IBrainFuck = artifacts.require("../contracts/IBrainFuck");
 var testdata = require('../data/BrainFuck.json');
 
 contract('BrainFuck', function(accounts) {
@@ -13,7 +14,8 @@ contract('BrainFuck', function(accounts) {
     testdata.vectors.forEach(function(v, i) {
         it("Passes test vector " + i, async function() {
             var instance = await instanceFuture;
-            var result = await instance.execute(v.input[0], v.input[1], {gas: v.gas});
+            var abi = IBrainFuck.at(instance.address);
+            var result = await abi.execute(v.input[0], v.input[1], {gas: v.gas});
             assert.equal(result, v.output[0]);
         });
     });
@@ -21,8 +23,9 @@ contract('BrainFuck', function(accounts) {
     after(async function() {
         var totalGas = 0;
         var instance = await instanceFuture;
+        var abi = IBrainFuck.at(instance.address);
         for(var v of testdata.vectors) {
-            totalGas += await instance.execute.estimateGas(v.input[0], v.input[1], {gas: v.gas}) - 21000;
+            totalGas += await abi.execute.estimateGas(v.input[0], v.input[1], {gas: v.gas}) - 21000;
         }
         console.log("Total gas for BrainFuck: " + totalGas);
     });

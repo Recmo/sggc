@@ -6,6 +6,7 @@
  */
 
 var HexDecoder = artifacts.require("../contracts/HexDecoder");
+var IHexDecoder = artifacts.require("../contracts/IHexDecoder");
 var testdata = require('../data/HexDecoder.json');
 
 contract('HexDecoder', function(accounts) {
@@ -13,7 +14,8 @@ contract('HexDecoder', function(accounts) {
     testdata.vectors.forEach(function(v, i) {
         it("Passes test vector " + i, async function() {
             var instance = await instanceFuture;
-            var result = await instance.decode(v.input[0], {gas: v.gas});
+            var abi = IHexDecoder.at(instance.address);
+            var result = await abi.decode(v.input[0], {gas: v.gas});
             assert.deepEqual(result, v.output[0]);
         });
     });
@@ -21,8 +23,9 @@ contract('HexDecoder', function(accounts) {
     after(async function() {
         var totalGas = 0;
         var instance = await instanceFuture;
+        var abi = IHexDecoder.at(instance.address);
         for(var v of testdata.vectors) {
-            totalGas += await instance.decode.estimateGas(v.input[0], {gas: v.gas}) - 21000;
+            totalGas += await abi.decode.estimateGas(v.input[0], {gas: v.gas}) - 21000;
         }
         console.log("Total gas for HexDecoder: " + totalGas);
     });
