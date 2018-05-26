@@ -1,4 +1,4 @@
-pragma solidity 0.4.24;
+pragma solidity ^0.4.23;
 
 contract BrainFuck {
     
@@ -15,7 +15,7 @@ contract BrainFuck {
         //
         // Compiler
         //
-        source := 0x45
+        source := 0x45 // offset left 31 bytes
         eof := add(calldataload(0x44), 0x45)
         pp := 2080
         stack := 0
@@ -76,51 +76,51 @@ contract BrainFuck {
         // Input is kept in calldata. Input pointer is offset by -31 so
         // a byte can be read using and(calldataload(ip), 0xff)
         
-    reset: // 0
+    // reset:
         tp := 32
         ip := add(calldataload(36), 5) // offset left 31 bytes
         op := 1056
         pp := 2080
         jump(mload(pp))
         
-    right: // 1
+    right: // >
         tp := add(tp, 1)
         pp := add(pp, 32)
         jump(mload(pp))
     
-    left: // 2
+    left: // <
         tp := sub(tp, 1)
         pp := add(pp, 32)
         jump(mload(pp))
     
-    incr: // 3
+    incr: // +
         mstore8(tp, add(mload(sub(tp, 31)), 1))
         pp := add(pp, 32)
         jump(mload(pp))
     
-    decr: // 4
+    decr: // -
         mstore8(tp, sub(mload(sub(tp, 31)), 1))
         pp := add(pp, 32)
         jump(mload(pp))
     
-    output: // 5
+    output: // .
         mstore8(op, mload(sub(tp, 31)))
         op := add(op, 1)
         pp := add(pp, 32)
         jump(mload(pp))
     
-    input: // 6
+    input: // ,
         mstore8(tp, calldataload(ip))
         ip := add(ip, 1)
         pp := add(pp, 32)
         jump(mload(pp))
     
-    open: // 7
+    open: // [
         jumpi(take, iszero(and(mload(sub(tp, 31)), 0xff))) 
         pp := add(pp, 64)
         jump(mload(pp))
     
-    close: // 8
+    close: // ]
         jumpi(take, and(mload(sub(tp, 31)), 0xff)) 
         pp := add(pp, 64)
         jump(mload(pp))
@@ -129,7 +129,7 @@ contract BrainFuck {
         pp := mload(add(pp, 32))
         jump(mload(pp))
     
-    exit: // 9
+    exit: // EOF
         mstore(992, 32)
         mstore(1024, sub(op, 1056))
         return(992, and(sub(op, 961), not(0x1F)))
