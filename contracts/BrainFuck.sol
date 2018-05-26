@@ -24,12 +24,44 @@ contract BrainFuck {
      * @return The program's output stream. Should be exactly the length of the
      *          number of outputs produced by the program.
      */
-    function execute(bytes program, bytes input) public pure returns(bytes) {
+    function execute(bytes program, bytes input)
+        public view
+        returns(bytes)
+    {
         uint ipp = 0;
         uint opp = 0;
         uint dp = 0;
         bytes memory mem = new bytes(1024);
         bytes memory output = new bytes(1024);
+        
+        
+        uint256 temp;
+        assembly {
+        
+        // DIRECT THREADING !!
+        
+        test_label:
+            temp := test_label
+            temp := add(temp, 4)
+            jump(temp)
+            
+        go_left:
+            jump(next_instruction)
+        
+        go_right:
+            jump(next_instruction)
+        
+        increment:
+            jump(next_instruction)
+        
+        input:
+            jump(next_instruction)
+            
+        }
+        
+        temp += 2;
+        
+        
 
         for(uint ip = 0; ip < program.length; ip++) {
             byte instruction = program[ip];
