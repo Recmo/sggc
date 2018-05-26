@@ -37,11 +37,7 @@ contract HexDecoder {
         returns(uint8)
     {
         uint8 i = uint8(input);
-        if (i & 0x40 != 0x0) {
-            return 0x9 + (i & 0xf);
-        } else {
-            return i & 0xf;
-        }
+        return (i & 0xf) + ((i / 64) * 9);
     }
 
     /**
