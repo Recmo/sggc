@@ -8,16 +8,9 @@
 pragma solidity 0.4.24;
 
 contract IndexOf {
-    /**
-     * @dev Returns the index of the first occurrence of `needle` in `haystack`,
-     *      or -1 if `needle` is not found in `haystack`.
-     *
-     * Input strings may be of any length <2^255.
-     *
-     * @param haystack The string to search.
-     * @param needle The string to search for.
-     * @return The index of `needle` in `haystack`, or -1 if not found.
-     */
+
+    uint256 constant firstBits = 0x0101010101010101010101010101010101010101010101010101010101010101;
+
     function indexOf(string haystack, string needle)
         public pure
         returns(int)
@@ -34,15 +27,59 @@ contract IndexOf {
         }
         bytes32 needleHash = keccak256(n);
         
+        // Compute first byte vector
+        uint256 fb = uint256(n[0]) * firstBits;
+        
         uint256 end = hl - nl;
-        for(uint i = 0; i <= end; i++) {
+        uint256 i = 0;
+        while (i <= end) {
             
+            // Compare for equality
             bytes32 haydig;
             assembly {
                 haydig := keccak256(add(h, add(32, i)), nl)
             }
             if(haydig == needleHash) {
                 return int(i);
+            }
+            
+            // Find next potential matching point
+            uint256 value;
+            assembly {
+                value := mload(add(h, add(32, i)))
+            }
+            uint256 matchb = ~(value ^ fb);
+            matchb &= matchb / 16;
+            matchb &= matchb / 4;
+            matchb &= matchb / 2;
+            matchb &= firstBits;
+            
+            if (matchb == 0) {
+                i += 32;
+                continue;
+            }
+            if (matchb < 2**128) {
+                i += 16;
+            }
+            matchb |= matchb / 2**128;
+            matchb &= 2**128 - 1;
+            if (matchb < 2**64) {
+                i += 8;
+            }
+            matchb |= matchb / 2**64;
+            matchb &= 2**64 - 1;
+            if (matchb < 2**32) {
+                i += 4;
+            }
+            matchb |= matchb / 2**32;
+            matchb &= 2**32 - 1;
+            if (matchb < 2**16) {
+                i += 2;
+            }
+            matchb |= matchb / 2**8;
+            matchb &= 2**8 - 1;
+            if (matchb < 2**16) {
+                i++;
             }
         }
         return -1;
