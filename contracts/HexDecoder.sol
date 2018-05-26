@@ -45,9 +45,9 @@ contract HexDecoder {
         public pure
         returns(bytes output)
     {
-        require(bytes(input).length % 2 == 0);
-        output = new bytes(bytes(input).length / 2);
-        for(uint i = 0; i < output.length; i++) {
+        uint256 ol = bytes(input).length / 2;
+        output = new bytes(ol);
+        for(uint i = 0; i < ol; i++) {
             uint8 a = uint8(bytes(input)[i * 2]);
             uint8 b = uint8(bytes(input)[i * 2 + 1]);
             a = (a & 0xf) + ((a / 64) * 9);
