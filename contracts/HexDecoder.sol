@@ -7,14 +7,40 @@
 
 pragma solidity 0.4.24;
 
+// 0  0011 0000 -> 0000
+// 1  0011 0001 -> 0001
+// 2  0011 0010 -> 0010
+// 3  0011 0011 -> 0011
+// 4  0011 0100 -> 0100
+// 5  0011 0101 -> 0101
+// 6  0011 0110 -> 0110
+// 7  0011 0111 -> 0111
+// 8  0011 1000 -> 1000
+// 9  0011 1001 -> 1001
+// a  0110 0001 -> 1010
+// b  0110 0010 -> 1011
+// c  0110 0011 -> 1100
+// d  0110 0100 -> 1101
+// e  0110 0101 -> 1110
+// f  0110 0110 -> 1111
+// A  0100 0001 -> 1010
+// B  0100 0010 -> 1011
+// C  0100 0011 -> 1100
+// D  0100 0100 -> 1101
+// E  0100 0101 -> 1110
+// F  0100 0110 -> 1111
+
 contract HexDecoder {
-    function hexchr(byte input) private pure returns(uint8) {
-        if(input >= 0x30 && input <= 0x39) {
-            return uint8(input) - 0x30;
-        } else if(input >= 0x41 && input <= 0x46) {
-            return uint8(input) - 0x37;
-        } else if(input >= 0x61 && input <= 0x67) {
-            return uint8(input) - 0x57;
+    
+    function hexchr(byte input)
+        private pure
+        returns(uint8)
+    {
+        uint8 i = uint8(input);
+        if (i & 0x40 != 0x0) {
+            return 0x9 + (i & 0xf);
+        } else {
+            return i & 0xf;
         }
     }
 
@@ -27,7 +53,10 @@ contract HexDecoder {
      * @param input The hex-encoded input.
      * @return The decoded output.
      */
-    function decode(string input) public pure returns(bytes output) {
+    function decode(string input)
+        public pure
+        returns(bytes output)
+    {
         require(bytes(input).length % 2 == 0);
         output = new bytes(bytes(input).length / 2);
         for(uint i = 0; i < output.length; i++) {
