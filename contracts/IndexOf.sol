@@ -22,20 +22,19 @@ contract IndexOf {
         public pure
         returns(int)
     {
-        bytes memory h = bytes(haystack);
         bytes memory n = bytes(needle);
-        
-        bytes32 needleHash = keccak256(n);
-        uint256 hl = h.length;
         uint256 nl = n.length;
         if (nl == 0) {
             return 0;
         }
+        bytes memory h = bytes(haystack);
+        uint256 hl = h.length;
         if (nl > hl) {
             return -1;
         }
-        uint256 end = hl - nl;
+        bytes32 needleHash = keccak256(n);
         
+        uint256 end = hl - nl;
         for(uint i = 0; i <= end; i++) {
             
             bytes32 haydig;
