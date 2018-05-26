@@ -6,6 +6,7 @@ contract BrainFuck {
         
         let source
         let eof
+        let stack
         let tp // Tape pointer
         let ip // Input pointer
         let op // Output pointer
@@ -17,6 +18,7 @@ contract BrainFuck {
         source := 0x45
         eof := add(calldataload(0x44), 0x45)
         pp := 2080
+        stack := 0
         for {} lt(source, eof) {} {
             switch and(calldataload(source), 0xff)
             case 0x3e { // >
@@ -46,10 +48,18 @@ contract BrainFuck {
             case 0x5b { // [
                 mstore(pp, open)
                 pp := add(pp, 64)
+                mstore(stack, pp)
+                stack := add(stack, 32)
             }
             case 0x5d { // ]
                 mstore(pp, close)
-                pp := add(pp, 64)
+                pp := add(pp, 32)
+                stack := sub(stack, 32)
+                let back := mload(stack) 
+                mstore(pp, back)
+                pp := add(pp, 32)
+                mstore(sub(back, 32), pp)
+                mstore(stack, 0)
             }
             default {}
             source := add(source, 1)
