@@ -5,7 +5,7 @@
  * https://creativecommons.org/licenses/by-sa/3.0/
  */
 
-pragma solidity 0.4.24;
+pragma solidity ^0.4.23;
 
 contract IndexOf {
 
@@ -60,56 +60,131 @@ contract IndexOf {
                 i++;
                 continue;
             }
-            if (matchb == 0) {
-                i += 32;
-                continue;
-            }
-            
-            
             
             if (matchb < 2**128) {
-                
-                i += 16;
                 if (matchb < 2**64) {
-                    i += 8;
+                    if (matchb < 2**32) {
+                        if (matchb < 2**16) {
+                            if (matchb < 2**8) {
+                                i += 1;
+                            } else {
+                                i += 2;
+                            }
+                        } else {
+                            if (matchb < 2**(8 + 16)) {
+                                i += 3;
+                            } else {
+                                i += 4;
+                            }
+                        }
+                    } else {
+                        if (matchb < 2**(16 + 32)) {
+                            if (matchb < 2**(8 + 32)) {
+                                i += 5;
+                            } else {
+                                i += 6;
+                            }
+                        } else {
+                            if (matchb < 2**(8 + 32 + 16)) {
+                                i += 7;
+                            } else {
+                                i += 8;
+                            }
+                        }
+                    }
+                } else {
+                    if (matchb < 2**(32 + 64)) {
+                        if (matchb < 2**(16 + 64)) {
+                            if (matchb < 2**(8 + 64)) {
+                                i += 9;
+                            } else {
+                                i += 10;
+                            }
+                        } else {
+                            if (matchb < 2**(8 + 16 + 64)) {
+                                i += 11;
+                            } else {
+                                i += 12;
+                            }
+                        }
+                    } else {
+                        if (matchb < 2**(16 + 32 + 64)) {
+                            if (matchb < 2**(8 + 32 + 64)) {
+                                i += 13;
+                            } else {
+                                i += 14;
+                            }
+                        } else {
+                            if (matchb < 2**(8 + 32 + 16 + 64)) {
+                                i += 15;
+                            } else {
+                                i += 16;
+                            }
+                        }
+                    }
                 }
-                matchb |= matchb / 2**64;
-                matchb &= 2**64 - 1;
-                if (matchb < 2**32) {
-                    i += 4;
-                }
-                matchb |= matchb / 2**32;
-                matchb &= 2**32 - 1;
-                if (matchb < 2**16) {
-                    i += 2;
-                }
-                matchb |= matchb / 2**8;
-                matchb &= 2**8 - 1;
-                if (matchb < 2**8) {
-                    i += 1;
-                }
-
             } else {
-                
                 if (matchb < 2**(64 + 128)) {
-                    i += 8;
+                    if (matchb < 2**(32 + 128)) {
+                        if (matchb < 2**(16 + 128)) {
+                            if (matchb < 2**(8 + 128)) {
+                                i += 17;
+                            } else {
+                                i += 18;
+                            }
+                        } else {
+                            if (matchb < 2**(8 + 16 + 128)) {
+                                i += 19;
+                            } else {
+                                i += 20;
+                            }
+                        }
+                    } else {
+                        if (matchb < 2**(16 + 32 + 128)) {
+                            if (matchb < 2**(8 + 32 + 128)) {
+                                i += 21;
+                            } else {
+                                i += 22;
+                            }
+                        } else {
+                            if (matchb < 2**(8 + 32 + 16 + 128)) {
+                                i += 23;
+                            } else {
+                                i += 24;
+                            }
+                        }
+                    }
+                } else {
+                    if (matchb < 2**(32 + 64 + 128)) {
+                        if (matchb < 2**(16 + 64 + 128)) {
+                            if (matchb < 2**(8 + 64 + 128)) {
+                                i += 25;
+                            } else {
+                                i += 26;
+                            }
+                        } else {
+                            if (matchb < 2**(8 + 16 + 64 + 128)) {
+                                i += 27;
+                            } else {
+                                i += 28;
+                            }
+                        }
+                    } else {
+                        if (matchb < 2**(16 + 32 + 64 + 128)) {
+                            if (matchb < 2**(8 + 32 + 64 + 128)) {
+                                i += 29;
+                            } else {
+                                i += 30;
+                            }
+                        } else {
+                            if (matchb < 2**(8 + 32 + 16 + 64 + 128)) {
+                                i += 31;
+                            } else {
+                                i += 32;
+                            }
+                        }
+                    }
                 }
-                matchb |= matchb / 2**64;
-                matchb &= 2**(64 + 128) - 1;
-                if (matchb < 2**(32 + 128)) {
-                    i += 4;
-                }
-                matchb |= matchb / 2**32;
-                matchb &= 2**(32 + 128) - 1;
-                if (matchb < 2**(16 + 128)) {
-                    i += 2;
-                }
-                matchb |= matchb / 2**8;
-                matchb &= 2**(8 + 128) - 1;
-                if (matchb < 2**(8 + 128)) {
-                    i += 1;
-                }
-                
             }
             
             // Compare for equality
