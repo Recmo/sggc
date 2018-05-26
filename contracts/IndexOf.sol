@@ -10,6 +10,8 @@ pragma solidity 0.4.24;
 contract IndexOf {
 
     uint256 constant firstBits = 0x0101010101010101010101010101010101010101010101010101010101010101;
+    
+    uint256 constant firstByte = 0x0100000000000000000000000000000000000000000000000000000000000000;
 
     function indexOf(string haystack, string needle)
         public pure
@@ -32,16 +34,8 @@ contract IndexOf {
         
         uint256 end = hl - nl;
         uint256 i = 0;
+        bytes32 haydig;
         while (i <= end) {
-            
-            // Compare for equality
-            bytes32 haydig;
-            assembly {
-                haydig := keccak256(add(h, add(32, i)), nl)
-            }
-            if(haydig == needleHash) {
-                return int(i);
-            }
             
             // Find next potential matching point
             uint256 value;
@@ -54,6 +48,18 @@ contract IndexOf {
             matchb &= matchb / 2;
             matchb &= firstBits;
             
+            if (matchb & firstByte != 0) {
+                
+                // Compare for equality
+                assembly {
+                    haydig := keccak256(add(h, add(32, i)), nl)
+                }
+                if(haydig == needleHash) {
+                    return int(i);
+                }
+                i++;
+                continue;
+            }
             if (matchb == 0) {
                 i += 32;
                 continue;
@@ -80,6 +86,14 @@ contract IndexOf {
             matchb &= 2**8 - 1;
             if (matchb < 2**16) {
                 i++;
+            }
+            
+            // Compare for equality
+            assembly {
+                haydig := keccak256(add(h, add(32, i)), nl)
+            }
+            if(haydig == needleHash) {
+                return int(i);
             }
         }
         return -1;
