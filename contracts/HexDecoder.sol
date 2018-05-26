@@ -34,7 +34,11 @@ contract HexDecoder {
         }
         assembly {
             mstore(sub(output, 32), 32)
-            return(sub(output, 32), add(ol, 64))
+            
+            // Add 64 to ol and round to the next multiple of 32
+            return(sub(output, 32), and(add(ol, 95),
+                0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE0
+            ))
         }
     }
 }
