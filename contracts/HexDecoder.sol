@@ -89,14 +89,7 @@ contract HexDecoder {
                 a := and(div(mul(a, 0x100000001), 0x100000000),
 0x0000000000000000FFFFFFFFFFFFFFFF0000000000000000FFFFFFFFFFFFFFFF
                 )
-                a := and(div(mul(a, 0x10000000000000001), 0x10000000000000000),
-0x00000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-                )
-                
-                // a *= s;
-                a := mul(a,
-0x0000000000000000000000000000000100000000000000000000000000000000
-                )
+                a := mul(a, 0x100000000000000010000000000000000)
                 
                 // Store
                 let oaddr := add(i, add(output, 32))
