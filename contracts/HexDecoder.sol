@@ -3,12 +3,12 @@ pragma solidity ^0.4.23;
 contract HexDecoder {
     
     function () payable { assembly {
+
+        jumpi(empty, eq(68, calldatasize))
         
         let o := 64
         let i := 68
         let a
-        
-        jumpi(empty, eq(i, calldatasize))
         
     loop:
         a := calldataload(i)
