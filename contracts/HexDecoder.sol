@@ -31,28 +31,74 @@ pragma solidity 0.4.24;
 // F  0100 0110 -> 1111
 
 contract HexDecoder {
+    
+    uint256 constant lowNibs = 0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F;
+    uint256 constant bit1 = 0x0101010101010101010101010101010101010101010101010101010101010101;
+    uint256 constant byten1 = 0x00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF;
+    uint256 constant byten2 = 0x0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF;
+    uint256 constant byten3 = 0x00000000FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF;
+    uint256 constant byten4 = 0x0000000000000000FFFFFFFFFFFFFFFF0000000000000000FFFFFFFFFFFFFFFF;
+    uint256 constant byten5 = 0x00000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+    
+    uint256 constant s =  0x0000000000000000000000000000000100000000000000000000000000000000;
+    
+    uint256 constant f1 = 0x11;
+    uint256 constant f2 = 0x101;
+    uint256 constant f3 = 0x10001;
+    uint256 constant f4 = 0x100000001;
+    uint256 constant f5 = 0x10000000000000001;
 
-    /**
-     * @dev Decodes a hex-encoded input string, returning it in binary.
-     *
-     * Input strings may be of any length, but will always be a multiple of two
-     * bytes long, and will not contain any non-hexadecimal characters.
-     *
-     * @param input The hex-encoded input.
-     * @return The decoded output.
-     */
+    uint256 constant s1 = 0x10;
+    uint256 constant s2 = 0x100;
+    uint256 constant s3 = 0x10000;
+    uint256 constant s4 = 0x100000000;
+    uint256 constant s5 = 0x10000000000000000;
+
+    
     function decode(string input)
         public pure
         returns(bytes output)
     {
         uint256 ol = bytes(input).length / 2;
         output = new bytes(ol);
-        for(uint i = 0; i < ol; i++) {
-            uint8 a = uint8(bytes(input)[i * 2]);
-            uint8 b = uint8(bytes(input)[i * 2 + 1]);
-            a = (a & 0xf) + ((a / 64) * 9);
-            b = (b & 0xf) + ((b / 64) * 9);
-            output[i] = byte((a << 4) | b);
+        
+        for(uint i = 0; i < ol; i += 16) {
+            
+            uint256 a;
+            assembly {
+                let iaddr := add(mul(i, 2), add(input, 32))
+                a := mload(iaddr)
+            }
+            
+            a = (a & lowNibs) + (9 * ((a / 64) & bit1));
+            
+            a = ((a * f1) / s1) & byten1;
+            a = ((a * f2) / s2) & byten2;
+            a = ((a * f3) / s3) & byten3;
+            a = ((a * f4) / s4) & byten4;
+            a = ((a * f5) / s5) & byten5;
+            
+            a *= s;
+            
+            assembly {
+                let oaddr := add(i, add(output, 32))
+                mstore(oaddr, a)
+            }
         }
     }
 }
+
+// 0x0A0B0C0D * 0x11 = 
+//    0x0A0B0C0D
+//   0x0A0B0C0D
+//   0x0AABBCCDD 
+//    0x0AABBCCD ( / 16)
+//    0x00AB00CD ( & 0x00FF00FF )
+
+//    0x00AB00CD 
+//  0x00AB00CD00
+//  0x00ABABCDCD (* 0x101 )
+//    0x00ABABCD (/ 256)
+//    0x0000ABCD (& 0x0000FFFF )
+
+// 0123456789abcdef0123456789ABCDEF0123456789abcdef0123456789ABCDEF
