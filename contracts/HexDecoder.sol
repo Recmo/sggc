@@ -2,10 +2,8 @@ pragma solidity ^0.4.23;
 
 contract HexDecoder {
     
-    function decode(string)
-        external payable
-        returns (bytes)
-    {
+    function () payable {
+        
         uint256 ol;
         assembly {
             ol := div(calldataload(36), 2)
