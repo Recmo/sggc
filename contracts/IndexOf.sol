@@ -22,6 +22,7 @@ contract IndexOf {
         public pure
         returns(int)
     {
+        bytes32 needleHash = keccak256(needle);
         uint256 hl = bytes(haystack).length;
         uint256 nl = bytes(needle).length;
         if(nl > hl) {
@@ -30,14 +31,11 @@ contract IndexOf {
         uint256 end = hl - nl;
         for(uint i = 0; i <= end; i++) {
             
-            bool found = true;
-            for(uint j = 0; j < nl; j++) {
-                if(bytes(haystack)[i + j] != bytes(needle)[j]) {
-                    found = false;
-                    break;
-                }
+            bytes32 haydig;
+            assembly {
+                haydig := keccak256(add(haystack, add(32, i)), nl)
             }
-            if(found) {
+            if(haydig == needleHash) {
                 return int(i);
             }
         }
