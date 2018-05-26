@@ -27,74 +27,67 @@ contract IndexOf {
         if (nl > hl) {
             return -1;
         }
-        bytes32 needleHash = keccak256(n);
         
-        // Compute first byte vector
-        uint256 fb = uint256(n[0]) * firstBits;
-        
-        uint256 end = hl - nl;
-        uint256 i = 0;
-        bytes32 haydig;
-        while (i <= end) {
+        if (nl < 32) {
             
-            // Find next potential matching point
-            uint256 value;
             assembly {
-                value := mload(add(h, add(32, i)))
-            }
-            uint256 matchb = ~(value ^ fb);
-            matchb &= matchb / 16;
-            matchb &= matchb / 4;
-            matchb &= matchb / 2;
-            matchb &= firstBits;
-            
-            if (matchb & firstByte != 0) {
+                let mask
+                let pat
+                let value
+                let i
+                let end
                 
-                // Compare for equality
-                assembly {
-                    haydig := keccak256(add(h, add(32, i)), nl)
+                mask := 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                mask := mul(mask, exp(256, sub(32, nl)))
+                
+                i := add(h, 32)
+                end := add(sub(add(i, hl), nl), 1) // Why the 1?
+                pat := and(mload(add(n, 32)), mask)
+                
+                for {} lt(i, end) {} {
+                    value := mload(i)
+                    value := and(not(xor(value, pat)), mask)
+                    if eq(value, mask) {
+                        mstore(0, sub(i, add(h, 32)))
+                        return(0, 32)
+                    }
+                    i := add(i, 1)
                 }
-                if(haydig == needleHash) {
-                    return int(i);
-                }
-                i++;
-                continue;
-            }
-            if (matchb == 0) {
-                i += 32;
-                continue;
-            }
-            if (matchb < 2**128) {
-                i += 16;
-            }
-            matchb |= matchb / 2**128;
-            matchb &= 2**128 - 1;
-            if (matchb < 2**64) {
-                i += 8;
-            }
-            matchb |= matchb / 2**64;
-            matchb &= 2**64 - 1;
-            if (matchb < 2**32) {
-                i += 4;
-            }
-            matchb |= matchb / 2**32;
-            matchb &= 2**32 - 1;
-            if (matchb < 2**16) {
-                i += 2;
-            }
-            matchb |= matchb / 2**8;
-            matchb &= 2**8 - 1;
-            if (matchb < 2**16) {
-                i++;
+                
+                mstore(0, not(0))
+                return(0, 32)
             }
             
-            // Compare for equality
+        } else {
+            
             assembly {
-                haydig := keccak256(add(h, add(32, i)), nl)
+                let nh
+                let pat
+                let value
+                let i
+                let end
+
+                nh := keccak256(add(n, 32), nl)
+                
+                i := add(h, 32)
+                end := add(sub(add(i, hl), nl), 1)
+                pat := mload(add(n, 32))
+                
+                for {} lt(i, end) {} {
+                    value := mload(i)
+                    if eq(value, pat) {
+                        let hh := keccak256(i, nl)
+                        if eq(nh, hh) {
+                            mstore(0, sub(i, add(h, 32)))
+                            return(0, 32)
+                        }
+                    }
+                    i := add(i, 1)
+                }
+                mstore(0, not(0))
+                return(0, 32)
             }
-            if(haydig == needleHash) {
-                return int(i);
-            }
+            
         }
         return -1;
     }
