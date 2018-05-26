@@ -85,7 +85,7 @@ contract IndexOf {
                 }
                 matchb |= matchb / 2**8;
                 matchb &= 2**8 - 1;
-                if (matchb < 2**16) {
+                if (matchb < 2**8) {
                     i += 1;
                 }
 
@@ -106,7 +106,7 @@ contract IndexOf {
                 }
                 matchb |= matchb / 2**8;
                 matchb &= 2**(8 + 128) - 1;
-                if (matchb < 2**(16 + 128)) {
+                if (matchb < 2**(8 + 128)) {
                     i += 1;
                 }
                 
