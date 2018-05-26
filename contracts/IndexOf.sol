@@ -25,7 +25,10 @@ contract IndexOf {
         bytes32 needleHash = keccak256(needle);
         uint256 hl = bytes(haystack).length;
         uint256 nl = bytes(needle).length;
-        if(nl > hl) {
+        if (nl == 0) {
+            return 0;
+        }
+        if (nl > hl) {
             return -1;
         }
         uint256 end = hl - nl;
