@@ -100,6 +100,8 @@ contract BrainFuck {
             mstore(add(inst, 0x120), exit)
         }
         
+        uint256[10] memory stack;
+        uint256 stackp = 0;
         uint256 progp = 0;
         for(uint ip = 0; ip < program.length; ip++) {
             byte instruction = program[ip];
@@ -117,44 +119,14 @@ contract BrainFuck {
                 prog[progp++] = inst[6];
             } else if(instruction == '[') {
                 prog[progp++] = inst[7];
-                prog[progp++] = inst[9];
-                
-                /*
-                if(mem[dp] == 0) {
-                    uint depth = 1;
-                    for(uint i = ip + 1; i < pl; i++) {
-                        if(program[i] == ']') {
-                            depth--;
-                            if(depth == 0) {
-                                ip = i;
-                                break;
-                            }
-                        } else if(program[i] == '[') {
-                            depth++;
-                        }
-                    }
-                }
-                */
+                prog[progp++] = 0;
+                stack[stackp++] = progp;
             } else if(instruction == ']') {
+                stackp--;
                 prog[progp++] = inst[8];
-                prog[progp++] = inst[9];
-                
-                /*
-                if(mem[dp] != 0) {
-                    depth = 1;
-                    for(i = ip - 1; i > 0; i--) {
-                        if(program[i] == '[') {
-                            depth--;
-                            if(depth == 0) {
-                                ip = i;
-                                break;
-                            }
-                        } else if(program[i] == ']') {
-                            depth++;
-                        }
-                    }
-                }
-                */
+                prog[progp++] = 32 * stack[stackp] + 2080;
+                prog[stack[stackp] - 1] = 32 * progp + 2080;
+                stack[stackp] = 0;
             }
         }
         prog[progp++] = inst[9];
