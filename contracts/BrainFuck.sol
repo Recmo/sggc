@@ -4,6 +4,10 @@ contract BrainFuck {
     
     function () external payable { assembly {
         
+        // This canceles out the "mstore(0x40, 0x80)" that
+        // solc likes to inject. It even gets partially optimized.
+        mstore(0x40, 0x00)
+        
         let source
         let eof
         let stack
@@ -15,56 +19,64 @@ contract BrainFuck {
         //
         // Compiler
         //
+        
+        // Create lookup table
+        // From high to low since we have overlaping writes
+        mstore(mul(0x5d, 16), close)
+        mstore(mul(0x5b, 16), open)
+        mstore(mul(0x3e, 16), right)
+        mstore(mul(0x3c, 16), left)
+        mstore(mul(0x2e, 16), output)
+        mstore(mul(0x2d, 16), decr)
+        mstore(mul(0x2c, 16), input)
+        mstore(mul(0x2b, 16), incr)
+
         source := 0x45 // offset left 31 bytes
         eof := add(calldataload(0x44), 0x45)
-        pp := 2080
-        stack := 0
+        pp := 2080 // WARNING: Overlaps with lookup table for high ascii
+        stack := 0 // WARNING: Overlaps with lookup table
+                   // If stack gets very deep or source has a very low
+                   // character this will fail.
+        
         for {} lt(source, eof) {} {
-            switch and(calldataload(source), 0xff)
-            case 0x3e { // >
-                mstore(pp, right)
+            
+            let c := and(calldataload(source), 0xff)
+            let inst := and(mload(mul(c, 16)), 0xFFFF)
+            
+            if inst {
+            
+                mstore(pp, inst)
                 pp := add(pp, 32)
+                
+                if eq(inst, open) {
+                    pp := add(pp, 32)
+                    mstore(stack, pp)
+                    stack := add(stack, 32)
+                }
+                if eq(inst, close) {
+                    stack := sub(stack, 32)
+                    let back := mload(stack) 
+                    mstore(pp, back)
+                    pp := add(pp, 32)
+                    mstore(sub(back, 32), pp)
+                    mstore(stack, 0)
+                }
             }
-            case 0x3c { // <
-                mstore(pp, left)
-                pp := add(pp, 32)
-            }
-            case 0x2b { // +
-                mstore(pp, incr)
-                pp := add(pp, 32)
-            }
-            case 0x2d { // -
-                mstore(pp, decr)
-                pp := add(pp, 32)
-            }
-            case 0x2e { // .
-                mstore(pp, output)
-                pp := add(pp, 32)
-            }
-            case 0x2c { // ,
-                mstore(pp, input)
-                pp := add(pp, 32)
-            }
-            case 0x5b { // [
-                mstore(pp, open)
-                pp := add(pp, 64)
-                mstore(stack, pp)
-                stack := add(stack, 32)
-            }
-            case 0x5d { // ]
-                mstore(pp, close)
-                pp := add(pp, 32)
-                stack := sub(stack, 32)
-                let back := mload(stack) 
-                mstore(pp, back)
-                pp := add(pp, 32)
-                mstore(sub(back, 32), pp)
-                mstore(stack, 0)
-            }
-            default {}
+            
             source := add(source, 1)
         }
         mstore(pp, exit)
+        
+        // Clear lookup table
+        mstore(mul(0x3e, 16), 0)
+        mstore(mul(0x3c, 16), 0)
+        mstore(mul(0x2b, 16), 0)
+        mstore(mul(0x2d, 16), 0)
+        mstore(mul(0x2e, 16), 0)
+        mstore(mul(0x2c, 16), 0)
+        mstore(mul(0x5b, 16), 0)
+        mstore(mul(0x5d, 16), 0)
+
         
         //
         // BrainFuck virtual machine in the Ethereum virtual machine
