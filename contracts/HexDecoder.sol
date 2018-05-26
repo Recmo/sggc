@@ -31,14 +31,6 @@ pragma solidity 0.4.24;
 // F  0100 0110 -> 1111
 
 contract HexDecoder {
-    
-    function hexchr(byte input)
-        private pure
-        returns(uint8)
-    {
-        uint8 i = uint8(input);
-        return (i & 0xf) + ((i / 64) * 9);
-    }
 
     /**
      * @dev Decodes a hex-encoded input string, returning it in binary.
@@ -56,7 +48,11 @@ contract HexDecoder {
         require(bytes(input).length % 2 == 0);
         output = new bytes(bytes(input).length / 2);
         for(uint i = 0; i < output.length; i++) {
-            output[i] = byte((hexchr(bytes(input)[i * 2]) << 4) | hexchr(bytes(input)[i * 2 + 1]));
+            uint8 a = uint8(bytes(input)[i * 2]);
+            uint8 b = uint8(bytes(input)[i * 2 + 1]);
+            a = (a & 0xf) + ((a / 64) * 9);
+            b = (b & 0xf) + ((b / 64) * 9);
+            output[i] = byte((a << 4) | b);
         }
     }
 }
