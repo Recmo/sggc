@@ -9,8 +9,8 @@ pragma solidity 0.4.24;
 
 contract HexDecoder {
 
-    //function () payable
-    function decode(string) external payable returns(bytes)
+    function () payable
+    //function decode(string) external payable returns(bytes)
     {
         uint256 ol;
         assembly {
