@@ -17,5 +17,28 @@ contract Sort {
      * @return The sorted list.
      */
     function sort(uint[] input) public pure returns(uint[]) {
+        sort(input, 0, int(input.length - 1));
+        return input;
+    }
+
+    function sort(uint[] input, int lo, int hi) internal pure {
+        if(lo < hi) {
+            int p = partition(input, lo, hi);
+            sort(input, lo, p - 1);
+            sort(input, p + 1, hi);
+        }
+    }
+
+    function partition(uint[] input, int lo, int hi) internal pure returns(int) {
+        uint pivot = input[uint(hi)];
+        int i = lo - 1;
+        for(int j = lo; j < hi; j++) {
+            if(input[uint(j)] < pivot) {
+                i += 1;
+                (input[uint(i)], input[uint(j)]) = (input[uint(j)], input[uint(i)]);
+            }
+        }
+        (input[uint(i + 1)], input[uint(hi)]) = (input[uint(hi)], input[uint(i + 1)]);
+        return i + 1;
     }
 }
