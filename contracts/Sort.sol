@@ -23,9 +23,13 @@ contract Sort {
 
     function sort(uint[] input, int lo, int hi) internal pure {
         if(lo < hi) {
-            int p = partition(input, lo, hi);
-            sort(input, lo, p - 1);
-            sort(input, p + 1, hi);
+            if (hi - lo < 7) {
+                insertionSort(input, lo, hi);
+            } else {
+                int p = partition(input, lo, hi);
+                sort(input, lo, p - 1);
+                sort(input, p + 1, hi);
+            }
         }
     }
 
@@ -40,5 +44,19 @@ contract Sort {
         }
         (input[uint(i + 1)], input[uint(hi)]) = (input[uint(hi)], input[uint(i + 1)]);
         return i + 1;
+    }
+    
+    function insertionSort(uint[] input, int lo, int hi) internal pure {
+        int i = lo + 1;
+        while (i <= hi) {
+            uint key = input[uint(i)];
+            int j = i - 1;
+            while(j >= lo && input[uint(j)] > key) {
+                input[uint(j + 1)] = input[uint(j)];
+                j -= 1;
+            }
+            input[uint(j + 1)] = key;
+            i++;
+        }
     }
 }
