@@ -23,27 +23,30 @@ contract Sort {
 
     function sort(uint[] input, int lo, int hi) internal pure {
         if(lo < hi) {
-            if (hi - lo < 7) {
-                insertionSort(input, lo, hi);
-            } else {
-                int p = partition(input, lo, hi);
-                sort(input, lo, p - 1);
-                sort(input, p + 1, hi);
-            }
+            int p = partition(input, lo, hi);
+            sort(input, lo, p);
+            sort(input, p + 1, hi);
         }
     }
 
     function partition(uint[] input, int lo, int hi) internal pure returns(int) {
-        uint pivot = input[uint(hi)];
+        uint pivot = input[uint(lo)];
         int i = lo - 1;
-        for(int j = lo; j < hi; j++) {
-            if(input[uint(j)] < pivot) {
+        int j = hi + 1;
+        while (true) {
+            i += 1;
+            while (input[uint(i)] < pivot) {
                 i += 1;
-                (input[uint(i)], input[uint(j)]) = (input[uint(j)], input[uint(i)]);
             }
+            j -= 1;
+            while (input[uint(j)] > pivot) {
+                j -= 1;
+            }
+            if (i >= j) {
+                return j;
+            }
+            (input[uint(i)], input[uint(j)]) = (input[uint(j)], input[uint(i)]);
         }
-        (input[uint(i + 1)], input[uint(hi)]) = (input[uint(hi)], input[uint(i + 1)]);
-        return i + 1;
     }
     
     function insertionSort(uint[] input, int lo, int hi) internal pure {
