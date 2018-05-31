@@ -26,9 +26,11 @@ contract Sort {
     {
         if(lo < hi) {
             if (hi - lo == 1) {
-                if (input[uint(lo)] > input[uint(hi)]) {
-                    (input[uint(lo)], input[uint(hi)]) =
-                    (input[uint(hi)], input[uint(lo)]) ;
+                uint lov = input[uint(lo)];
+                uint hiv = input[uint(hi)];
+                if (lov > hiv) {
+                    input[uint(lo)] = hiv;
+                    input[uint(hi)] = lov;
                 }
             } else {
                 int slo;
@@ -48,16 +50,21 @@ contract Sort {
         int i = lo;
         int j = hi;
         while (true) {
-            while (input[uint(i)] < pivot) i++;
-            while (input[uint(j)] > pivot) j--;
+            uint iv = input[uint(i)];
+            uint jv = input[uint(j)];
+            while (iv < pivot) {
+                i++;
+                iv = input[uint(i)];
+            }
+            while (jv > pivot) {
+                j--;
+                jv = input[uint(j)];
+            }
             if (i >= j) {
-                //i = j;
-                //while(i > lo && input[uint(i)] == pivot) i--;
-                //while(j < hi && input[uint(j)] == pivot) j++;
                 return (j, j + 1);
             }
-            (input[uint(i)], input[uint(j)]) =
-            (input[uint(j)], input[uint(i)]) ;
+            input[uint(i)] = jv;
+            input[uint(j)] = iv;
             i += 1;
             j -= 1;
         }
