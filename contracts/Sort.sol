@@ -21,33 +21,44 @@ contract Sort {
         return input;
     }
 
-    function sort(uint[] input, int lo, int hi) internal pure {
+    function sort(uint[] input, int lo, int hi)
+        internal pure
+    {
         if(lo < hi) {
-            int p = partition(input, lo, hi);
-            sort(input, lo, p);
-            sort(input, p + 1, hi);
+            int slo;
+            int shi;
+            (slo, shi) = partition(input, lo, hi);
+            sort(input, lo, slo);
+            sort(input, shi, hi);
         }
     }
 
-    function partition(uint[] input, int lo, int hi) internal pure returns(int) {
+    function partition(uint[] input, int lo, int hi)
+        internal pure
+        returns(int, int)
+    {
         uint pivot = input[uint((lo + hi) / 2)];
         int i = lo;
         int j = hi;
         while (true) {
-            while (input[uint(i)] < pivot) {
-                i += 1;
-            }
-            while (input[uint(j)] > pivot) {
-                j -= 1;
-            }
+            while (input[uint(i)] < pivot) i++;
+            while (input[uint(j)] > pivot) j--;
             if (i >= j) {
-                return j;
+                i = j;
+                while(i > lo && input[uint(i)] == pivot) i--;
+                while(j < hi && input[uint(j)] == pivot) j++;
+                return (i, j);
             }
-            (input[uint(i)], input[uint(j)]) = (input[uint(j)], input[uint(i)]);
+            (input[uint(i)], input[uint(j)]) =
+            (input[uint(j)], input[uint(i)]) ;
+            i += 1;
+            j -= 1;
         }
     }
     
-    function insertionSort(uint[] input, int lo, int hi) internal pure {
+    function insertionSort(uint[] input, int lo, int hi)
+        internal pure
+    {
         int i = lo + 1;
         while (i <= hi) {
             uint key = input[uint(i)];
