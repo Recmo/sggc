@@ -50,7 +50,7 @@ contract Unique {
                     
                     // Check filter if we have not seen it before
                     mask := exp(2, byte(0, mul(value,
-0x3ce7420db11e8986e69e1dbb4bf13ff4ed733e074c8df08835b4542e7938a96f
+0x3cb610f2f269903047b2e6af9f5940b3ae7a667c7a5bc30f0e02a1b323a7fe57
                     )))
                     jumpi(unique, iszero(and(filter, mask)))
                     
