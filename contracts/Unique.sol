@@ -26,16 +26,24 @@ contract Unique {
             uint256 value = input[i];
             uint256 h = (value ^ flag) * prime;
             uint256 index = h % ht.length;
+            uint256 iv;
             
             bool found = false;
-            uint256 iv = ht[index];
-            while (iv != 0) {
-                if (iv == h) {
-                    found = true;
-                    break;
-                }
-                index = (index + 1) % htl;
-                iv = ht[index];
+            assembly {
+                iv := mload(add(mul(index, 32), add(32, ht)))
+                
+                jumpi(iend, iszero(iv))
+                iloop:
+                    jumpi(ibreak, eq(iv, h))
+                    index := mod(add(index, 1), htl)
+                    iv := mload(add(mul(index, 32), add(32, ht)))
+                    jumpi(iloop, iv)
+                    jump(iend)
+                
+                ibreak:
+                    found := 1
+                
+                iend:
             }
             if (found) {
                 continue;
