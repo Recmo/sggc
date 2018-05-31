@@ -14,10 +14,11 @@ contract Unique {
     uint256 constant prime = 0x3cb610f2f269903047b2e6af9f5940b3ae7a667c7a5bc30f0e02a1b323a7fee1;
     
     function uniquify(uint[] input)
-        public pure
+        public view
         returns(uint[])
     {
-        uint256[] memory ht = new uint256[](2 * input.length);
+        uint256 htl = 2 * input.length;
+        uint256[] memory ht = new uint256[](htl);
         
         uint ptr = 0;
         for(uint i = 0; i < input.length; i++) {
@@ -27,13 +28,14 @@ contract Unique {
             uint256 index = h % ht.length;
             
             bool found = false;
-            while (ht[index] != 0) {
-                if (ht[index] == h) {
+            uint256 iv = ht[index];
+            while (iv != 0) {
+                if (iv == h) {
                     found = true;
                     break;
                 }
-                index++;
-                index %= ht.length;
+                index = (index + 1) % htl;
+                iv = ht[index];
             }
             if (found) {
                 continue;
