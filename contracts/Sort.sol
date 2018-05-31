@@ -31,14 +31,12 @@ contract Sort {
 
     function partition(uint[] input, int lo, int hi) internal pure returns(int) {
         uint pivot = input[uint((lo + hi) / 2)];
-        int i = lo - 1;
-        int j = hi + 1;
+        int i = lo;
+        int j = hi;
         while (true) {
-            i += 1;
             while (input[uint(i)] < pivot) {
                 i += 1;
             }
-            j -= 1;
             while (input[uint(j)] > pivot) {
                 j -= 1;
             }
