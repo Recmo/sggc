@@ -25,11 +25,18 @@ contract Sort {
         internal pure
     {
         if(lo < hi) {
-            int slo;
-            int shi;
-            (slo, shi) = partition(input, lo, hi);
-            sort(input, lo, slo);
-            sort(input, shi, hi);
+            if (hi - lo == 1) {
+                if (input[uint(lo)] > input[uint(hi)]) {
+                    (input[uint(lo)], input[uint(hi)]) =
+                    (input[uint(hi)], input[uint(lo)]) ;
+                }
+            } else {
+                int slo;
+                int shi;
+                (slo, shi) = partition(input, lo, hi);
+                sort(input, lo, slo);
+                sort(input, shi, hi);
+            }
         }
     }
 
@@ -44,10 +51,10 @@ contract Sort {
             while (input[uint(i)] < pivot) i++;
             while (input[uint(j)] > pivot) j--;
             if (i >= j) {
-                i = j;
-                while(i > lo && input[uint(i)] == pivot) i--;
-                while(j < hi && input[uint(j)] == pivot) j++;
-                return (i, j);
+                //i = j;
+                //while(i > lo && input[uint(i)] == pivot) i--;
+                //while(j < hi && input[uint(j)] == pivot) j++;
+                return (j, j + 1);
             }
             (input[uint(i)], input[uint(j)]) =
             (input[uint(j)], input[uint(i)]) ;
