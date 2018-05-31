@@ -11,6 +11,7 @@ contract Unique {
     
     function () external payable
     {
+        // 1099556 in competition!
         assembly {
             
             let l := calldataload(36)
