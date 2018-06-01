@@ -9,61 +9,72 @@ pragma solidity 0.4.24;
 
 contract Unique {
     
-    uint256 constant prime = 0x3cb610f2f269903047b2e6af9f5940b3ae7a667c7a5bc30f0e02a1b323a7fee1;
-    
-    function uniquify(uint[] input)
-        public view
-        returns(uint[])
-    {
-        uint256 htl = 1 + 2 * input.length;
-        uint256 scale = 1 + uint256(-htl) / htl;
-        uint256[] memory ht = new uint256[](htl);
+    function () external payable { assembly {
         
-        uint ptr = 0;
-        for(uint i = 0; i < input.length; i++) {
+        // @author Remco Bloemen <remco.bloemen@gmail.com>
+        
+        // Clear all memory
+        mstore(0x40, 0)
+        
+        let l := calldataload(36)
+        jumpi(main, l)
+        mstore(0, 32)
+        mstore(32, 0)
+        return(0, 64)
+        
+    main:
+        let endi := add(68, mul(l, 32))
+        let ptr := 64
+        let i := 68
+        let ht := endi
+        let htl := mul(l, 2)
+        let scale := add(div(sub(0, htl), htl), 1)
+        
+    oloop:
+        {
+            let value
+            let vhash
+            let index
+            let iv
             
-            uint256 value = input[i];
-            uint256 h = (value ^ prime) * prime;
-            uint256 index = h / scale;
-            uint256 iv;
+            // Read value
+            value := calldataload(i)
             
-            bool found = false;
-            assembly {
-                
-                
-                
-                iv := mload(add(mul(index, 32), add(32, ht)))
-                
-                jumpi(iend, iszero(iv))
-                iloop:
-                    jumpi(ibreak, eq(iv, h))
-                    index := mod(add(index, 1), htl)
-                    iv := mload(add(mul(index, 32), add(32, ht)))
-                    jumpi(iloop, iv)
-                    jump(iend)
-                
-                ibreak:
-                    found := 1
-                
-                iend:
-            }
-            if (found) {
-                continue;
-            }
+            // Compute index and index value
+            vhash := mul(xor(value,
+0x3cb610f2f269903047b2e6af9f5940b3ae7a667c7a5bc30f0e02a1b323a7fee1
+            ),
+0x3cb610f2f269903047b2e6af9f5940b3ae7a667c7a5bc30f0e02a1b323a7fee1
+            )
+            index := add(ht, mul(div(vhash, scale), 32))
+            iv := mload(index)
             
-            // Insert
-            ht[index] = h;
-            input[ptr] = value;
-            ptr++;
+            jumpi(unique, iszero(iv))
+        iloop:
+            jumpi(iblock_end, eq(iv, vhash))
+            index := add(index, 32) // TODO: overflow
+            iv := mload(index)
+            jumpi(iloop, iv)
+            
+        unique:
+            // Add to the hash table
+            mstore(index, vhash)
+            
+            // Add to start of list
+            mstore(ptr, value)
+            ptr := add(ptr, 32)
+            
+        iblock_end:
         }
-
-        // In-place return
-        assembly {
-            let start := sub(input, 32)
-            mstore(start, 32)
-            mstore(input, ptr)
-            return(start, mul(add(ptr, 2), 32))
-        }
-    }
+            
+    oloop_continue:
+        i := add(i, 32)
+        jumpi(oloop, lt(i, endi))
+        
+    // oloop_end:
+        mstore(0, 32)
+        mstore(32, div(sub(ptr, 64), 32))
+        return(0, ptr)
+    }}
     
 }
