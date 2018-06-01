@@ -18,6 +18,8 @@ contract Unique {
         
         let l := calldataload(36)
         jumpi(main, l)
+        
+        // Empty list
         mstore(0, 32)
         mstore(32, 0)
         return(0, 64)
@@ -27,8 +29,9 @@ contract Unique {
         let ptr := 64
         let i := 68
         let ht := endi
-        let htl := mul(l, 2)
+        let htl := mul(l, 1)
         let scale := add(div(sub(0, htl), htl), 1)
+        let skip := mul(htl, 32)
         
     oloop:
         {
@@ -52,7 +55,7 @@ contract Unique {
             jumpi(unique, iszero(iv))
         iloop:
             jumpi(iblock_end, eq(iv, vhash))
-            index := add(index, 32) // TODO: overflow
+            index := add(index, skip)
             iv := mload(index)
             jumpi(iloop, iv)
             
