@@ -44,7 +44,7 @@ contract Unique {
             value := calldataload(i)
             
             // Compute index and index value
-            vhash := mul(xor(value,
+            vhash := mul(add(value,
 0x3cb610f2f269903047b2e6af9f5940b3ae7a667c7a5bc30f0e02a1b323a7fee1
             ),
 0x3cb610f2f269903047b2e6af9f5940b3ae7a667c7a5bc30f0e02a1b323a7fee1
