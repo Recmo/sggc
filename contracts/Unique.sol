@@ -13,6 +13,8 @@ contract Unique {
         
         // @author Remco Bloemen <remco.bloemen@gmail.com>
         
+        // TODO https://www.pvk.ca/Blog/numerical_experiments_in_hashing.html
+        
         // Clear all memory
         mstore(0x40, 0)
         
@@ -25,10 +27,8 @@ contract Unique {
         return(0, 64)
         
     main:
-        let endi := add(68, mul(l, 32))
         let ptr := 64
         let i := 68
-        let ht := endi
         let htl := mul(l, 1)
         let scale := add(div(sub(0, htl), htl), 1)
         let skip := mul(htl, 32)
@@ -49,7 +49,7 @@ contract Unique {
             ),
 0x3cb610f2f269903047b2e6af9f5940b3ae7a667c7a5bc30f0e02a1b323a7fee1
             )
-            index := add(ht, mul(div(vhash, scale), 32))
+            index := add(mul(div(vhash, scale), 32), calldatasize)
             iv := mload(index)
             
             jumpi(unique, iszero(iv))
@@ -72,7 +72,7 @@ contract Unique {
             
     oloop_continue:
         i := add(i, 32)
-        jumpi(oloop, lt(i, endi))
+        jumpi(oloop, lt(i, calldatasize))
         
     // oloop_end:
         mstore(0, 32)
