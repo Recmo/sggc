@@ -19,49 +19,53 @@ contract Sort {
             
             let lolo := lo
             let hihi := hi
+            let d := sub(hi, lo)
             
-            // Optimize for two
-            if eq(sub(hi, lo), 32) {
-                {
-                    let a := mload(lo)
-                    let b := mload(hi)
-                    if lt(b, a) {
-                        mstore(lo, b)
-                        mstore(hi, a)
+            if lt(d, 96) {
+                
+                // Optimize for two
+                if eq(d, 32) {
+                    {
+                        let a := mload(lo)
+                        let b := mload(hi)
+                        if lt(b, a) {
+                            mstore(lo, b)
+                            mstore(hi, a)
+                        }
                     }
+                    jump(ret)
                 }
-                jump(ret)
-            }
-            
-            // Optimize for three
-            if eq(sub(hi, lo), 64) {
-                {
-                    let a := mload(lo)
-                    let b := mload(add(lo, 32))
-                    let c := mload(hi)
-                    if lt(b, a) {
-                        a
-                        b
-                        =: a
-                        =: b
-                    }
-                    if lt(c, b) {
-                        b
-                        c
-                        =: b
-                        =: c
+                
+                // Optimize for three
+                //if eq(sub(hi, lo), 64) {
+                    {
+                        let a := mload(lo)
+                        let b := mload(add(lo, 32))
+                        let c := mload(hi)
                         if lt(b, a) {
                             a
                             b
                             =: a
                             =: b
                         }
+                        if lt(c, b) {
+                            b
+                            c
+                            =: b
+                            =: c
+                            if lt(b, a) {
+                                a
+                                b
+                                =: a
+                                =: b
+                            }
+                        }
+                        mstore(lo, a)
+                        mstore(add(lo, 32), b)
+                        mstore(hi, c)
                     }
-                    mstore(lo, a)
-                    mstore(add(lo, 32), b)
-                    mstore(hi, c)
-                }
-                jump(ret)
+                    jump(ret)
+                //}
             }
             
             // Partition
