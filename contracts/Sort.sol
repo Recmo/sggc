@@ -52,18 +52,28 @@ contract Sort {
                     input[uint(lo + 2)] = c;
                 }
             } else {
-                int slo;
-                int shi;
-                (slo, shi) = partition(input, lo, hi);
-                sort(input, lo, slo);
-                sort(input, shi, hi);
+                uint alo;
+                uint ahi;
+                uint slo;
+                uint shi;
+                assembly {
+                    alo := add(add(input, 32), mul(lo, 32))
+                    ahi := add(add(input, 32), mul(hi, 32))
+                }
+                (slo, shi) = partition(alo, ahi);
+                assembly {
+                    slo := div(sub(slo, add(input, 32)), 32)
+                    shi := div(sub(shi, add(input, 32)), 32)
+                }
+                sort(input, lo, int(slo));
+                sort(input, int(shi), hi);
             }
         }
     }
     
-    function partition(uint[] input, int lo, int hi)
+    function partition(uint256 lo, uint256 hi)
         internal view
-        returns(int, int)
+        returns(uint256, uint256)
     {
         assembly {
             let pivot
@@ -71,12 +81,8 @@ contract Sort {
             let hiv
             
             // Compute pivot value
-            pivot := div(add(lo, hi), 2)
-            pivot := add(add(input, 32), mul(pivot, 32))
+            pivot := and(div(add(lo, hi), 2), not(0x1F))
             pivot := mload(pivot)
-            
-            lo := add(add(input, 32), mul(lo, 32))
-            hi := add(add(input, 32), mul(hi, 32))
             
         loop:
             lov := mload(lo)
@@ -97,8 +103,8 @@ contract Sort {
             jump(loop)
             
         end:
-            lo := div(sub(hi, add(input, 32)), 32)
-            hi := add(lo, 1)
+            lo := hi
+            hi := add(lo, 32)
         }
         return (lo, hi);
     }
