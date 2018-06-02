@@ -5,88 +5,57 @@ contract Sort {
     // @author Remco Bloemen <remco@wicked.ventures>
     
     function sort(uint[] input) public view returns(uint[]) {
-        
-        // 999377 in competition
-        sort(input, 0, int(input.length - 1));
+        heapSort(input, input.length);
         return input;
     }
 
-    function sort(uint[] input, int lo, int hi)
+    // To heapify a subtree rooted with node i which is
+    // an index in arr[]. n is size of heap
+    function heapify(uint[] arr, uint n, uint i)
         internal view
     {
-        if(lo < hi) {
-            if (hi - lo == 1) {
-                uint lov = input[uint(lo)];
-                uint hiv = input[uint(hi)];
-                if (lov > hiv) {
-                    input[uint(lo)] = hiv;
-                    input[uint(hi)] = lov;
-                }
-            } else {
-                int slo;
-                int shi;
-                (slo, shi) = partition(input, lo, hi);
-                sort(input, lo, slo);
-                sort(input, shi, hi);
-            }
-        }
-    }
+        while (true) {
+            uint largest = i;    // Initialize largest as root
+            uint l = 2 * i + 1;  // left = 2*i + 1
+            uint r = 2 * i + 2;  // right = 2*i + 2
+        
+            // If left child is larger than root
+            if (l < n && arr[l] > arr[largest])
+                largest = l;
 
-    function partition(uint[] input, int lo, int hi)
-        internal view
-        returns(int, int)
-    {
-        assembly {
-            let pivot
-            let lov
-            let hiv
-            
-            // Compute pivot value
-            pivot := div(add(lo, hi), 2)
-            pivot := add(add(input, 32), mul(pivot, 32))
-            pivot := mload(pivot)
-            
-            lo := add(add(input, 32), mul(lo, 32))
-            hi := add(add(input, 32), mul(hi, 32))
-            
-        loop:
-            lov := mload(lo)
-            hiv := mload(hi)
-            for {} lt(lov, pivot) {} {
-                lo := add(lo, 32)
-                lov := mload(lo)
+            // If right child is larger than largest so far
+            if (r < n && arr[r] > arr[largest])
+                largest = r;
+                
+            if (largest == i) {
+                return;
             }
-            for {} gt(hiv, pivot) {} {
-                hi := sub(hi, 32)
-                hiv := mload(hi)
-            }
-            jumpi(end, iszero(lt(lo, hi)))
-            mstore(lo, hiv)
-            mstore(hi, lov)
-            lo := add(lo, 32)
-            hi := sub(hi, 32)
-            jump(loop)
+
+            // Swap largest with root
+            (arr[i], arr[largest]) = (arr[largest], arr[i]);
             
-        end:
-            lo := div(sub(hi, add(input, 32)), 32)
-            hi := add(lo, 1)
+            // Heapify the affected sub-tree
+            i = largest;
         }
-        return (lo, hi);
     }
     
-    function insertionSort(uint[] input, int lo, int hi)
+    function heapSort(uint[] arr, uint n)
         internal view
     {
-        int i = lo + 1;
-        while (i <= hi) {
-            uint key = input[uint(i)];
-            int j = i - 1;
-            while(j >= lo && input[uint(j)] > key) {
-                input[uint(j + 1)] = input[uint(j)];
-                j -= 1;
-            }
-            input[uint(j + 1)] = key;
-            i++;
+        int i;
+        
+        // Build heap (rearrange array)
+        for (i = int(n) / 2 - 1; i >= 0; i--)
+            heapify(arr, n, uint(i));
+        
+        // One by one extract an element from heap
+        for (i = int(n) - 1; i >= 0; i--)
+        {
+            // Move current root to end
+            (arr[0], arr[uint(i)]) = (arr[uint(i)], arr[0]);
+     
+            // call max heapify on the reduced heap
+            heapify(arr, uint(i), 0);
         }
     }
 }
