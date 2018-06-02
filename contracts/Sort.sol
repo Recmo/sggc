@@ -36,11 +36,6 @@ contract Sort {
         internal view
         returns(int, int)
     {
-        assert(lo >= 0);
-        assert(uint(lo) < input.length);
-        assert(hi >= 0);
-        assert(uint(hi) < input.length);
-        assert(lo < hi);
         assembly {
             let pivot
             let lov
@@ -76,11 +71,6 @@ contract Sort {
             lo := div(sub(hi, add(input, 32)), 32)
             hi := add(lo, 1)
         }
-        assert(lo >= 0);
-        assert(uint(lo) < input.length);
-        assert(hi >= 0);
-        assert(uint(hi) < input.length);
-        assert(lo < hi);
         return (lo, hi);
     }
     
