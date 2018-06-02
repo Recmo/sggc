@@ -20,6 +20,7 @@ contract Sort {
             let lolo := lo
             let hihi := hi
             
+            // Optimize for two
             if eq(sub(hi, lo), 32) {
                 {
                     let a := mload(lo)
@@ -28,6 +29,37 @@ contract Sort {
                         mstore(lo, b)
                         mstore(hi, a)
                     }
+                }
+                jump(ret)
+            }
+            
+            // Optimize for three
+            if eq(sub(hi, lo), 64) {
+                {
+                    let a := mload(lo)
+                    let b := mload(add(lo, 32))
+                    let c := mload(hi)
+                    if lt(b, a) {
+                        a
+                        b
+                        =: a
+                        =: b
+                    }
+                    if lt(c, b) {
+                        b
+                        c
+                        =: b
+                        =: c
+                        if lt(b, a) {
+                            a
+                            b
+                            =: a
+                            =: b
+                        }
+                    }
+                    mstore(lo, a)
+                    mstore(add(lo, 32), b)
+                    mstore(hi, c)
                 }
                 jump(ret)
             }
