@@ -30,44 +30,79 @@ contract Unique {
         let ptr := 64
         let i := 68
         let htl := mul(l, 1)
-        let scale := add(div(sub(0, htl), htl), 1)
         let skip := mul(htl, 32)
+        let scale := add(div(sub(0, htl), htl), 1)
         
     oloop:
         {
             let value
             let vhash
-            let index
+            let index1
+            let index2
             let iv
             
             // Read value
             value := calldataload(i)
             
-            // Compute index and index value
-            vhash := mul(add(value,
-0x9903047b2e6af9f5940b3ae7a667c7a5bc30f0e02a1b323a7fee13cb610f2f26
-            ),
-0x3cb610f2f269903047b2e6af9f5940b3ae7a667c7a5bc30f0e02a1b323a7fee1
+            // Offset value so we don't get zeros
+            vhash := add(value,
+0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f
             )
-            index := add(mul(div(vhash, scale), 32), calldatasize)
-            iv := mload(index)
             
-            jumpi(unique, iszero(iv))
+            // Compute index 1
+            index1 := add(mul(div(mul(vhash,
+0xb7094513c3a0a2641751087acb3855f3c0a80be7260acdf01a49b4661672cb23
+            ), scale), 32), calldatasize)
+            
+            // Read index 1
+            iv := mload(index1)
+            jumpi(unique1, iszero(iv))
+            jumpi(seen, eq(iv, vhash))
+            
+            // Compute index 2
+            index2 := add(mul(div(mul(vhash,
+0x1b6d296aa8b7284041b9f0e36895d18399d8026b57a51e5af0ed54c3e03bd3a1
+            ), scale), 32), calldatasize)
+            
+            // Read index 2
+            iv := mload(index2)
+            jumpi(unique2, iszero(iv))
+            jumpi(seen, eq(iv, vhash))
+            
         iloop:
-            jumpi(iblock_end, eq(iv, vhash))
-            index := add(index, skip)
-            iv := mload(index)
-            jumpi(iloop, iv)
+            // Increment and test index 1
+            index1 := add(index1, skip)
+            iv := mload(index1)
+            jumpi(unique1, iszero(iv))
+            jumpi(seen, eq(iv, vhash))
             
-        unique:
+            // Incerment and test index 2
+            index2 := add(index2, skip)
+            iv := mload(index2)
+            jumpi(unique2, iszero(iv))
+            jumpi(seen, eq(iv, vhash))
+            
+            // Loop
+            jump(iloop)
+        
+        unique2:
             // Add to the hash table
-            mstore(index, vhash)
+            mstore(index2, vhash)
             
             // Add to start of list
             mstore(ptr, value)
             ptr := add(ptr, 32)
+            jump(seen)
             
-        iblock_end:
+        unique1:
+            // Add to the hash table
+            mstore(index1, vhash)
+            
+            // Add to start of list
+            mstore(ptr, value)
+            ptr := add(ptr, 32)
+        
+        seen:
         }
             
     oloop_continue:
