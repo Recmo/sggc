@@ -7,28 +7,28 @@ contract Sort {
     function sort(uint[] input)
         public payable returns(uint[])
     {
-        sort(input, 0, int(input.length - 1));
+        uint256 l = input.length;
+        if (l < 2) return input;
+        sort(input, 0, int(l - 1));
         return input;
     }
 
     function sort(uint[] memory input, int lo, int hi)
         internal view
     {
-        if(lo < hi) {
-            if (hi - lo == 1) {
-                uint lov = input[uint(lo)];
-                uint hiv = input[uint(hi)];
-                if (lov > hiv) {
-                    input[uint(lo)] = hiv;
-                    input[uint(hi)] = lov;
-                }
-            } else {
-                int slo;
-                int shi;
-                (slo, shi) = partition(input, lo, hi);
-                sort(input, lo, slo);
-                sort(input, shi, hi);
+        if (hi - lo == 1) {
+            uint lov = input[uint(lo)];
+            uint hiv = input[uint(hi)];
+            if (lov > hiv) {
+                input[uint(lo)] = hiv;
+                input[uint(hi)] = lov;
             }
+        } else {
+            int slo;
+            int shi;
+            (slo, shi) = partition(input, lo, hi);
+            if (lo < slo) sort(input, lo, slo);
+            if (shi < hi) sort(input, shi, hi);
         }
     }
 
