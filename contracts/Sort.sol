@@ -36,28 +36,52 @@ contract Sort {
         internal view
         returns(int, int)
     {
-        uint pivot = input[uint((lo + hi) / 2)];
-        int i = lo;
-        int j = hi;
-        while (true) {
-            uint iv = input[uint(i)];
-            uint jv = input[uint(j)];
-            while (iv < pivot) {
-                i++;
-                iv = input[uint(i)];
+        assert(lo >= 0);
+        assert(uint(lo) < input.length);
+        assert(hi >= 0);
+        assert(uint(hi) < input.length);
+        assert(lo < hi);
+        assembly {
+            let pivot
+            let lov
+            let hiv
+            
+            // Compute pivot value
+            pivot := div(add(lo, hi), 2)
+            pivot := add(add(input, 32), mul(pivot, 32))
+            pivot := mload(pivot)
+            
+            lo := add(add(input, 32), mul(lo, 32))
+            hi := add(add(input, 32), mul(hi, 32))
+            
+        loop:
+            lov := mload(lo)
+            hiv := mload(hi)
+            for {} lt(lov, pivot) {} {
+                lo := add(lo, 32)
+                lov := mload(lo)
             }
-            while (jv > pivot) {
-                j--;
-                jv = input[uint(j)];
+            for {} gt(hiv, pivot) {} {
+                hi := sub(hi, 32)
+                hiv := mload(hi)
             }
-            if (i >= j) {
-                return (j, j + 1);
-            }
-            input[uint(i)] = jv;
-            input[uint(j)] = iv;
-            i += 1;
-            j -= 1;
+            jumpi(end, iszero(lt(lo, hi)))
+            mstore(lo, hiv)
+            mstore(hi, lov)
+            lo := add(lo, 32)
+            hi := sub(hi, 32)
+            jump(loop)
+            
+        end:
+            lo := div(sub(hi, add(input, 32)), 32)
+            hi := add(lo, 1)
         }
+        assert(lo >= 0);
+        assert(uint(lo) < input.length);
+        assert(hi >= 0);
+        assert(uint(hi) < input.length);
+        assert(lo < hi);
+        return (lo, hi);
     }
     
     function insertionSort(uint[] input, int lo, int hi)
