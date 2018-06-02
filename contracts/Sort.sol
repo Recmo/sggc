@@ -13,12 +13,43 @@ contract Sort {
         internal view
     {
         if(lo < hi) {
-            if (hi - lo == 1) {
-                uint lov = input[uint(lo)];
-                uint hiv = input[uint(hi)];
-                if (lov > hiv) {
-                    input[uint(lo)] = hiv;
-                    input[uint(hi)] = lov;
+            if (hi - lo <= 2) {
+                if (hi - lo == 1) {
+                    uint lov = input[uint(lo)];
+                    uint hiv = input[uint(hi)];
+                    if (lov > hiv) {
+                        input[uint(lo)] = hiv;
+                        input[uint(hi)] = lov;
+                    }
+                } else /* if (hi - lo == 2) */ {
+                    uint a = input[uint(lo)];
+                    uint b = input[uint(lo + 1)];
+                    uint c = input[uint(lo + 2)];
+                    if (a < b) {
+                        if (b < c) {
+                            return;
+                            // (a, b, c) = (a, b, c);
+                        } else {
+                            if (a < c) {
+                                (a, b, c) = (a, c, b);
+                            } else {
+                                (a, b, c) = (c, a, b);
+                            }
+                        }
+                    } else {
+                        if (a < c) {
+                            (a, b, c) = (b, a, c);
+                        } else {
+                            if (b < c) {
+                                (a, b, c) = (b, c, a);
+                            } else {
+                                (a, b, c) = (c, b, a);
+                            }
+                        }
+                    }
+                    input[uint(lo)] = a;
+                    input[uint(lo + 1)] = b;
+                    input[uint(lo + 2)] = c;
                 }
             } else {
                 int slo;
