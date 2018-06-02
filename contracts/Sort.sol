@@ -1,22 +1,10 @@
-/**
- * This file is part of the 1st Solidity Gas Golfing Contest.
- *
- * This work is licensed under Creative Commons Attribution ShareAlike 3.0.
- * https://creativecommons.org/licenses/by-sa/3.0/
- */
-
 pragma solidity 0.4.24;
 
 contract Sort {
-    /**
-     * @dev Sorts a list of integers in ascending order.
-     *
-     * The input list may be of any length.
-     *
-     * @param input The list of integers to sort.
-     * @return The sorted list.
-     */
-    function sort(uint[] input) public pure returns(uint[]) {
+    
+    // @author Remco Bloemen <remco@wicked.ventures>
+    
+    function sort(uint[] input) public view returns(uint[]) {
         
         // 999377 in competition
         sort(input, 0, int(input.length - 1));
@@ -24,7 +12,7 @@ contract Sort {
     }
 
     function sort(uint[] input, int lo, int hi)
-        internal pure
+        internal view
     {
         if(lo < hi) {
             if (hi - lo == 1) {
@@ -45,7 +33,7 @@ contract Sort {
     }
 
     function partition(uint[] input, int lo, int hi)
-        internal pure
+        internal view
         returns(int, int)
     {
         uint pivot = input[uint((lo + hi) / 2)];
@@ -73,7 +61,7 @@ contract Sort {
     }
     
     function insertionSort(uint[] input, int lo, int hi)
-        internal pure
+        internal view
     {
         int i = lo + 1;
         while (i <= hi) {
