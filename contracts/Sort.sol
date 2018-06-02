@@ -5,6 +5,7 @@ contract Sort {
     function () external payable { assembly {
         
         // @author Remco Bloemen <remco@wicked.ventures>
+        // Competition: 387058 gas
         
         // Copy input to memory
         calldatacopy(0, 4, calldatasize)
