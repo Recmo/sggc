@@ -9,44 +9,44 @@ contract Sort {
     {
         uint256 l = input.length;
         if (l < 2) return input;
-        sort(input, 0, int(l - 1));
+        sort(input, 0, l - 1);
         return input;
     }
 
-    function sort(uint[] memory input, int lo, int hi)
+    function sort(uint[] memory input, uint256 lo, uint256 hi)
         internal view
     {
         if (hi - lo == 1) {
-            uint lov = input[uint(lo)];
-            uint hiv = input[uint(hi)];
+            uint256 lov = input[lo];
+            uint256 hiv = input[hi];
             if (lov > hiv) {
-                input[uint(lo)] = hiv;
-                input[uint(hi)] = lov;
+                input[lo] = hiv;
+                input[hi] = lov;
             }
             return;
         }
         
         // partition
-        uint pivot = input[uint((lo + hi) / 2)];
-        int i = lo;
-        int j = hi;
+        uint256 pivot = input[(lo + hi) / 2];
+        uint256 i = lo;
+        uint256 j = hi;
         while (true) {
-            uint iv = input[uint(i)];
-            uint jv = input[uint(j)];
+            uint iv = input[i];
+            uint jv = input[j];
             while (iv < pivot) {
                 i++;
-                iv = input[uint(i)];
+                iv = input[i];
             }
             while (jv > pivot) {
                 j--;
-                jv = input[uint(j)];
+                jv = input[j];
             }
             if (i >= j) {
                 i = j + 1;
                 break;
             }
-            input[uint(i)] = jv;
-            input[uint(j)] = iv;
+            input[i] = jv;
+            input[j] = iv;
             i += 1;
             j -= 1;
         }
