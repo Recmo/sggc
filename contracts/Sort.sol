@@ -14,28 +14,53 @@ contract Sort {
     function heapify(uint[] arr, uint n, uint i)
         internal view
     {
-        while (true) {
-            uint largest = i;    // Initialize largest as root
-            uint l = 2 * i + 1;  // left = 2*i + 1
-            uint r = 2 * i + 2;  // right = 2*i + 2
-        
-            // If left child is larger than root
-            if (l < n && arr[l] > arr[largest])
-                largest = l;
-
-            // If right child is larger than largest so far
-            if (r < n && arr[r] > arr[largest])
-                largest = r;
-                
-            if (largest == i) {
-                return;
-            }
-
-            // Swap largest with root
-            (arr[i], arr[largest]) = (arr[largest], arr[i]);
+        assembly {
             
-            // Heapify the affected sub-tree
-            i = largest;
+            let largest
+            let l
+            let r
+            let ival
+            let lval
+            let tval
+            
+        loop:
+            
+            l := add(mul(2, i), 1)
+            r := add(mul(2, i), 2) // add(l, 1)
+            
+            // TODO: Move out of loop
+            ival := mload(add(mul(i, 32), add(arr, 32)))
+            
+            // Start with the root as largest
+            largest := i
+            lval := ival
+            
+            // If left child is larger than root
+            tval := mload(add(mul(l, 32), add(arr, 32)))
+            if and(lt(l, n), gt(tval, lval)) {
+                largest := l
+                lval := tval
+            }
+            
+            // If right child is larger than largest so far
+            tval := mload(add(mul(r, 32), add(arr, 32)))
+            if and(lt(r, n), gt(tval, lval)) {
+                largest := r
+                lval := tval
+            }
+            
+            // If root is largest we are done
+            jumpi(end, eq(largest, i))
+            
+            // Swap largest with root
+            mstore(add(mul(i,       32), add(arr, 32)), lval)
+            mstore(add(mul(largest, 32), add(arr, 32)), ival)
+            
+            // Repeat for subtree starting at largest
+            i := largest
+            jump(loop)
+            
+        end:
         }
     }
     
