@@ -16,13 +16,35 @@ contract Sort {
     function sort(uint[] memory input, uint256 lo, uint256 hi)
         internal view
     {
-        if (hi - lo == 1) {
-            uint256 lov = input[lo];
-            uint256 hiv = input[hi];
-            if (lov > hiv) {
-                input[lo] = hiv;
-                input[hi] = lov;
+        uint256 d = hi - lo;
+        if (d < 3) {
+            // Optimize for two values
+            if (d == 1) {
+                uint256 a = input[lo];
+                uint256 b = input[hi];
+                if (b < a) {
+                    input[lo] = b;
+                    input[hi] = a;
+                }
+                return;
             }
+            
+            // Optimize for three values
+            a = input[lo];
+            b = input[lo + 1];
+            uint256 c = input[hi];
+            if (b < a) {
+                (a, b) = (b, a);
+            }
+            if (c < b) {
+                (b, c) = (c, b);
+                if (b < a) {
+                    (a, b) = (b, a);
+                }
+            }
+            input[lo] = a;
+            input[lo + 1] = b;
+            input[hi] = c;
             return;
         }
         
