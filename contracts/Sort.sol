@@ -4,21 +4,24 @@ contract Sort {
     
     // @author Remco Bloemen <remco@wicked.ventures>
     
-    function sort(uint[] input) public view returns(uint[]) {
-        if (input.length == 0) {
-            return input;
+    function () external payable
+    {
+        assembly {
+            mstore(0x40, 0)
         }
         uint256 lo;
         uint256 hi;
         assembly {
-            lo := add(input, 32)
-            hi := add(lo, mul(mload(input), 32))
-            hi := sub(hi, 32)
+            calldatacopy(0, 4, calldatasize)
+            lo := 0x40
+            hi := add(lo, sub(calldatasize, 0x64))
         }
         sort(lo, hi);
-        return input;
+        assembly {
+            return(0, sub(calldatasize, 4))
+        }
     }
-
+    
     function sort(uint256 lo, uint256 hi)
         internal view
     {
