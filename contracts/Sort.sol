@@ -22,55 +22,16 @@ contract Sort {
     function sort(uint256 lo, uint256 hi)
         internal view
     {
-        if (hi - lo <= 32) {
-            if (hi - lo == 32) {
-                assembly {
-                    let a := mload(lo)
-                    let b := mload(hi)
-                    if lt(b, a) {
-                        mstore(lo, b)
-                        mstore(hi, a)
-                    }
+        if (hi - lo == 32) {
+            assembly {
+                let a := mload(lo)
+                let b := mload(hi)
+                if lt(b, a) {
+                    mstore(lo, b)
+                    mstore(hi, a)
                 }
-                return;
-            } else  {
-                uint256 a;
-                uint256 b;
-                uint256 c;
-                assembly {
-                    a := mload(lo)
-                    b := mload(add(lo, 32))
-                    c := mload(hi)
-                }
-                if (a < b) {
-                    if (b < c) {
-                        return;
-                        // (a, b, c) = (a, b, c);
-                    } else {
-                        if (a < c) {
-                            (a, b, c) = (a, c, b);
-                        } else {
-                            (a, b, c) = (c, a, b);
-                        }
-                    }
-                } else {
-                    if (a < c) {
-                        (a, b, c) = (b, a, c);
-                    } else {
-                        if (b < c) {
-                            (a, b, c) = (b, c, a);
-                        } else {
-                            (a, b, c) = (c, b, a);
-                        }
-                    }
-                }
-                assembly {
-                    mstore(lo, a)
-                    mstore(add(lo, 32), b)
-                    mstore(hi, c)
-                }
-                return;
             }
+            return;
         }
         
         // Partition
