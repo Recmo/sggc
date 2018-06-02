@@ -13,8 +13,6 @@ contract Unique {
         
         // @author Remco Bloemen <remco.bloemen@gmail.com>
         
-        // TODO https://www.pvk.ca/Blog/numerical_experiments_in_hashing.html
-        
         // Clear all memory
         mstore(0x40, 0)
         
@@ -29,7 +27,7 @@ contract Unique {
     main:
         let ptr := 64
         let i := 68
-        let htl := mul(l, 1)
+        let htl := div(mul(l, 25), 10)
         let skip := mul(htl, 32)
         let scale := add(div(sub(0, htl), htl), 1)
         
@@ -105,7 +103,7 @@ contract Unique {
         seen:
         }
             
-    oloop_continue:
+    // oloop_continue:
         i := add(i, 32)
         jumpi(oloop, lt(i, calldatasize))
         
