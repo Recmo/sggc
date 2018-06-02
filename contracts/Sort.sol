@@ -23,13 +23,12 @@ contract Sort {
             let lval
             let tval
             
+            ival := mload(add(mul(i, 32), add(arr, 32)))
+            
         loop:
             
             l := add(mul(2, i), 1)
-            r := add(mul(2, i), 2) // add(l, 1)
-            
-            // TODO: Move out of loop
-            ival := mload(add(mul(i, 32), add(arr, 32)))
+            r := add(l, 1)
             
             // Start with the root as largest
             largest := i
