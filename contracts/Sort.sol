@@ -72,8 +72,6 @@ contract Sort {
                 let pivot
                 let lov
                 let hiv
-                let i
-                let j
                 
                 // Compute pivot value
                 pivot := and(div(add(lo, hi), 2),
