@@ -76,7 +76,9 @@ contract Sort {
                 let j
                 
                 // Compute pivot value
-                pivot := and(div(add(lo, hi), 2), not(0x1F))
+                pivot := and(div(add(lo, hi), 2),
+0x0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0
+                )
                 pivot := mload(pivot)
                 
             loop:
