@@ -33,19 +33,41 @@ contract Sort {
             a = input[lo];
             b = input[lo + 1];
             uint256 c = input[hi];
-            if (b < a) {
-                (a, b) = (b, a);
-            }
-            if (c < b) {
-                (b, c) = (c, b);
-                if (b < a) {
-                    (a, b) = (b, a);
+            if (a < b) {
+                if (b < c) {
+                    return;
+                } else {
+                    if (c < a) {
+                        input[lo] = c;
+                        input[lo + 1] = a;
+                        input[hi] = b;
+                        return;
+                    } else {
+                        input[lo + 1] = c;
+                        input[hi] = b;
+                        return;
+                    }
+                }
+            } else {
+                if (a < c) {
+                    input[lo] = b;
+                    input[lo + 1] = a;
+                    input[hi] = c;
+                    return;
+                } else {
+                    if (b < c) {
+                        input[lo] = b;
+                        input[lo + 1] = c;
+                        input[hi] = a;
+                        return;
+                    } else {
+                        input[lo] = c;
+                        input[lo + 1] = b;
+                        input[hi] = a;
+                        return;
+                    }
                 }
             }
-            input[lo] = a;
-            input[lo + 1] = b;
-            input[hi] = c;
-            return;
         }
         
         // partition
