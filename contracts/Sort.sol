@@ -4,14 +4,14 @@ contract Sort {
     
     // @author Remco Bloemen <remco@wicked.ventures>
     
-    function sort(uint[] input) public view returns(uint[]) {
-        
-        // 999377 in competition
+    function sort(uint[] input)
+        public payable returns(uint[])
+    {
         sort(input, 0, int(input.length - 1));
         return input;
     }
 
-    function sort(uint[] input, int lo, int hi)
+    function sort(uint[] memory input, int lo, int hi)
         internal view
     {
         if(lo < hi) {
