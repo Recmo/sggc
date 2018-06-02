@@ -27,19 +27,6 @@ contract Sort {
         }
         
         // partition
-        int slo;
-        int shi;
-        (slo, shi) = partition(input, lo, hi);
-        
-        // Recurse
-        if (lo < slo) sort(input, lo, slo);
-        if (shi < hi) sort(input, shi, hi);
-    }
-
-    function partition(uint[] input, int lo, int hi)
-        internal view
-        returns(int, int)
-    {
         uint pivot = input[uint((lo + hi) / 2)];
         int i = lo;
         int j = hi;
@@ -55,12 +42,17 @@ contract Sort {
                 jv = input[uint(j)];
             }
             if (i >= j) {
-                return (j, j + 1);
+                i = j + 1;
+                break;
             }
             input[uint(i)] = jv;
             input[uint(j)] = iv;
             i += 1;
             j -= 1;
         }
+                
+        // Recurse
+        if (lo < j) sort(input, lo, j);
+        if (i < hi) sort(input, i, hi);
     }
 }
