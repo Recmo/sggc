@@ -16,47 +16,50 @@ contract Sort {
     {
         assembly {
             
-            let largest
-            let l
-            let r
+            let top
+            let iaddr // Root
             let ival
-            let lval
+            let maddr // Maximum
+            let mval
+            let taddr // Temporary
             let tval
             
-            ival := mload(add(mul(i, 32), add(arr, 32)))
+            arr := add(arr, 32)
+            top := add(mul(n, 32), arr)
+            iaddr := add(mul(i, 32), arr)
+            ival := mload(iaddr)
             
         loop:
             
-            l := add(mul(2, i), 1)
-            r := add(l, 1)
-            
             // Start with the root as largest
-            largest := i
-            lval := ival
+            maddr := iaddr
+            mval := ival
             
             // If left child is larger than root
-            tval := mload(add(mul(l, 32), add(arr, 32)))
-            if and(lt(l, n), gt(tval, lval)) {
-                largest := l
-                lval := tval
+            taddr := add(arr, mul(sub(iaddr, arr), 2))
+            tval := mload(taddr)
+            if and(lt(taddr, top), gt(tval, mval)) {
+                maddr := taddr
+                mval := tval
             }
             
             // If right child is larger than largest so far
-            tval := mload(add(mul(r, 32), add(arr, 32)))
-            if and(lt(r, n), gt(tval, lval)) {
-                largest := r
-                lval := tval
+            taddr := add(taddr, 32)
+            tval := mload(taddr)
+            if and(lt(taddr, top), gt(tval, mval)) {
+                maddr := taddr
+                mval := tval
             }
             
             // If root is largest we are done
-            jumpi(end, eq(largest, i))
+            jumpi(end, eq(maddr, iaddr))
             
             // Swap largest with root
-            mstore(add(mul(i,       32), add(arr, 32)), lval)
-            mstore(add(mul(largest, 32), add(arr, 32)), ival)
+            mstore(iaddr, mval)
+            mstore(maddr, ival)
             
             // Repeat for subtree starting at largest
-            i := largest
+            iaddr := maddr
             jump(loop)
             
         end:
