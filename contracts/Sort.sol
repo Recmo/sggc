@@ -7,7 +7,6 @@ contract Sort {
         // @author Remco Bloemen <remco@wicked.ventures>
         
         // Copy input to memory
-        mstore(0x40, 0) // Clear memory (get's rid of Solidities free ptr)
         calldatacopy(0, 4, calldatasize)
         
         // Special case for zero or one value
