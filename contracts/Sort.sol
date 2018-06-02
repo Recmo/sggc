@@ -5,8 +5,6 @@ contract Sort {
     // @author Remco Bloemen <remco@wicked.ventures>
     
     function sort(uint[] input) public view returns(uint[]) {
-        
-        // 999377 in competition
         sort(input, 0, int(input.length - 1));
         return input;
     }
@@ -31,7 +29,7 @@ contract Sort {
             }
         }
     }
-
+    
     function partition(uint[] input, int lo, int hi)
         internal view
         returns(int, int)
@@ -72,21 +70,5 @@ contract Sort {
             hi := add(lo, 1)
         }
         return (lo, hi);
-    }
-    
-    function insertionSort(uint[] input, int lo, int hi)
-        internal view
-    {
-        int i = lo + 1;
-        while (i <= hi) {
-            uint key = input[uint(i)];
-            int j = i - 1;
-            while(j >= lo && input[uint(j)] > key) {
-                input[uint(j + 1)] = input[uint(j)];
-                j -= 1;
-            }
-            input[uint(j + 1)] = key;
-            i++;
-        }
     }
 }
