@@ -29,7 +29,7 @@ contract Unique {
     main:
         let ptr := 64
         let i := 68
-        let htl := mul(l, 1)
+        let htl := div(mul(l, 15), 10)
         let scale := add(div(sub(0, htl), htl), 1)
         let skip := mul(htl, 32)
         
@@ -47,7 +47,7 @@ contract Unique {
             vhash := mul(add(value,
 0x9903047b2e6af9f5940b3ae7a667c7a5bc30f0e02a1b323a7fee13cb610f2f26
             ),
-0x3cb610f2f269903047b2e6af9f5940b3ae7a667c7a5bc30f0e02a1b323a7fee1
+0x1b6d296aa8b7284041b9f0e36895d18399d8026b57a51e5af0ed54c3e03bd3a1
             )
             index := add(mul(div(vhash, scale), 32), calldatasize)
             iv := mload(index)
