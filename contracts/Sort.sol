@@ -1,84 +1,87 @@
-pragma solidity 0.4.24;
+pragma solidity ^0.4.23;
 
 contract Sort {
     
     // @author Remco Bloemen <remco@wicked.ventures>
     
     function sort(uint[] input) public view returns(uint[]) {
-        sort(input, 0, int(input.length - 1));
+        if (input.length == 0) {
+            return input;
+        }
+        uint256 lo;
+        uint256 hi;
+        assembly {
+            lo := add(input, 32)
+            hi := add(lo, mul(mload(input), 32))
+            hi := sub(hi, 32)
+        }
+        sort(lo, hi);
         return input;
     }
 
-    function sort(uint[] input, int lo, int hi)
+    function sort(uint256 lo, uint256 hi)
         internal view
     {
-        if(lo < hi) {
-            if (hi - lo <= 2) {
-                if (hi - lo == 1) {
-                    uint lov = input[uint(lo)];
-                    uint hiv = input[uint(hi)];
-                    if (lov > hiv) {
-                        input[uint(lo)] = hiv;
-                        input[uint(hi)] = lov;
+        if (hi - lo <= 32) {
+            if (hi - lo == 32) {
+                assembly {
+                    let a := mload(lo)
+                    let b := mload(hi)
+                    if lt(b, a) {
+                        mstore(lo, b)
+                        mstore(hi, a)
                     }
-                } else /* if (hi - lo == 2) */ {
-                    uint a = input[uint(lo)];
-                    uint b = input[uint(lo + 1)];
-                    uint c = input[uint(lo + 2)];
-                    if (a < b) {
-                        if (b < c) {
-                            return;
-                            // (a, b, c) = (a, b, c);
-                        } else {
-                            if (a < c) {
-                                (a, b, c) = (a, c, b);
-                            } else {
-                                (a, b, c) = (c, a, b);
-                            }
-                        }
+                }
+                return;
+            } else  {
+                uint256 a;
+                uint256 b;
+                uint256 c;
+                assembly {
+                    a := mload(lo)
+                    b := mload(add(lo, 32))
+                    c := mload(hi)
+                }
+                if (a < b) {
+                    if (b < c) {
+                        return;
+                        // (a, b, c) = (a, b, c);
                     } else {
                         if (a < c) {
-                            (a, b, c) = (b, a, c);
+                            (a, b, c) = (a, c, b);
                         } else {
-                            if (b < c) {
-                                (a, b, c) = (b, c, a);
-                            } else {
-                                (a, b, c) = (c, b, a);
-                            }
+                            (a, b, c) = (c, a, b);
                         }
                     }
-                    input[uint(lo)] = a;
-                    input[uint(lo + 1)] = b;
-                    input[uint(lo + 2)] = c;
+                } else {
+                    if (a < c) {
+                        (a, b, c) = (b, a, c);
+                    } else {
+                        if (b < c) {
+                            (a, b, c) = (b, c, a);
+                        } else {
+                            (a, b, c) = (c, b, a);
+                        }
+                    }
                 }
-            } else {
-                uint alo;
-                uint ahi;
-                uint slo;
-                uint shi;
                 assembly {
-                    alo := add(add(input, 32), mul(lo, 32))
-                    ahi := add(add(input, 32), mul(hi, 32))
+                    mstore(lo, a)
+                    mstore(add(lo, 32), b)
+                    mstore(hi, c)
                 }
-                (slo, shi) = partition(alo, ahi);
-                assembly {
-                    slo := div(sub(slo, add(input, 32)), 32)
-                    shi := div(sub(shi, add(input, 32)), 32)
-                }
-                sort(input, lo, int(slo));
-                sort(input, int(shi), hi);
+                return;
             }
         }
-    }
-    
-    function partition(uint256 lo, uint256 hi)
-        internal view
-        returns(uint256, uint256)
-    {
+        
+        // Partition
+        uint256 lolo = lo;
+        uint256 hihi = hi;
         assembly {
             let pivot
             let lov
             let hiv
+            let i
+            let j
             
             // Compute pivot value
             pivot := and(div(add(lo, hi), 2), not(0x1F))
@@ -106,6 +109,9 @@ contract Sort {
             lo := hi
             hi := add(lo, 32)
         }
-        return (lo, hi);
+        
+        // Recurse
+        if (lolo < lo) sort(lolo, lo);
+        if (hi < hihi) sort(hi, hihi);
     }
 }
