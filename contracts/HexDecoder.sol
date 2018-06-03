@@ -47,12 +47,14 @@ contract HexDecoder {
     {
         uint256 ol = bytes(input).length / 2;
         output = new bytes(ol);
-        for(uint i = 0; i < ol; i++) {
-            uint8 a = uint8(bytes(input)[i * 2]);
-            uint8 b = uint8(bytes(input)[i * 2 + 1]);
+        uint256 i = 0;
+        uint256 j = 0;
+        for (; i < ol;) {
+            uint8 a = uint8(bytes(input)[j++]);
+            uint8 b = uint8(bytes(input)[j++]);
             a = (a & 0xf) + ((a / 64) * 9);
             b = (b & 0xf) + ((b / 64) * 9);
-            output[i] = byte((a << 4) | b);
+            output[i++] = byte((a << 4) | b);
         }
     }
 }
