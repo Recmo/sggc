@@ -58,38 +58,39 @@ contract HexDecoder {
                 
                 // Load input block
                 uint256 B;
-                          B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
-                B *= 256; B |= uint8(bytes(input)[j++]);
+                          B |= uint8(bytes(input)[j]);
+                B *= 256; B |= uint8(bytes(input)[j +  1]);
+                B *= 256; B |= uint8(bytes(input)[j +  2]);
+                B *= 256; B |= uint8(bytes(input)[j +  3]);
+                B *= 256; B |= uint8(bytes(input)[j +  4]);
+                B *= 256; B |= uint8(bytes(input)[j +  5]);
+                B *= 256; B |= uint8(bytes(input)[j +  6]);
+                B *= 256; B |= uint8(bytes(input)[j +  7]);
+                B *= 256; B |= uint8(bytes(input)[j +  8]);
+                B *= 256; B |= uint8(bytes(input)[j +  9]);
+                B *= 256; B |= uint8(bytes(input)[j + 10]);
+                B *= 256; B |= uint8(bytes(input)[j + 11]);
+                B *= 256; B |= uint8(bytes(input)[j + 12]);
+                B *= 256; B |= uint8(bytes(input)[j + 13]);
+                B *= 256; B |= uint8(bytes(input)[j + 14]);
+                B *= 256; B |= uint8(bytes(input)[j + 15]);
+                B *= 256; B |= uint8(bytes(input)[j + 16]);
+                B *= 256; B |= uint8(bytes(input)[j + 17]);
+                B *= 256; B |= uint8(bytes(input)[j + 18]);
+                B *= 256; B |= uint8(bytes(input)[j + 19]);
+                B *= 256; B |= uint8(bytes(input)[j + 20]);
+                B *= 256; B |= uint8(bytes(input)[j + 21]);
+                B *= 256; B |= uint8(bytes(input)[j + 22]);
+                B *= 256; B |= uint8(bytes(input)[j + 23]);
+                B *= 256; B |= uint8(bytes(input)[j + 24]);
+                B *= 256; B |= uint8(bytes(input)[j + 25]);
+                B *= 256; B |= uint8(bytes(input)[j + 26]);
+                B *= 256; B |= uint8(bytes(input)[j + 27]);
+                B *= 256; B |= uint8(bytes(input)[j + 28]);
+                B *= 256; B |= uint8(bytes(input)[j + 29]);
+                B *= 256; B |= uint8(bytes(input)[j + 30]);
+                B *= 256; B |= uint8(bytes(input)[j + 31]);
+                j += 32;
                 
                 // SWAR convert hex to nibbles
                 B = (B & lowNibs) + (9 * ((B / 64) & bit1));
@@ -103,22 +104,23 @@ contract HexDecoder {
                 
                 // Write to output
                 bytes16 out = bytes16(bytes32(B));
-                output[i++] = out[ 0];
-                output[i++] = out[ 1];
-                output[i++] = out[ 2];
-                output[i++] = out[ 3];
-                output[i++] = out[ 4];
-                output[i++] = out[ 5];
-                output[i++] = out[ 6];
-                output[i++] = out[ 7];
-                output[i++] = out[ 8];
-                output[i++] = out[ 9];
-                output[i++] = out[10];
-                output[i++] = out[11];
-                output[i++] = out[12];
-                output[i++] = out[13];
-                output[i++] = out[14];
-                output[i++] = out[15];
+                output[i     ] = out[ 0];
+                output[i +  1] = out[ 1];
+                output[i +  2] = out[ 2];
+                output[i +  3] = out[ 3];
+                output[i +  4] = out[ 4];
+                output[i +  5] = out[ 5];
+                output[i +  6] = out[ 6];
+                output[i +  7] = out[ 7];
+                output[i +  8] = out[ 8];
+                output[i +  9] = out[ 9];
+                output[i + 10] = out[10];
+                output[i + 11] = out[11];
+                output[i + 12] = out[12];
+                output[i + 13] = out[13];
+                output[i + 14] = out[14];
+                output[i + 15] = out[15];
+                i += 16;
             }
         }
         for (; i < ol; ) {
