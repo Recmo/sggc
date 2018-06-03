@@ -32,15 +32,19 @@ pragma solidity 0.4.24;
 
 contract HexDecoder {
 
-    /**
-     * @dev Decodes a hex-encoded input string, returning it in binary.
-     *
-     * Input strings may be of any length, but will always be a multiple of two
-     * bytes long, and will not contain any non-hexadecimal characters.
-     *
-     * @param input The hex-encoded input.
-     * @return The decoded output.
-     */
+    uint256 constant lowNibs = 0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F;
+    uint256 constant bit1 = 0x0101010101010101010101010101010101010101010101010101010101010101;
+    uint256 constant byten1 = 0x0FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF0;
+    uint256 constant byten2 = 0x0FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF000;
+    uint256 constant byten3 = 0x0FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF0000000;
+    uint256 constant byten4 = 0x0FFFFFFFFFFFFFFFF0000000000000000FFFFFFFFFFFFFFFF000000000000000;
+    
+    uint256 constant f1 = 0x11;
+    uint256 constant f2 = 0x101;
+    uint256 constant f3 = 0x10001;
+    uint256 constant f4 = 0x100000001;
+    uint256 constant f5 = 0x100000000000000010;
+
     function decode(string input)
         public pure
         returns(bytes output)
@@ -49,7 +53,34 @@ contract HexDecoder {
         output = new bytes(ol);
         uint256 i = 0;
         uint256 j = 0;
-        for (; i < ol;) {
+        if (ol > 15) {
+            for (; i < ol - 15; ) {
+                
+                // Load input block
+                uint256 B;
+                for(uint k = 0 ; k < 32; k++) {
+                    B *= 256;
+                    B |= uint8(bytes(input)[j++]);
+                }
+                
+                // SWAR convert hex to nibbles
+                B = (B & lowNibs) + (9 * ((B / 64) & bit1));
+                
+                // SWAR shuffle nibbles to left
+                B = (B * f1) & byten1;
+                B = (B * f2) & byten2;
+                B = (B * f3) & byten3;
+                B = (B * f4) & byten4;
+                B = B * f5;
+                
+                // Write to output
+                bytes16 out = bytes16(bytes32(B));
+                for(k = 0 ; k < 16; k++) {
+                    output[i++] = out[k];
+                }
+            }
+        }
+        for (; i < ol; ) {
             uint8 a = uint8(bytes(input)[j++]);
             uint8 b = uint8(bytes(input)[j++]);
             a = (a & 0xf) + ((a / 64) * 9);
