@@ -45,8 +45,8 @@ contract HexDecoder {
             }
         }
         for (; i < ol; ) {
-            uint8 a = uint8(bytes(input)[j++]);
-            uint8 b = uint8(bytes(input)[j++]);
+            uint8 a = uint8(read1(bytes(input), j++));
+            uint8 b = uint8(read1(bytes(input), j++));
             a = (a & 0xf) + ((a / 64) * 9);
             b = (b & 0xf) + ((b / 64) * 9);
             output[i++] = byte((a << 4) | b);
@@ -59,38 +59,38 @@ contract HexDecoder {
     {
         // Load input block
         uint256 B;
-                  B |= uint256(bytes32(input[ j + 31]));
-        B /= 256; B |= uint256(bytes32(input[ j + 30]));
-        B /= 256; B |= uint256(bytes32(input[ j + 29]));
-        B /= 256; B |= uint256(bytes32(input[ j + 28]));
-        B /= 256; B |= uint256(bytes32(input[ j + 27]));
-        B /= 256; B |= uint256(bytes32(input[ j + 26]));
-        B /= 256; B |= uint256(bytes32(input[ j + 25]));
-        B /= 256; B |= uint256(bytes32(input[ j + 24]));
-        B /= 256; B |= uint256(bytes32(input[ j + 23]));
-        B /= 256; B |= uint256(bytes32(input[ j + 22]));
-        B /= 256; B |= uint256(bytes32(input[ j + 21]));
-        B /= 256; B |= uint256(bytes32(input[ j + 20]));
-        B /= 256; B |= uint256(bytes32(input[ j + 19]));
-        B /= 256; B |= uint256(bytes32(input[ j + 18]));
-        B /= 256; B |= uint256(bytes32(input[ j + 17]));
-        B /= 256; B |= uint256(bytes32(input[ j + 16]));
-        B /= 256; B |= uint256(bytes32(input[ j + 15]));
-        B /= 256; B |= uint256(bytes32(input[ j + 14]));
-        B /= 256; B |= uint256(bytes32(input[ j + 13]));
-        B /= 256; B |= uint256(bytes32(input[ j + 12]));
-        B /= 256; B |= uint256(bytes32(input[ j + 11]));
-        B /= 256; B |= uint256(bytes32(input[ j + 10]));
-        B /= 256; B |= uint256(bytes32(input[ j +  9]));
-        B /= 256; B |= uint256(bytes32(input[ j +  8]));
-        B /= 256; B |= uint256(bytes32(input[ j +  7]));
-        B /= 256; B |= uint256(bytes32(input[ j +  6]));
-        B /= 256; B |= uint256(bytes32(input[ j +  5]));
-        B /= 256; B |= uint256(bytes32(input[ j +  4]));
-        B /= 256; B |= uint256(bytes32(input[ j +  3]));
-        B /= 256; B |= uint256(bytes32(input[ j +  2]));
-        B /= 256; B |= uint256(bytes32(input[ j +  1]));
-        B /= 256; B |= uint256(bytes32(input[ j     ]));
+                  B |= read1(input, j     );
+        B *= 256; B |= read1(input, j +  1);
+        B *= 256; B |= read1(input, j +  2);
+        B *= 256; B |= read1(input, j +  3);
+        B *= 256; B |= read1(input, j +  4);
+        B *= 256; B |= read1(input, j +  5);
+        B *= 256; B |= read1(input, j +  6);
+        B *= 256; B |= read1(input, j +  7);
+        B *= 256; B |= read1(input, j +  8);
+        B *= 256; B |= read1(input, j +  9);
+        B *= 256; B |= read1(input, j + 10);
+        B *= 256; B |= read1(input, j + 11);
+        B *= 256; B |= read1(input, j + 12);
+        B *= 256; B |= read1(input, j + 13);
+        B *= 256; B |= read1(input, j + 14);
+        B *= 256; B |= read1(input, j + 15);
+        B *= 256; B |= read1(input, j + 16);
+        B *= 256; B |= read1(input, j + 17);
+        B *= 256; B |= read1(input, j + 18);
+        B *= 256; B |= read1(input, j + 19);
+        B *= 256; B |= read1(input, j + 20);
+        B *= 256; B |= read1(input, j + 21);
+        B *= 256; B |= read1(input, j + 22);
+        B *= 256; B |= read1(input, j + 23);
+        B *= 256; B |= read1(input, j + 24);
+        B *= 256; B |= read1(input, j + 25);
+        B *= 256; B |= read1(input, j + 26);
+        B *= 256; B |= read1(input, j + 27);
+        B *= 256; B |= read1(input, j + 28);
+        B *= 256; B |= read1(input, j + 29);
+        B *= 256; B |= read1(input, j + 30);
+        B *= 256; B |= read1(input, j + 31);
         return B;
     }
     
@@ -98,7 +98,7 @@ contract HexDecoder {
         internal pure
         returns (uint256)
     {
-        return uint256(bytes32(input[i]));
+        return uint256(bytes(input)[i]);
     }
     
     function write16(bytes memory output, uint256 i, bytes16 out)
