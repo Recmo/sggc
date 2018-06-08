@@ -56,40 +56,7 @@ contract HexDecoder {
         if (ol > 15) {
             for (; i < ol - 15; ) {
                 
-                // Load input block
-                uint256 B;
-                          B |= uint256(bytes(input)[j    ]);
-                B *= 256; B |= uint256(bytes(input)[j +  1]);
-                B *= 256; B |= uint256(bytes(input)[j +  2]);
-                B *= 256; B |= uint256(bytes(input)[j +  3]);
-                B *= 256; B |= uint256(bytes(input)[j +  4]);
-                B *= 256; B |= uint256(bytes(input)[j +  5]);
-                B *= 256; B |= uint256(bytes(input)[j +  6]);
-                B *= 256; B |= uint256(bytes(input)[j +  7]);
-                B *= 256; B |= uint256(bytes(input)[j +  8]);
-                B *= 256; B |= uint256(bytes(input)[j +  9]);
-                B *= 256; B |= uint256(bytes(input)[j + 10]);
-                B *= 256; B |= uint256(bytes(input)[j + 11]);
-                B *= 256; B |= uint256(bytes(input)[j + 12]);
-                B *= 256; B |= uint256(bytes(input)[j + 13]);
-                B *= 256; B |= uint256(bytes(input)[j + 14]);
-                B *= 256; B |= uint256(bytes(input)[j + 15]);
-                B *= 256; B |= uint256(bytes(input)[j + 16]);
-                B *= 256; B |= uint256(bytes(input)[j + 17]);
-                B *= 256; B |= uint256(bytes(input)[j + 18]);
-                B *= 256; B |= uint256(bytes(input)[j + 19]);
-                B *= 256; B |= uint256(bytes(input)[j + 20]);
-                B *= 256; B |= uint256(bytes(input)[j + 21]);
-                B *= 256; B |= uint256(bytes(input)[j + 22]);
-                B *= 256; B |= uint256(bytes(input)[j + 23]);
-                B *= 256; B |= uint256(bytes(input)[j + 24]);
-                B *= 256; B |= uint256(bytes(input)[j + 25]);
-                B *= 256; B |= uint256(bytes(input)[j + 26]);
-                B *= 256; B |= uint256(bytes(input)[j + 27]);
-                B *= 256; B |= uint256(bytes(input)[j + 28]);
-                B *= 256; B |= uint256(bytes(input)[j + 29]);
-                B *= 256; B |= uint256(bytes(input)[j + 30]);
-                B *= 256; B |= uint256(bytes(input)[j + 31]);
+                uint256 B = read32(bytes(input), j);
                 j += 32;
                 
                 // SWAR convert hex to nibbles
@@ -103,23 +70,7 @@ contract HexDecoder {
                 B =  B * f5;
                 
                 // Write to output
-                bytes16 out = bytes16(bytes32(B));
-                output[i     ] = out[ 0];
-                output[i +  1] = out[ 1];
-                output[i +  2] = out[ 2];
-                output[i +  3] = out[ 3];
-                output[i +  4] = out[ 4];
-                output[i +  5] = out[ 5];
-                output[i +  6] = out[ 6];
-                output[i +  7] = out[ 7];
-                output[i +  8] = out[ 8];
-                output[i +  9] = out[ 9];
-                output[i + 10] = out[10];
-                output[i + 11] = out[11];
-                output[i + 12] = out[12];
-                output[i + 13] = out[13];
-                output[i + 14] = out[14];
-                output[i + 15] = out[15];
+                write16(output, i, bytes16(bytes32(B)));
                 i += 16;
             }
         }
@@ -130,5 +81,67 @@ contract HexDecoder {
             b = (b & 0xf) + ((b / 64) * 9);
             output[i++] = byte((a << 4) | b);
         }
-    } 
+    }
+    
+    function read32(bytes memory input, uint256 j)
+        internal pure
+        returns (uint256)
+    {
+        // Load input block
+        uint256 B;
+                  B |= uint256(bytes(input)[j    ]);
+        B *= 256; B |= uint256(bytes(input)[j +  1]);
+        B *= 256; B |= uint256(bytes(input)[j +  2]);
+        B *= 256; B |= uint256(bytes(input)[j +  3]);
+        B *= 256; B |= uint256(bytes(input)[j +  4]);
+        B *= 256; B |= uint256(bytes(input)[j +  5]);
+        B *= 256; B |= uint256(bytes(input)[j +  6]);
+        B *= 256; B |= uint256(bytes(input)[j +  7]);
+        B *= 256; B |= uint256(bytes(input)[j +  8]);
+        B *= 256; B |= uint256(bytes(input)[j +  9]);
+        B *= 256; B |= uint256(bytes(input)[j + 10]);
+        B *= 256; B |= uint256(bytes(input)[j + 11]);
+        B *= 256; B |= uint256(bytes(input)[j + 12]);
+        B *= 256; B |= uint256(bytes(input)[j + 13]);
+        B *= 256; B |= uint256(bytes(input)[j + 14]);
+        B *= 256; B |= uint256(bytes(input)[j + 15]);
+        B *= 256; B |= uint256(bytes(input)[j + 16]);
+        B *= 256; B |= uint256(bytes(input)[j + 17]);
+        B *= 256; B |= uint256(bytes(input)[j + 18]);
+        B *= 256; B |= uint256(bytes(input)[j + 19]);
+        B *= 256; B |= uint256(bytes(input)[j + 20]);
+        B *= 256; B |= uint256(bytes(input)[j + 21]);
+        B *= 256; B |= uint256(bytes(input)[j + 22]);
+        B *= 256; B |= uint256(bytes(input)[j + 23]);
+        B *= 256; B |= uint256(bytes(input)[j + 24]);
+        B *= 256; B |= uint256(bytes(input)[j + 25]);
+        B *= 256; B |= uint256(bytes(input)[j + 26]);
+        B *= 256; B |= uint256(bytes(input)[j + 27]);
+        B *= 256; B |= uint256(bytes(input)[j + 28]);
+        B *= 256; B |= uint256(bytes(input)[j + 29]);
+        B *= 256; B |= uint256(bytes(input)[j + 30]);
+        B *= 256; B |= uint256(bytes(input)[j + 31]);
+        return B;
+    }
+    
+    function write16(bytes memory output, uint256 i, bytes16 out)
+        internal pure
+    {
+        output[i     ] = out[ 0];
+        output[i +  1] = out[ 1];
+        output[i +  2] = out[ 2];
+        output[i +  3] = out[ 3];
+        output[i +  4] = out[ 4];
+        output[i +  5] = out[ 5];
+        output[i +  6] = out[ 6];
+        output[i +  7] = out[ 7];
+        output[i +  8] = out[ 8];
+        output[i +  9] = out[ 9];
+        output[i + 10] = out[10];
+        output[i + 11] = out[11];
+        output[i + 12] = out[12];
+        output[i + 13] = out[13];
+        output[i + 14] = out[14];
+        output[i + 15] = out[15];
+    }
 }
