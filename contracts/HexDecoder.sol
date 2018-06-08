@@ -1,34 +1,4 @@
-/**
- * This file is part of the 1st Solidity Gas Golfing Contest.
- *
- * This work is licensed under Creative Commons Attribution ShareAlike 3.0.
- * https://creativecommons.org/licenses/by-sa/3.0/
- */
-
-pragma solidity 0.4.24;
-
-// 0  0011 0000 -> 0000
-// 1  0011 0001 -> 0001
-// 2  0011 0010 -> 0010
-// 3  0011 0011 -> 0011
-// 4  0011 0100 -> 0100
-// 5  0011 0101 -> 0101
-// 6  0011 0110 -> 0110
-// 7  0011 0111 -> 0111
-// 8  0011 1000 -> 1000
-// 9  0011 1001 -> 1001
-// a  0110 0001 -> 1010
-// b  0110 0010 -> 1011
-// c  0110 0011 -> 1100
-// d  0110 0100 -> 1101
-// e  0110 0101 -> 1110
-// f  0110 0110 -> 1111
-// A  0100 0001 -> 1010
-// B  0100 0010 -> 1011
-// C  0100 0011 -> 1100
-// D  0100 0100 -> 1101
-// E  0100 0101 -> 1110
-// F  0100 0110 -> 1111
+pragma solidity ^0.4.23;
 
 contract HexDecoder {
 
@@ -89,38 +59,38 @@ contract HexDecoder {
     {
         // Load input block
         uint256 B;
-                  B |= read1(input, j     );
-        B *= 256; B |= read1(input, j +  1);
-        B *= 256; B |= read1(input, j +  2);
-        B *= 256; B |= read1(input, j +  3);
-        B *= 256; B |= read1(input, j +  4);
-        B *= 256; B |= read1(input, j +  5);
-        B *= 256; B |= read1(input, j +  6);
-        B *= 256; B |= read1(input, j +  7);
-        B *= 256; B |= read1(input, j +  8);
-        B *= 256; B |= read1(input, j +  9);
-        B *= 256; B |= read1(input, j + 10);
-        B *= 256; B |= read1(input, j + 11);
-        B *= 256; B |= read1(input, j + 12);
-        B *= 256; B |= read1(input, j + 13);
-        B *= 256; B |= read1(input, j + 14);
-        B *= 256; B |= read1(input, j + 15);
-        B *= 256; B |= read1(input, j + 16);
-        B *= 256; B |= read1(input, j + 17);
-        B *= 256; B |= read1(input, j + 18);
-        B *= 256; B |= read1(input, j + 19);
-        B *= 256; B |= read1(input, j + 20);
-        B *= 256; B |= read1(input, j + 21);
-        B *= 256; B |= read1(input, j + 22);
-        B *= 256; B |= read1(input, j + 23);
-        B *= 256; B |= read1(input, j + 24);
-        B *= 256; B |= read1(input, j + 25);
-        B *= 256; B |= read1(input, j + 26);
-        B *= 256; B |= read1(input, j + 27);
-        B *= 256; B |= read1(input, j + 28);
-        B *= 256; B |= read1(input, j + 29);
-        B *= 256; B |= read1(input, j + 30);
-        B *= 256; B |= read1(input, j + 31);
+                  B |= read1(input, j + 31);
+        B /= 256; B |= read1(input, j + 30);
+        B /= 256; B |= read1(input, j + 29);
+        B /= 256; B |= read1(input, j + 28);
+        B /= 256; B |= read1(input, j + 27);
+        B /= 256; B |= read1(input, j + 26);
+        B /= 256; B |= read1(input, j + 25);
+        B /= 256; B |= read1(input, j + 24);
+        B /= 256; B |= read1(input, j + 23);
+        B /= 256; B |= read1(input, j + 22);
+        B /= 256; B |= read1(input, j + 21);
+        B /= 256; B |= read1(input, j + 20);
+        B /= 256; B |= read1(input, j + 19);
+        B /= 256; B |= read1(input, j + 18);
+        B /= 256; B |= read1(input, j + 17);
+        B /= 256; B |= read1(input, j + 16);
+        B /= 256; B |= read1(input, j + 15);
+        B /= 256; B |= read1(input, j + 14);
+        B /= 256; B |= read1(input, j + 13);
+        B /= 256; B |= read1(input, j + 12);
+        B /= 256; B |= read1(input, j + 11);
+        B /= 256; B |= read1(input, j + 10);
+        B /= 256; B |= read1(input, j +  9);
+        B /= 256; B |= read1(input, j +  8);
+        B /= 256; B |= read1(input, j +  7);
+        B /= 256; B |= read1(input, j +  6);
+        B /= 256; B |= read1(input, j +  5);
+        B /= 256; B |= read1(input, j +  4);
+        B /= 256; B |= read1(input, j +  3);
+        B /= 256; B |= read1(input, j +  2);
+        B /= 256; B |= read1(input, j +  1);
+        B /= 256; B |= read1(input, j     );
         return B;
     }
     
@@ -128,7 +98,7 @@ contract HexDecoder {
         internal pure
         returns (uint256)
     {
-        return uint256(bytes(input)[i]);
+        return uint256(bytes32(input[i]));
     }
     
     function write16(bytes memory output, uint256 i, bytes16 out)
