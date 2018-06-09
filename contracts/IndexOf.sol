@@ -5,7 +5,7 @@ contract IndexOf {
     /// @author Remco Bloemen <remco@wicked.ventures>
 
     function indexOf(string haystack, string needle)
-        public pure
+        public payable
         returns(int256)
     {
         uint256 hl = bytes(haystack).length;
