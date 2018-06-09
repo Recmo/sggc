@@ -2,6 +2,8 @@ pragma solidity ^0.4.23;
 
 contract IndexOf {
     
+    /// @author Remco Bloemen <remco@wicked.ventures>
+    
     function indexOf(string haystack, string needle)
         public pure
         returns(int256)
