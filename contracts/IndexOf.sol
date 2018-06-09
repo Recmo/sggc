@@ -1,30 +1,54 @@
 pragma solidity ^0.4.23;
 
 contract IndexOf {
-
+    
     function indexOf(string haystack, string needle)
         public pure
-        returns(int)
+        returns(int256)
     {
         uint256 hl = bytes(haystack).length;
         uint256 nl = bytes(needle).length;
         if(nl > hl) {
             return -1;
         }
-        uint256 end = hl - nl;
-        for(uint i = 0; i <= end; i++) {
-            
-            bool found = true;
-            for(uint j = 0; j < nl; j++) {
-                if(bytes(haystack)[i + j] != bytes(needle)[j]) {
-                    found = false;
+        if(nl == 0) {
+            return 0;
+        }
+        
+        // Knuth-Morris-Pratt failure table
+        uint256[] memory F = new uint256[](nl);
+        for(uint i = 2; i < nl; i++) {
+            uint256 j = F[i - 1];
+            for (;;) {
+                if(bytes(needle)[j] == bytes(needle)[i - 1]) { 
+                    F[i] = j + 1;
+                    break; 
+                }
+                if(j == 0) {
+                    F[i] = 0;
                     break;
                 }
-            }
-            if(found) {
-                return int(i);
+                j = F[j];
             }
         }
-        return -1;
+        
+        i = 0;
+        j = 0;
+        for (;;) {
+            if(j == hl) {
+                return -1;
+            }
+            if(bytes(haystack)[j] == bytes(needle)[i]) {
+                i++;
+                j++;
+                if(i == nl) {
+                    return int256(j - nl);
+                }
+            } else if(i > 0) {
+                i = F[i];
+            } else {
+                j++;
+            }
+        }
     }
 }
