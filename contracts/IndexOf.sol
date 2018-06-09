@@ -27,6 +27,9 @@ contract IndexOf {
         if(nl > hl) {
             return -1;
         }
+        if (hl == nl && keccak256(haystack) == keccak256(needle)) {
+            return 0;
+        }
         uint256 end = hl - nl;
         for(uint i = 0; i <= end; i++) {
             
