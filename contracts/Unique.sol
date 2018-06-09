@@ -1,4 +1,4 @@
-pragma solidity 0.4.24;
+pragma solidity ^0.4.23;
 
 contract Unique {
     
@@ -23,8 +23,14 @@ contract Unique {
         uint256[] memory table = new uint256[](l + l);
         
         uint256 ptr = 0;
+        uint256 last = p1;
         for(uint256 i = 0; i < l; i++) {
             uint256 value = input[i];
+            if (value == last) {
+                continue;
+            }
+            last = value;
+            
             uint256 vhash = value + p1;
             
             uint256 index1 = (vhash * p2) / scale;
