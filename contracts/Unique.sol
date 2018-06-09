@@ -36,7 +36,7 @@ contract Unique {
         uint256 htl = (25 * l) / 10;
         uint256 scale = ((-htl) / htl) + 1;
 
-        uint256[] memory table = new uint256[](htl*3);
+        uint256[] memory table = new uint256[](htl*2);
         
         uint256 ptr = 0;
         for(uint256 i = 0; i < l; i++) {
@@ -87,7 +87,7 @@ contract Unique {
                 continue;
             }
             
-            index1 += htl;
+            index1 += 1;
             r = table[index1];
             if (r == 0) {
                 out[ptr++] = value;
@@ -98,7 +98,7 @@ contract Unique {
                 continue;
             }
             
-            index2 += htl;
+            index2 += 1;
             r = table[index2];
             if (r == 0) {
                 out[ptr++] = value;
