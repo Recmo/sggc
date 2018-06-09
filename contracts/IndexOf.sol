@@ -22,7 +22,7 @@ contract IndexOf {
         for(uint i = 2; i < nl; i++) {
             uint256 j = F[i - 1];
             for (;;) {
-                if(bytes(needle)[j] == bytes(needle)[i - 1]) { 
+                if(read1(needle, j) == read1(needle, i - 1)) { 
                     F[i] = j + 1;
                     break; 
                 }
@@ -40,7 +40,7 @@ contract IndexOf {
             if(j == hl) {
                 return -1;
             }
-            if(bytes(haystack)[j] == bytes(needle)[i]) {
+            if(read1(haystack, j) == read1(needle, i)) {
                 i++;
                 j++;
                 if(i == nl) {
@@ -52,5 +52,12 @@ contract IndexOf {
                 j++;
             }
         }
+    }
+    
+    function read1(string memory a, uint256 i)
+        private pure
+        returns (bytes32)
+    {
+        return bytes(a)[i];
     }
 }
