@@ -1,6 +1,8 @@
 pragma solidity ^0.4.23;
 
 contract HexDecoder {
+    
+    /// @author Remco Bloemen <remco@wicked.ventures>
 
     uint256 constant lowNibs = 0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F;
     uint256 constant bit1 = 0x0101010101010101010101010101010101010101010101010101010101010101;
