@@ -17,28 +17,31 @@ contract IndexOf {
             return 0;
         }
         
-        // Rabin-Karp without verify
-        uint256 needleHash = 0;
-        for(uint i = 0; i < nl; i++) {
-            needleHash += needleHash;
-            needleHash += read1(needle, i);
+        // Boyer-Moore
+        uint256[256] memory badChar;
+        for(uint256 i = 0; i < 256; i++) {
+            badChar[i] = uint256(-1);
         }
-        uint256 factor = 2 ** (nl - 1);
+        for (i = 0; i < nl; i++) {
+            badChar[read1(needle, i)] = i;
+        }
         
-        uint256 hayHash = 0;
-        for(i = 0; i < nl; i++) {
-            hayHash += hayHash;
-            hayHash += read1(haystack, i);
-        }
-        if (hayHash == needleHash) {
-            return 0;
-        }
-        for (; i < hl; i++) {
-            hayHash -= read1(haystack, i - nl) * factor;
-            hayHash += hayHash;
-            hayHash += read1(haystack, i);
-            if (hayHash == needleHash) {
-                return int256(i - nl + 1);
+        uint256 s = 0;
+        while (s <= (hl - nl)) {
+            i = nl - 1;
+            while (i <= nl && read1(needle, i) == read1(haystack, s + i)) {
+                i--;
+            }
+            if (i > nl) {
+                return int256(s);
+            } else {
+                uint256 skip = i - badChar[read1(haystack, s + i)];
+                
+                if (skip > 1 && skip < hl) {
+                    s += skip;
+                } else {
+                    s += 1;
+                }
             }
         }
         return -1;
