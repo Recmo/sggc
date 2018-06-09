@@ -16,7 +16,7 @@ contract('IndexOf', function(accounts) {
             var instance = await instanceFuture;
             var abi = IIndexOf.at(instance.address);
             var result = await abi.indexOf(v.input[0], v.input[1], {gas: v.gas});
-            assert.equal(result, v.output[0]);
+            assert.equal(result.toNumber(), v.output[0]);
         });
     });
 
