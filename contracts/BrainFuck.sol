@@ -37,40 +37,56 @@ contract BrainFuck {
         for(uint pp = 0; pp < pro.length; pp++) {
             bytes1 instruction = pro[pp];
             if (instruction == '>') {
-                amount = 1;
-                while (pro[pp + 1] == '>') {
-                    amount += 1;
-                    pp++;
+                if (pro[pp + 1] == '>') {
+                    amount = 1;
+                    do {
+                        amount += 1;
+                        pp++;
+                    } while (pro[pp + 1] == '>');
+                    byt[bp] = right;
+                    arg[bp] = amount;
+                } else {
+                    byt[bp] = right1;
                 }
-                byt[bp] = right;
-                arg[bp] = amount;
                 bp++;
             } else if (instruction == '<') {
-                amount = 1;
-                while (pro[pp + 1] == '<') {
-                    amount += 1;
-                    pp++;
+                if (pro[pp + 1] == '<') {
+                    amount = 1;
+                    do {
+                        amount += 1;
+                        pp++;
+                    } while (pro[pp + 1] == '<');
+                    byt[bp] = left;
+                    arg[bp] = amount;
+                } else {
+                    byt[bp] = left1;
                 }
-                byt[bp] = left;
-                arg[bp] = amount;
                 bp++;
             } else if (instruction == '+') {
-                amount = 1;
-                while (pro[pp + 1] == '+') {
-                    amount += 1;
-                    pp++;
+                if (pro[pp + 1] == '+') {
+                    amount = 1;
+                    do {
+                        amount += 1;
+                        pp++;
+                    } while (pro[pp + 1] == '+');
+                    byt[bp] = incr;
+                    arg[bp] = amount;
+                } else {
+                    byt[bp] = incr1;
                 }
-                byt[bp] = incr;
-                arg[bp] = amount;
                 bp++;
             } else if (instruction == '-') {
-                amount = 1;
-                while (pro[pp + 1] == '-') {
-                    amount += 1;
-                    pp++;
+                if (pro[pp + 1] == '-') {
+                    amount = 1;
+                    do {
+                        amount += 1;
+                        pp++;
+                    } while (pro[pp + 1] == '-');
+                    byt[bp] = decr;
+                    arg[bp] = amount;
+                } else {
+                    byt[bp] = decr1;
                 }
-                byt[bp] = decr;
-                arg[bp] = amount;
                 bp++;
             } else if (instruction == '.') {
                 byt[bp] = output;
@@ -115,6 +131,19 @@ contract BrainFuck {
         return (mp, ip, op, pp);
     }
     
+    function right1(
+        uint256 mp,
+        bytes memory inp, uint256 ip,
+        bytes memory out, uint256 op,
+        uint256[] memory arg,
+        uint256 pp
+    ) private pure returns (uint256, uint256, uint256, uint256)
+    {
+        mp += 1;
+        pp++;
+        return (mp, ip, op, pp);
+    }
+    
     function right(
         uint256 mp,
         bytes memory inp, uint256 ip,
@@ -124,6 +153,19 @@ contract BrainFuck {
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
         mp += arg[pp];
+        pp++;
+        return (mp, ip, op, pp);
+    }
+    
+    function left1(
+        uint256 mp,
+        bytes memory inp, uint256 ip,
+        bytes memory out, uint256 op,
+        uint256[] memory arg,
+        uint256 pp
+    ) private pure returns (uint256, uint256, uint256, uint256)
+    {
+        mp -= 1;
         pp++;
         return (mp, ip, op, pp);
     }
@@ -141,6 +183,19 @@ contract BrainFuck {
         return (mp, ip, op, pp);
     }
     
+    function incr1(
+        uint256 mp,
+        bytes memory inp, uint256 ip,
+        bytes memory out, uint256 op,
+        uint256[] memory arg,
+        uint256 pp
+    ) private pure returns (uint256, uint256, uint256, uint256)
+    {
+        out[mp] = bytes1(uint8(read1(out, mp) + 1));
+        pp++;
+        return (mp, ip, op, pp);
+    }
+    
     function incr(
         uint256 mp,
         bytes memory inp, uint256 ip,
@@ -149,7 +204,20 @@ contract BrainFuck {
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        out[mp] = bytes1(uint8(out[mp]) + arg[pp]);
+        out[mp] = bytes1(uint8(read1(out, mp) + arg[pp]));
+        pp++;
+        return (mp, ip, op, pp);
+    }
+    
+    function decr1(
+        uint256 mp,
+        bytes memory inp, uint256 ip,
+        bytes memory out, uint256 op,
+        uint256[] memory arg,
+        uint256 pp
+    ) private pure returns (uint256, uint256, uint256, uint256)
+    {
+        out[mp] = bytes1(uint8(read1(out, mp) - 1));
         pp++;
         return (mp, ip, op, pp);
     }
@@ -162,7 +230,7 @@ contract BrainFuck {
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        out[mp] = bytes1(uint8(out[mp]) - arg[pp]);
+        out[mp] = bytes1(uint8(read1(out, mp) - arg[pp]));
         pp++;
         return (mp, ip, op, pp);
     }
@@ -175,7 +243,8 @@ contract BrainFuck {
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        out[op++] = out[mp];
+        out[op] = out[mp];
+        op++;
         pp++;
         return (mp, ip, op, pp);
     }
@@ -235,5 +304,12 @@ contract BrainFuck {
     {
         pp = 0x123456789ABCDEF;
         return (mp, ip, op, pp);
+    }
+    
+    function read1(bytes memory inp, uint256 i)
+        internal pure
+        returns (uint256)
+    {
+        return uint256(bytes(inp)[i]);
     }
 }
