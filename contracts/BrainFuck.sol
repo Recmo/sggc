@@ -191,7 +191,7 @@ contract BrainFuck {
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        out[mp] = bytes1(uint8(read1(out, mp) + 1));
+        out[mp] = bytes1(read1(out, mp) + 1);
         pp++;
         return (mp, ip, op, pp);
     }
@@ -204,7 +204,7 @@ contract BrainFuck {
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        out[mp] = bytes1(uint8(read1(out, mp) + arg[pp]));
+        out[mp] = bytes1(read1(out, mp) + arg[pp]);
         pp++;
         return (mp, ip, op, pp);
     }
@@ -217,7 +217,7 @@ contract BrainFuck {
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        out[mp] = bytes1(uint8(read1(out, mp) - 1));
+        out[mp] = bytes1(read1(out, mp) - 1);
         pp++;
         return (mp, ip, op, pp);
     }
@@ -230,7 +230,7 @@ contract BrainFuck {
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        out[mp] = bytes1(uint8(read1(out, mp) - arg[pp]));
+        out[mp] = bytes1(read1(out, mp) - arg[pp]);
         pp++;
         return (mp, ip, op, pp);
     }
@@ -257,7 +257,8 @@ contract BrainFuck {
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        out[mp] = inp[ip++];
+        out[mp] = inp[ip];
+        ip++;
         pp++;
         return (mp, ip, op, pp);
     }
@@ -310,6 +311,6 @@ contract BrainFuck {
         internal pure
         returns (uint256)
     {
-        return uint256(bytes(inp)[i]);
+        return uint256(inp[i]);
     }
 }
