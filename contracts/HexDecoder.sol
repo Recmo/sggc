@@ -104,21 +104,27 @@ contract HexDecoder {
     function write16(bytes memory output, uint256 i, bytes16 out)
         internal pure
     {
-        output[i     ] = out[ 0];
-        output[i +  1] = out[ 1];
-        output[i +  2] = out[ 2];
-        output[i +  3] = out[ 3];
-        output[i +  4] = out[ 4];
-        output[i +  5] = out[ 5];
-        output[i +  6] = out[ 6];
-        output[i +  7] = out[ 7];
-        output[i +  8] = out[ 8];
-        output[i +  9] = out[ 9];
-        output[i + 10] = out[10];
-        output[i + 11] = out[11];
-        output[i + 12] = out[12];
-        output[i + 13] = out[13];
-        output[i + 14] = out[14];
-        output[i + 15] = out[15];
+        write1(output, i     , out[ 0]);
+        write1(output, i +  1, out[ 1]);
+        write1(output, i +  2, out[ 2]);
+        write1(output, i +  3, out[ 3]);
+        write1(output, i +  4, out[ 4]);
+        write1(output, i +  5, out[ 5]);
+        write1(output, i +  6, out[ 6]);
+        write1(output, i +  7, out[ 7]);
+        write1(output, i +  8, out[ 8]);
+        write1(output, i +  9, out[ 9]);
+        write1(output, i + 10, out[10]);
+        write1(output, i + 11, out[11]);
+        write1(output, i + 12, out[12]);
+        write1(output, i + 13, out[13]);
+        write1(output, i + 14, out[14]);
+        write1(output, i + 15, out[15]);
+    }
+    
+    function write1(bytes memory output, uint256 i, bytes1 o)
+        internal pure
+    {
+        output[i] = o;
     }
 }
