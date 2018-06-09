@@ -24,7 +24,10 @@ contract Unique {
      * @param input The list of integers to uniquify.
      * @return The input list, with any duplicate elements removed.
      */
-    function uniquify(uint[] input) public pure returns(uint[] ret) {
+    function uniquify(uint[] input)
+        public payable
+        returns(uint[] ret) 
+    {
         uint ptr = 0;
         for(uint i = 0; i < input.length; i++) {
             if(isUnique(input, i, input[i])) {
