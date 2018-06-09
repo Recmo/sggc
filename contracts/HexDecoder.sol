@@ -104,22 +104,23 @@ contract HexDecoder {
     function write16(bytes memory output, uint256 i, bytes16 out)
         internal pure
     {
-        write1(output, i     , out[ 0]);
-        write1(output, i +  1, out[ 1]);
-        write1(output, i +  2, out[ 2]);
-        write1(output, i +  3, out[ 3]);
-        write1(output, i +  4, out[ 4]);
-        write1(output, i +  5, out[ 5]);
-        write1(output, i +  6, out[ 6]);
-        write1(output, i +  7, out[ 7]);
-        write1(output, i +  8, out[ 8]);
-        write1(output, i +  9, out[ 9]);
-        write1(output, i + 10, out[10]);
-        write1(output, i + 11, out[11]);
-        write1(output, i + 12, out[12]);
-        write1(output, i + 13, out[13]);
-        write1(output, i + 14, out[14]);
-        write1(output, i + 15, out[15]);
+        uint256 B = uint256(bytes32(out));
+        write1(output, i     , bytes1(bytes32(B))); B *= 256;
+        write1(output, i +  1, bytes1(bytes32(B))); B *= 256;
+        write1(output, i +  2, bytes1(bytes32(B))); B *= 256;
+        write1(output, i +  3, bytes1(bytes32(B))); B *= 256;
+        write1(output, i +  4, bytes1(bytes32(B))); B *= 256;
+        write1(output, i +  5, bytes1(bytes32(B))); B *= 256;
+        write1(output, i +  6, bytes1(bytes32(B))); B *= 256;
+        write1(output, i +  7, bytes1(bytes32(B))); B *= 256;
+        write1(output, i +  8, bytes1(bytes32(B))); B *= 256;
+        write1(output, i +  9, bytes1(bytes32(B))); B *= 256;
+        write1(output, i + 10, bytes1(bytes32(B))); B *= 256;
+        write1(output, i + 11, bytes1(bytes32(B))); B *= 256;
+        write1(output, i + 12, bytes1(bytes32(B))); B *= 256;
+        write1(output, i + 13, bytes1(bytes32(B))); B *= 256;
+        write1(output, i + 14, bytes1(bytes32(B))); B *= 256;
+        write1(output, i + 15, bytes1(bytes32(B)));
     }
     
     function write1(bytes memory output, uint256 i, bytes1 o)
