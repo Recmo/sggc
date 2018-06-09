@@ -33,19 +33,44 @@ contract BrainFuck {
         uint256[20] memory stack;
         uint256 sp = 0;
         uint256 bp = 0;
+        uint256 amount;
         for(uint pp = 0; pp < pro.length; pp++) {
             bytes1 instruction = pro[pp];
             if (instruction == '>') {
+                amount = 1;
+                while (pro[pp + 1] == '>') {
+                    amount += 1;
+                    pp++;
+                }
                 byt[bp] = right;
+                arg[bp] = amount;
                 bp++;
             } else if (instruction == '<') {
+                amount = 1;
+                while (pro[pp + 1] == '<') {
+                    amount += 1;
+                    pp++;
+                }
                 byt[bp] = left;
+                arg[bp] = amount;
                 bp++;
             } else if (instruction == '+') {
+                amount = 1;
+                while (pro[pp + 1] == '+') {
+                    amount += 1;
+                    pp++;
+                }
                 byt[bp] = incr;
+                arg[bp] = amount;
                 bp++;
             } else if (instruction == '-') {
+                amount = 1;
+                while (pro[pp + 1] == '-') {
+                    amount += 1;
+                    pp++;
+                }
                 byt[bp] = decr;
+                arg[bp] = amount;
                 bp++;
             } else if (instruction == '.') {
                 byt[bp] = output;
@@ -59,9 +84,9 @@ contract BrainFuck {
                 bp++;
             } else if(instruction == ']') {
                 byt[bp] = close;
-                uint256 matchp = stack[--sp];
-                arg[matchp] = bp + 1;
-                arg[bp] = matchp + 1;
+                amount = stack[--sp];
+                arg[amount] = bp + 1;
+                arg[bp] = amount + 1;
                 bp++;
             }
         }
@@ -98,7 +123,7 @@ contract BrainFuck {
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        mp++;
+        mp += arg[pp];
         pp++;
         return (mp, ip, op, pp);
     }
@@ -111,7 +136,7 @@ contract BrainFuck {
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        mp--;
+        mp -= arg[pp];
         pp++;
         return (mp, ip, op, pp);
     }
@@ -124,7 +149,7 @@ contract BrainFuck {
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        out[mp] = bytes1(uint8(out[mp]) + 1);
+        out[mp] = bytes1(uint8(out[mp]) + arg[pp]);
         pp++;
         return (mp, ip, op, pp);
     }
@@ -137,7 +162,7 @@ contract BrainFuck {
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        out[mp] = bytes1(uint8(out[mp]) - 1);
+        out[mp] = bytes1(uint8(out[mp]) - arg[pp]);
         pp++;
         return (mp, ip, op, pp);
     }
