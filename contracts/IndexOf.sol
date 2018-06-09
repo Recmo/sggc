@@ -17,32 +17,34 @@ contract IndexOf {
             return 0;
         }
         
-        // Boyer-Moore
+        // Boyer–Moore–Horspool
+        
+        // Bad character rule
         uint256[256] memory badChar;
         uint256[] memory needle32 = new uint256[](nl);
+        
         for (uint256 i = 0; i < nl; i++) {
-            uint256 u32 = read1(needle, i);
-            badChar[u32] = i + 1;
-            needle32[i] = u32;
+            // Needle lookup table
+            uint256 s = read1(needle, i);
+            needle32[i] = s;
+            
+            // Bad character table
+            if (i != nl - 1) {
+                badChar[s] = i + 1;
+            }
         }
         
-        uint256 s = 0;
+        s = 0;
         while (s <= (hl - nl)) {
             i = nl - 1;
-            while (i <= nl && needle32[i] == read1(haystack, s + i)) {
+            while (needle32[i] == read1(haystack, s + i)) {
+                if(i == 0) {
+                    return int256(s);
+                } 
                 i--;
             }
-            if (i > nl) {
-                return int256(s);
-            } else {
-                uint256 skip = i - badChar[read1(haystack, s + i)] - 1;
-                
-                if (skip > 1 && skip < hl) {
-                    s += skip;
-                } else {
-                    s += 1;
-                }
-            }
+            uint256 skip = badChar[read1(haystack, s + nl - 1)] - 1;
+            s += nl - skip - 1;
         }
         return -1;
     }
