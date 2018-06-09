@@ -13,7 +13,7 @@ contract BrainFuck {
         public pure
         returns(bytes)
     {
-        bytes memory out = new bytes(1024);
+        bytes memory out = new bytes(2048);
         uint256[] memory arg = new uint256[](pro.length);
         
         compile(pro, arg);
@@ -48,34 +48,44 @@ contract BrainFuck {
     
     function run(bytes memory pro, bytes memory inp, bytes memory out, uint256[] memory arg) private pure returns (uint256 op)
     {
-        bytes memory mem = new bytes(1024);
-
         uint256 pp = 0;
         uint256 ip = 0;
-        uint256 mp = 0;
+        uint256 mp = 1024;
         
         for(; pp < pro.length;) {
             bytes1 instruction = pro[pp];
             if(instruction == '+') {
-                (mp, ip, op, pp) = incr(mem, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = incr(out, mp, inp, ip, out, op, arg, pp);
             } else if(instruction == '-') {
-                (mp, ip, op, pp) = decr(mem, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = decr(out, mp, inp, ip, out, op, arg, pp);
             } else if(instruction == '>') {
-                (mp, ip, op, pp) = right(mem, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = right(out, mp, inp, ip, out, op, arg, pp);
             } else if(instruction == '<') {
-                (mp, ip, op, pp) = left(mem, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = left(out, mp, inp, ip, out, op, arg, pp);
             } else if(instruction == '.') {
-                (mp, ip, op, pp) = output(mem, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = output(out, mp, inp, ip, out, op, arg, pp);
             } else if(instruction == ',') {
-                (mp, ip, op, pp) = input(mem, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = input(out, mp, inp, ip, out, op, arg, pp);
             } else if(instruction == '[') {
-                (mp, ip, op, pp) = open(mem, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = open(out, mp, inp, ip, out, op, arg, pp);
             } else if(instruction == ']') {
-                (mp, ip, op, pp) = close(mem, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = close(out, mp, inp, ip, out, op, arg, pp);
             } else {
-                pp++;
+                (mp, ip, op, pp) = nop(out, mp, inp, ip, out, op, arg, pp);
             }
         }
+    }
+    
+    function nop(
+        bytes memory mem, uint256 mp,
+        bytes memory inp, uint256 ip,
+        bytes memory out, uint256 op,
+        uint256[] memory arg,
+        uint256 pp
+    ) private pure returns (uint256, uint256, uint256, uint256)
+    {
+        pp++;
+        return (mp, ip, op, pp);
     }
     
     function right(
