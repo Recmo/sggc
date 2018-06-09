@@ -9,16 +9,6 @@ pragma solidity 0.4.24;
 
 contract Unique {
     
-    function isUnique(uint256[] memory arr, uint256 len, uint256 value)
-        private pure
-        returns(bool)
-    {
-        for(uint256 i = 0; i < len; i++) {
-            if(arr[i] == value) return false;
-        }
-        return true;
-    }
-    
     uint256 constant p1 = 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f;
     uint256 constant p2 = 0xb7094513c3a0a2641751087acb3855f3c0a80be7260acdf01a49b4661672cb23;
     uint256 constant p3 = 0x1b6d296aa8b7284041b9f0e36895d18399d8026b57a51e5af0ed54c3e03bd3a1;
@@ -33,10 +23,9 @@ contract Unique {
         }
         uint256[] memory out = new uint256[](l);
         
-        uint256 htl = (25 * l) / 10;
-        uint256 scale = ((-htl) / htl) + 1;
+        uint256 scale = ((-l) / l) + 1;
 
-        uint256[] memory table = new uint256[](htl*2);
+        uint256[] memory table = new uint256[](l + l);
         
         uint256 ptr = 0;
         for(uint256 i = 0; i < l; i++) {
@@ -65,7 +54,7 @@ contract Unique {
                 continue;
             }
             
-            index1 += htl;
+            index1 += l;
             r = table[index1];
             if (r == 0) {
                 out[ptr++] = value;
@@ -76,7 +65,7 @@ contract Unique {
                 continue;
             }
             
-            index2 += htl;
+            index2 += l;
             r = table[index2];
             if (r == 0) {
                 out[ptr++] = value;
