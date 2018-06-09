@@ -40,8 +40,8 @@ contract BrainFuck {
                 stack[sp++] = pp;
             } else if(instruction == ']') {
                 uint256 matchp = stack[--sp];
-                arg[matchp] = pp;
-                arg[pp] = matchp;
+                arg[matchp] = pp + 1;
+                arg[pp] = matchp + 1;
             }
         }
     }
@@ -54,30 +54,40 @@ contract BrainFuck {
         uint256 ip = 0;
         uint256 mp = 0;
         
-        for(pp = 0; pp < pro.length; pp++) {
+        for(; pp < pro.length;) {
             bytes1 instruction = pro[pp];
             if(instruction == '+') {
-                //(mp, ip, op, pp) = incr(mem, mp, inp, ip, out, op, arg, pp);
-                
                 mem[mp] = byte(uint(mem[mp]) + 1);
+                pp++;
             } else if(instruction == '-') {
                 mem[mp] = byte(uint(mem[mp]) - 1);
+                pp++;
             } else if(instruction == '>') {
                 mp++;
+                pp++;
             } else if(instruction == '<') {
                 mp--;
+                pp++;
             } else if(instruction == '.') {
                 out[op++] = mem[mp];
+                pp++;
             } else if(instruction == ',') {
                 mem[mp] = inp[ip++];
+                pp++;
             } else if(instruction == '[') {
                 if(mem[mp] == 0) {
                     pp = arg[pp];
+                } else {
+                    pp++;
                 }
             } else if(instruction == ']') {
                 if(mem[mp] != 0) {
                     pp = arg[pp];
+                } else {
+                    pp++;
                 }
+            } else {
+                pp++;
             }
         }
     }
