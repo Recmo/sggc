@@ -12,7 +12,7 @@ contract BrainFuck {
         uint256[] memory arg = new uint256[](pro.length);
         
         // Stress test the parser. (It's a dynamic array of function pointers)
-        function(uint256,bytes memory,uint256,bytes memory,uint256,uint256[] memory,uint256) internal pure returns(uint256,uint256,uint256,uint256)[] memory byt = new function(uint256,bytes memory,uint256,bytes memory,uint256,uint256[] memory,uint256) internal pure returns(uint256,uint256,uint256,uint256)[](pro.length);
+        function(uint256,bytes memory,uint256,bytes memory,uint256,uint256[] memory,uint256) internal pure returns(uint256,uint256,uint256,uint256)[] memory byt = new function(uint256,bytes memory,uint256,bytes memory,uint256,uint256[] memory,uint256) internal pure returns(uint256,uint256,uint256,uint256)[](pro.length + 1);
         
         compile(pro, arg, byt);
         
@@ -58,6 +58,7 @@ contract BrainFuck {
                 byt[pp] = nop;
             }
         }
+        byt[pp] = exit;
     }
     
     function run(function(uint256,bytes memory,uint256,bytes memory,uint256,uint256[] memory,uint256) internal pure returns(uint256,uint256,uint256,uint256)[] memory byt, bytes memory inp, bytes memory out, uint256[] memory arg) private pure returns (uint256 op)
@@ -189,6 +190,18 @@ contract BrainFuck {
         } else {
             pp++;
         }
+        return (mp, ip, op, pp);
+    }
+    
+    function exit(
+        uint256 mp,
+        bytes memory inp, uint256 ip,
+        bytes memory out, uint256 op,
+        uint256[] memory arg,
+        uint256 pp
+    ) private pure returns (uint256, uint256, uint256, uint256)
+    {
+        pp = 0x123456789ABCDEF;
         return (mp, ip, op, pp);
     }
 }
