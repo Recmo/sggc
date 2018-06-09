@@ -35,7 +35,7 @@ contract BrainFuck {
         uint256 bp = 0;
         uint256 amount;
         for(uint pp = 0; pp < pro.length; pp++) {
-            bytes1 instruction = pro[pp];
+            bytes32 instruction = pro[pp];
             if (instruction == '>') {
                 if (pro[pp + 1] == '>') {
                     amount = 1;
