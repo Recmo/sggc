@@ -19,11 +19,8 @@ contract IndexOf {
         
         // Boyer-Moore
         uint256[256] memory badChar;
-        for(uint256 i = 0; i < 256; i++) {
-            badChar[i] = uint256(-1);
-        }
-        for (i = 0; i < nl; i++) {
-            badChar[read1(needle, i)] = i;
+        for (uint256 i = 0; i < nl; i++) {
+            badChar[read1(needle, i)] = i + 1;
         }
         
         uint256 s = 0;
@@ -35,7 +32,7 @@ contract IndexOf {
             if (i > nl) {
                 return int256(s);
             } else {
-                uint256 skip = i - badChar[read1(haystack, s + i)];
+                uint256 skip = i - badChar[read1(haystack, s + i)] - 1;
                 
                 if (skip > 1 && skip < hl) {
                     s += skip;
