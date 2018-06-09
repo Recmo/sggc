@@ -25,14 +25,18 @@ contract BrainFuck {
      *          number of outputs produced by the program.
      */
     function execute(bytes program, bytes input) public pure returns(bytes) {
+        uint256 pl = program.length;
+        
         uint ipp = 0;
         uint opp = 0;
         uint dp = 0;
         bytes memory mem = new bytes(1024);
         bytes memory output = new bytes(1024);
-
-        for(uint ip = 0; ip < program.length; ip++) {
-            byte instruction = program[ip];
+        uint256[] memory arg = new uint256[](pl);
+        compile(program, arg);
+        
+        for(uint ip = 0; ip < pl; ip++) {
+            bytes1 instruction = program[ip];
             if(instruction == '+') {
                 mem[dp] = byte(uint(mem[dp]) + 1);
             } else if(instruction == '-') {
@@ -47,41 +51,38 @@ contract BrainFuck {
                 mem[dp] = input[ipp++];
             } else if(instruction == '[') {
                 if(mem[dp] == 0) {
-                    uint depth = 1;
-                    for(uint i = ip + 1; i < program.length; i++) {
-                        if(program[i] == ']') {
-                            depth--;
-                            if(depth == 0) {
-                                ip = i;
-                                break;
-                            }
-                        } else if(program[i] == '[') {
-                            depth++;
-                        }
-                    }
+                    ip = arg[ip];
                 }
             } else if(instruction == ']') {
                 if(mem[dp] != 0) {
-                    depth = 1;
-                    for(i = ip - 1; i > 0; i--) {
-                        if(program[i] == '[') {
-                            depth--;
-                            if(depth == 0) {
-                                ip = i;
-                                break;
-                            }
-                        } else if(program[i] == ']') {
-                            depth++;
-                        }
-                    }
+                    ip = arg[ip];
                 }
             }
         }
 
+        // Create output array
         bytes memory ret = new bytes(opp);
-        for(i = 0; i < opp; i++) {
+        for(uint256 i = 0; i < opp; i++) {
             ret[i] = output[i];
         }
         return ret;
+    }
+    
+    function compile(bytes memory pro, uint256[] memory arg)
+        private pure
+    {
+        // Compute arguments
+        uint256[20] memory stack;
+        uint256 sp = 0;
+        for(uint pp = 0; pp < pro.length; pp++) {
+            bytes1 instruction = pro[pp];
+            if(instruction == '[') {
+                stack[sp++] = pp;
+            } else if(instruction == ']') {
+                uint256 matchp = stack[--sp];
+                arg[matchp] = pp;
+                arg[pp] = matchp;
+            }
+        }
     }
 }
