@@ -19,14 +19,17 @@ contract IndexOf {
         
         // Boyer-Moore
         uint256[256] memory badChar;
+        uint256[] memory needle32 = new uint256[](nl);
         for (uint256 i = 0; i < nl; i++) {
-            badChar[read1(needle, i)] = i + 1;
+            uint256 u32 = read1(needle, i);
+            badChar[u32] = i + 1;
+            needle32[i] = u32;
         }
         
         uint256 s = 0;
         while (s <= (hl - nl)) {
             i = nl - 1;
-            while (i <= nl && read1(needle, i) == read1(haystack, s + i)) {
+            while (i <= nl && needle32[i] == read1(haystack, s + i)) {
                 i--;
             }
             if (i > nl) {
