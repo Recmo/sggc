@@ -23,13 +23,18 @@ contract Unique {
         uint256[] memory table = new uint256[](l + l);
         
         uint256 ptr = 0;
-        uint256 last = p1;
+        uint256 last1 = p1;
+        uint256 last2 = p1;
         for(uint256 i = 0; i < l; i++) {
             uint256 value = input[i];
-            if (value == last) {
+            if (value == last1) {
                 continue;
             }
-            last = value;
+            if (value == last2) {
+                continue;
+            }
+            last2 = last1;
+            last1 = value;
             
             uint256 vhash = value + p1;
             
@@ -189,10 +194,10 @@ contract Unique {
         }
 
         // Construct return value
-        uint256[] memory ret = new uint256[](ptr);
-        for(i = 0; i < ret.length; i++) {
-            ret[i] = out[i];
+        table = new uint256[](ptr);
+        for(i = 0; i < ptr; i++) {
+            table[i] = out[i];
         }
-        return ret;
+        return table;
     }
 }
