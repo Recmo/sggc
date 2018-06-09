@@ -55,29 +55,29 @@ contract BrainFuck {
         for(; pp < pro.length;) {
             bytes1 instruction = pro[pp];
             if(instruction == '+') {
-                (mp, ip, op, pp) = incr(out, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = incr(mp, inp, ip, out, op, arg, pp);
             } else if(instruction == '-') {
-                (mp, ip, op, pp) = decr(out, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = decr(mp, inp, ip, out, op, arg, pp);
             } else if(instruction == '>') {
-                (mp, ip, op, pp) = right(out, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = right(mp, inp, ip, out, op, arg, pp);
             } else if(instruction == '<') {
-                (mp, ip, op, pp) = left(out, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = left(mp, inp, ip, out, op, arg, pp);
             } else if(instruction == '.') {
-                (mp, ip, op, pp) = output(out, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = output(mp, inp, ip, out, op, arg, pp);
             } else if(instruction == ',') {
-                (mp, ip, op, pp) = input(out, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = input(mp, inp, ip, out, op, arg, pp);
             } else if(instruction == '[') {
-                (mp, ip, op, pp) = open(out, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = open(mp, inp, ip, out, op, arg, pp);
             } else if(instruction == ']') {
-                (mp, ip, op, pp) = close(out, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = close(mp, inp, ip, out, op, arg, pp);
             } else {
-                (mp, ip, op, pp) = nop(out, mp, inp, ip, out, op, arg, pp);
+                (mp, ip, op, pp) = nop(mp, inp, ip, out, op, arg, pp);
             }
         }
     }
     
     function nop(
-        bytes memory mem, uint256 mp,
+        uint256 mp,
         bytes memory inp, uint256 ip,
         bytes memory out, uint256 op,
         uint256[] memory arg,
@@ -89,7 +89,7 @@ contract BrainFuck {
     }
     
     function right(
-        bytes memory mem, uint256 mp,
+        uint256 mp,
         bytes memory inp, uint256 ip,
         bytes memory out, uint256 op,
         uint256[] memory arg,
@@ -102,7 +102,7 @@ contract BrainFuck {
     }
     
     function left(
-        bytes memory mem, uint256 mp,
+        uint256 mp,
         bytes memory inp, uint256 ip,
         bytes memory out, uint256 op,
         uint256[] memory arg,
@@ -115,66 +115,66 @@ contract BrainFuck {
     }
     
     function incr(
-        bytes memory mem, uint256 mp,
+        uint256 mp,
         bytes memory inp, uint256 ip,
         bytes memory out, uint256 op,
         uint256[] memory arg,
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        mem[mp] = bytes1(uint8(mem[mp]) + 1);
+        out[mp] = bytes1(uint8(out[mp]) + 1);
         pp++;
         return (mp, ip, op, pp);
     }
     
     function decr(
-        bytes memory mem, uint256 mp,
+        uint256 mp,
         bytes memory inp, uint256 ip,
         bytes memory out, uint256 op,
         uint256[] memory arg,
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        mem[mp] = bytes1(uint8(mem[mp]) - 1);
+        out[mp] = bytes1(uint8(out[mp]) - 1);
         pp++;
         return (mp, ip, op, pp);
     }
     
     function output(
-        bytes memory mem, uint256 mp,
+        uint256 mp,
         bytes memory inp, uint256 ip,
         bytes memory out, uint256 op,
         uint256[] memory arg,
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        out[op++] = mem[mp];
+        out[op++] = out[mp];
         pp++;
         return (mp, ip, op, pp);
     }
     
     function input(
-        bytes memory mem, uint256 mp,
+        uint256 mp,
         bytes memory inp, uint256 ip,
         bytes memory out, uint256 op,
         uint256[] memory arg,
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        mem[mp] = inp[ip++];
+        out[mp] = inp[ip++];
         pp++;
         return (mp, ip, op, pp);
     }
     
     function open(
-        bytes memory mem, uint256 mp,
+        uint256 mp,
         bytes memory inp, uint256 ip,
         bytes memory out, uint256 op,
         uint256[] memory arg,
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        if (mem[mp] == 0) {
+        if (out[mp] == 0) {
             pp = arg[pp];
         } else {
             pp++;
@@ -183,14 +183,14 @@ contract BrainFuck {
     }
     
     function close(
-        bytes memory mem, uint256 mp,
+        uint256 mp,
         bytes memory inp, uint256 ip,
         bytes memory out, uint256 op,
         uint256[] memory arg,
         uint256 pp
     ) private pure returns (uint256, uint256, uint256, uint256)
     {
-        if (mem[mp] != 0) {
+        if (out[mp] != 0) {
             pp = arg[pp];
         } else {
             pp++;
