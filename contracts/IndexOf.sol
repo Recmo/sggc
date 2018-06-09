@@ -3,9 +3,6 @@ pragma solidity ^0.4.23;
 contract IndexOf {
     
     /// @author Remco Bloemen <remco@wicked.ventures>
-    
-    //uint256 constant p1 = 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f;
-    uint256 constant p1 = 257;
 
     function indexOf(string haystack, string needle)
         public pure
@@ -23,14 +20,14 @@ contract IndexOf {
         // Rabin-Karp without verify
         uint256 needleHash = 0;
         for(uint i = 0; i < nl; i++) {
-            needleHash *= p1;
+            needleHash += needleHash;
             needleHash += read1(needle, i);
         }
-        uint256 factor = p1 ** (nl - 1);
+        uint256 factor = 2 ** (nl - 1);
         
         uint256 hayHash = 0;
         for(i = 0; i < nl; i++) {
-            hayHash *= p1;
+            hayHash += hayHash;
             hayHash += read1(haystack, i);
         }
         if (hayHash == needleHash) {
@@ -38,7 +35,7 @@ contract IndexOf {
         }
         for (; i < hl; i++) {
             hayHash -= read1(haystack, i - nl) * factor;
-            hayHash *= p1;
+            hayHash += hayHash;
             hayHash += read1(haystack, i);
             if (hayHash == needleHash) {
                 return int256(i - nl + 1);
