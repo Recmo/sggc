@@ -1,13 +1,8 @@
-/**
- * This file is part of the 1st Solidity Gas Golfing Contest.
- *
- * This work is licensed under Creative Commons Attribution ShareAlike 3.0.
- * https://creativecommons.org/licenses/by-sa/3.0/
- */
-
 pragma solidity 0.4.24;
 
 contract Unique {
+    
+    /// @author Remco Bloemen <remco@wicked.ventures>
     
     uint256 constant p1 = 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f;
     uint256 constant p2 = 0xb7094513c3a0a2641751087acb3855f3c0a80be7260acdf01a49b4661672cb23;
