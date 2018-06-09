@@ -37,13 +37,17 @@ contract IndexOf {
         s = 0;
         while (s <= (hl - nl)) {
             i = nl - 1;
-            while (needle32[i] == read1(haystack, s + i)) {
+            
+            uint256 hsn = read1(haystack, s + nl - 1);
+            uint256 hsi = hsn;
+            while (needle32[i] == hsi) {
                 if(i == 0) {
                     return int256(s);
                 } 
                 i--;
+                hsi = read1(haystack, s + i);
             }
-            s += nl - badChar[read1(haystack, s + nl - 1)];
+            s += nl - badChar[hsn];
         }
         return -1;
     }
