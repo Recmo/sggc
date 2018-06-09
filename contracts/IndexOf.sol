@@ -43,8 +43,7 @@ contract IndexOf {
                 } 
                 i--;
             }
-            uint256 skip = badChar[read1(haystack, s + nl - 1)] - 1;
-            s += nl - skip - 1;
+            s += nl - badChar[read1(haystack, s + nl - 1)];
         }
         return -1;
     }
