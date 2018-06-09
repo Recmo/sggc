@@ -40,7 +40,7 @@ contract HexDecoder {
                 B =  B * f5;
                 
                 // Write to output
-                write16(output, i, bytes16(bytes32(B)));
+                write16(output, i, B);
                 i += 16;
             }
         }
@@ -49,7 +49,7 @@ contract HexDecoder {
             uint8 b = uint8(read1(bytes(input), j++));
             a = (a & 0xf) + ((a / 64) * 9);
             b = (b & 0xf) + ((b / 64) * 9);
-            output[i++] = byte((a << 4) | b);
+            output[i++] = bytes1((a << 4) | b);
         }
     }
     
@@ -101,10 +101,9 @@ contract HexDecoder {
         return uint256(bytes(input)[i]);
     }
     
-    function write16(bytes memory output, uint256 i, bytes16 out)
+    function write16(bytes memory output, uint256 i, uint256 B)
         internal pure
     {
-        uint256 B = uint256(bytes32(out));
         write1(output, i     , bytes1(bytes32(B))); B *= 256;
         write1(output, i +  1, bytes1(bytes32(B))); B *= 256;
         write1(output, i +  2, bytes1(bytes32(B))); B *= 256;
