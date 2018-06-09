@@ -32,33 +32,40 @@ contract BrainFuck {
         // Compute arguments
         uint256[20] memory stack;
         uint256 sp = 0;
+        uint256 bp = 0;
         for(uint pp = 0; pp < pro.length; pp++) {
             bytes1 instruction = pro[pp];
             if (instruction == '>') {
-                byt[pp] = right;
+                byt[bp] = right;
+                bp++;
             } else if (instruction == '<') {
-                byt[pp] = left;
+                byt[bp] = left;
+                bp++;
             } else if (instruction == '+') {
-                byt[pp] = incr;
+                byt[bp] = incr;
+                bp++;
             } else if (instruction == '-') {
-                byt[pp] = decr;
+                byt[bp] = decr;
+                bp++;
             } else if (instruction == '.') {
-                byt[pp] = output;
+                byt[bp] = output;
+                bp++;
             } else if (instruction == ',') {
-                byt[pp] = input;
+                byt[bp] = input;
+                bp++;
             } else if(instruction == '[') {
-                byt[pp] = open;
-                stack[sp++] = pp;
+                byt[bp] = open;
+                stack[sp++] = bp;
+                bp++;
             } else if(instruction == ']') {
-                byt[pp] = close;
+                byt[bp] = close;
                 uint256 matchp = stack[--sp];
-                arg[matchp] = pp + 1;
-                arg[pp] = matchp + 1;
-            } else {
-                byt[pp] = nop;
+                arg[matchp] = bp + 1;
+                arg[bp] = matchp + 1;
+                bp++;
             }
         }
-        byt[pp] = exit;
+        byt[bp] = exit;
     }
     
     function run(function(uint256,bytes memory,uint256,bytes memory,uint256,uint256[] memory,uint256) internal pure returns(uint256,uint256,uint256,uint256)[] memory byt, bytes memory inp, bytes memory out, uint256[] memory arg) private pure returns (uint256 op)
