@@ -48,18 +48,6 @@ contract Unique {
             if (r == vhash) {
                 continue;
             }
-            
-            uint256 index2 = (vhash * p3) / scale;
-            r = table[index2];
-            if (r == 0) {
-                out[ptr++] = value;
-                table[index2] = vhash;
-                continue;
-            }
-            if (r == vhash) {
-                continue;
-            }
-            
             index1 += l;
             r = table[index1];
             if (r == 0) {
@@ -70,9 +58,8 @@ contract Unique {
             if (r == vhash) {
                 continue;
             }
-            
-            index2 += l;
-            r = table[index2];
+            index1 += 1;
+            r = table[index1];
             if (r == 0) {
                 out[ptr++] = value;
                 table[index1] = vhash;
@@ -93,17 +80,6 @@ contract Unique {
                 continue;
             }
             
-            index2 += 1;
-            r = table[index2];
-            if (r == 0) {
-                out[ptr++] = value;
-                table[index1] = vhash;
-                continue;
-            }
-            if (r == vhash) {
-                continue;
-            }
-            
             index1 += 1;
             r = table[index1];
             if (r == 0) {
@@ -115,82 +91,6 @@ contract Unique {
                 continue;
             }
             
-            index2 += 1;
-            r = table[index2];
-            if (r == 0) {
-                out[ptr++] = value;
-                table[index1] = vhash;
-                continue;
-            }
-            if (r == vhash) {
-                continue;
-            }
-            
-            index1 += 1;
-            r = table[index1];
-            if (r == 0) {
-                out[ptr++] = value;
-                table[index1] = vhash;
-                continue;
-            }
-            if (r == vhash) {
-                continue;
-            }
-            
-            index2 += 1;
-            r = table[index2];
-            if (r == 0) {
-                out[ptr++] = value;
-                table[index1] = vhash;
-                continue;
-            }
-            if (r == vhash) {
-                continue;
-            }
-            
-            index1 += 1;
-            r = table[index1];
-            if (r == 0) {
-                out[ptr++] = value;
-                table[index1] = vhash;
-                continue;
-            }
-            if (r == vhash) {
-                continue;
-            }
-            
-            index2 += 1;
-            r = table[index2];
-            if (r == 0) {
-                out[ptr++] = value;
-                table[index1] = vhash;
-                continue;
-            }
-            if (r == vhash) {
-                continue;
-            }
-            
-            index1 += 1;
-            r = table[index1];
-            if (r == 0) {
-                out[ptr++] = value;
-                table[index1] = vhash;
-                continue;
-            }
-            if (r == vhash) {
-                continue;
-            }
-            
-            index2 += 1;
-            r = table[index2];
-            if (r == 0) {
-                out[ptr++] = value;
-                table[index1] = vhash;
-                continue;
-            }
-            if (r == vhash) {
-                continue;
-            }            
         }
 
         // Construct return value
