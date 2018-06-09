@@ -13,22 +13,52 @@ contract BrainFuck {
         public pure
         returns(bytes)
     {
-        uint256 pl = pro.length;
-        
-        uint256 pp = 0;
-        uint256 ip = 0;
-        uint256 op = 0;
-        uint256 mp = 0;
-        
-        bytes memory mem = new bytes(1024);
         bytes memory out = new bytes(1024);
-        uint256[] memory arg = new uint256[](pl);
+        uint256[] memory arg = new uint256[](pro.length);
         
         compile(pro, arg);
         
-        for(pp = 0; pp < pl; pp++) {
+        uint256 op = run(pro, inp, out, arg);
+        
+        // Create output array
+        bytes memory ret = new bytes(op);
+        for(uint256 i = 0; i < op; i++) {
+            ret[i] = out[i];
+        }
+        return ret;
+    }
+    
+    function compile(bytes memory pro, uint256[] memory arg)
+        private pure
+    {
+        // Compute arguments
+        uint256[20] memory stack;
+        uint256 sp = 0;
+        for(uint pp = 0; pp < pro.length; pp++) {
+            bytes1 instruction = pro[pp];
+            if(instruction == '[') {
+                stack[sp++] = pp;
+            } else if(instruction == ']') {
+                uint256 matchp = stack[--sp];
+                arg[matchp] = pp;
+                arg[pp] = matchp;
+            }
+        }
+    }
+    
+    function run(bytes memory pro, bytes memory inp, bytes memory out, uint256[] memory arg) private pure returns (uint256 op)
+    {
+        bytes memory mem = new bytes(1024);
+
+        uint256 pp = 0;
+        uint256 ip = 0;
+        uint256 mp = 0;
+        
+        for(pp = 0; pp < pro.length; pp++) {
             bytes1 instruction = pro[pp];
             if(instruction == '+') {
+                //(mp, ip, op, pp) = incr(mem, mp, inp, ip, out, op, arg, pp);
+                
                 mem[mp] = byte(uint(mem[mp]) + 1);
             } else if(instruction == '-') {
                 mem[mp] = byte(uint(mem[mp]) - 1);
@@ -50,11 +80,7 @@ contract BrainFuck {
                 }
             }
         }
-        
-        // Create output array
-        bytes memory ret = new bytes(op);
-        for(uint256 i = 0; i < op; i++) {
-            ret[i] = out[i];
+    }
         }
         return ret;
     }
