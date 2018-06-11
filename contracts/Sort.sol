@@ -108,12 +108,14 @@ contract Sort {
             }
             
             // Recurse
-            if lt(lolo, lo) {
-                sort(lolo, lo)
-            }
-            if lt(hi, hihi) {
-                sort(hi, hihi)
-            }
+            
+        sortlo:
+            jumpi(sorthi, eq(lolo, lo))
+            sort(lolo, lo)
+        
+        sorthi:
+            jumpi(ret, eq(hi, hihi))
+            sort(hi, hihi)
             
         ret:
         }
