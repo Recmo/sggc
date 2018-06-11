@@ -20,31 +20,28 @@ contract BrainFuck {
         // Compiler
         //
         
-        // Create lookup table
+        // Create lookup table (256 bytes)
         // From high to low since we have overlaping writes
-        mstore(mul(0x5d, 16), close)
-        mstore(mul(0x5b, 16), open)
-        mstore(mul(0x3e, 16), right)
-        mstore(mul(0x3c, 16), left)
-        mstore(mul(0x2e, 16), output)
-        mstore(mul(0x2d, 16), decr)
-        mstore(mul(0x2c, 16), input)
-        mstore(mul(0x2b, 16), incr)
+        mstore(mul(0x5d, 2), close)
+        mstore(mul(0x5b, 2), open)
+        mstore(mul(0x3e, 2), right)
+        mstore(mul(0x3c, 2), left)
+        mstore(mul(0x2e, 2), output)
+        mstore(mul(0x2d, 2), decr)
+        mstore(mul(0x2c, 2), input)
+        mstore(mul(0x2b, 2), incr)
 
         source := 0x45 // offset left 31 bytes
         eof := add(calldataload(0x44), 0x45)
-        pp := 2080 // WARNING: Overlaps with lookup table for high ascii
-        stack := 0 // WARNING: Overlaps with lookup table
-                   // If stack gets very deep or source has a very low
-                   // character this will fail.
-        
+        pp := 2080
+        stack := 256
         {
             let c
             let inst
             // If input is empty we will see one zero byte
         cloop:
-            c := and(calldataload(source), 0xff)
-            inst := and(mload(mul(c, 16)), 0xFFFF)
+            c := and(calldataload(source), 0xFF)
+            inst := and(mload(add(c, c)), 0xFFFF)
             
             if inst {
             
@@ -71,16 +68,16 @@ contract BrainFuck {
         cend:
         }
         mstore(pp, exit)
-        
+    
         // Clear lookup table
-        mstore(mul(0x3e, 16), 0)
-        mstore(mul(0x3c, 16), 0)
-        mstore(mul(0x2b, 16), 0)
-        mstore(mul(0x2d, 16), 0)
-        mstore(mul(0x2e, 16), 0)
-        mstore(mul(0x2c, 16), 0)
-        mstore(mul(0x5b, 16), 0)
-        mstore(mul(0x5d, 16), 0)
+        mstore(mul(0x3e, 2), 0)
+        mstore(mul(0x3c, 2), 0)
+        mstore(mul(0x2b, 2), 0)
+        mstore(mul(0x2d, 2), 0)
+        mstore(mul(0x2e, 2), 0)
+        mstore(mul(0x2c, 2), 0)
+        mstore(mul(0x5b, 2), 0)
+        mstore(mul(0x5d, 2), 0)
 
         
         //
