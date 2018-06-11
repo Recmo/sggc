@@ -4,16 +4,22 @@ contract BrainFuck {
     
     function () external payable { assembly {
         
+        /// @author Remco Bloemen <remco@wicked.ventures> 
+        
         // This canceles out the "mstore(0x40, 0x80)" that
         // solc likes to inject. It even gets partially optimized.
         mstore(0x40, 0x00)
         
-        let t  // temp
-        let tp // Tape pointer      / stack pointer
-        let ip // Input pointer     / source pointer
-        let op // Output pointer    / temp
+        // Declare stack variables
+        // (we jump so much, best to keep stack layout fixed)
+        //
+        //        Runtime              Compile time
+        let t  //                      Temp (repetitions)
+        let tp // Tape pointer         [ ] stack pointer
+        let ip // Input pointer        Source pointer
+        let op // Output pointer       Temp (instruction)
         let pp // Program pointer
-        
+    
     ///////////////////////////////////////////////////////
     // Compiler
     ///////////////////////////////////////////////////////
