@@ -21,7 +21,7 @@ contract BrainFuck {
         let pp // Program pointer
     
     ///////////////////////////////////////////////////////
-    // Compiler
+    // BrainFuck Optimizing Compiler (optimized)
     ///////////////////////////////////////////////////////
         
         // Create lookup table (512 bytes)
