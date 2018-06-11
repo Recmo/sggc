@@ -66,12 +66,31 @@ contract BrainFuck {
         mstore(pp, t)
         pp := add(pp, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
-    
+
     cleft:
+        // Check if next char is also >
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jumpi(cleftn, eq(op, 0x3c))
+        // Single instruction
         mstore(pp, left)
         pp := add(pp, 32)
-        jump(cnext)
-    
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+    cleftn:
+        t := 1
+    cleftn_loop:
+        // We have seen two consecutive >>, check for more
+        t := add(t, 1)
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jumpi(cleftn_loop, eq(op, 0x3c))
+        // Bulk instruction
+        mstore(pp, leftn)
+        pp := add(pp, 32)
+        mstore(pp, t)
+        pp := add(pp, 32)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+
     cincr:
         mstore(pp, incr)
         pp := add(pp, 32)
@@ -147,9 +166,15 @@ contract BrainFuck {
         tp := add(tp, mload(pp))
         pp := add(pp, 32)
         jump(mload(pp))
-    
+        
     left: // <
         tp := sub(tp, 1)
+        pp := add(pp, 32)
+        jump(mload(pp))
+        
+    leftn: // <
+        pp := add(pp, 32)
+        tp := sub(tp, mload(pp))
         pp := add(pp, 32)
         jump(mload(pp))
     
