@@ -8,68 +8,95 @@ contract BrainFuck {
         // solc likes to inject. It even gets partially optimized.
         mstore(0x40, 0x00)
         
-        let source
-        let eof
-        let stack
-        let tp // Tape pointer
-        let ip // Input pointer
-        let op // Output pointer
+        let tp // Tape pointer      / stack pointer
+        let ip // Input pointer     / source pointer
+        let op // Output pointer    / temp
         let pp // Program pointer
         
         //
         // Compiler
         //
         
-        // Create lookup table (256 bytes)
+        // Create lookup table (512 bytes)
         // From high to low since we have overlaping writes
-        mstore(mul(0x5d, 2), close)
-        mstore(mul(0x5b, 2), open)
-        mstore(mul(0x3e, 2), right)
-        mstore(mul(0x3c, 2), left)
-        mstore(mul(0x2e, 2), output)
-        mstore(mul(0x2d, 2), decr)
-        mstore(mul(0x2c, 2), input)
-        mstore(mul(0x2b, 2), incr)
+        // XORed with cnop make cnop the default entry
+        mstore(mul(0x5d, 2), xor(cclose, cnop))
+        mstore(mul(0x5b, 2), xor(copen, cnop))
+        mstore(mul(0x3e, 2), xor(cright, cnop))
+        mstore(mul(0x3c, 2), xor(cleft, cnop))
+        mstore(mul(0x2e, 2), xor(coutput, cnop))
+        mstore(mul(0x2d, 2), xor(cdecr, cnop))
+        mstore(mul(0x2c, 2), xor(cinput, cnop))
+        mstore(mul(0x2b, 2), xor(cincr, cnop))
+        mstore(mul(0x00, 2), xor(ceof, cnop))
 
-        source := 0x45 // offset left 31 bytes
-        eof := add(calldataload(0x44), 0x45)
+        ip := 0x44 // source pointer offset left 31 bytes and ones for the first increment
         pp := 2080
-        stack := 256
-        {
-            let c
-            let inst
-            // If input is empty we will see one zero byte
-        cloop:
-            c := and(calldataload(source), 0xFF)
-            inst := and(mload(add(c, c)), 0xFFFF)
-            
-            if inst {
-            
-                mstore(pp, inst)
-                pp := add(pp, 32)
-                
-                if eq(inst, open) {
-                    pp := add(pp, 32)
-                    mstore(stack, pp)
-                    stack := add(stack, 32)
-                }
-                if eq(inst, close) {
-                    stack := sub(stack, 32)
-                    let back := mload(stack) 
-                    mstore(pp, back)
-                    pp := add(pp, 32)
-                    mstore(sub(back, 32), pp)
-                    mstore(stack, 0)
-                }
-            }
-            
-            source := add(source, 1)
-            jumpi(cloop, lt(source, eof))
-        cend:
-        }
-        mstore(pp, exit)
+        tp := 512  // stack pointer
+        
+    cnext:
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+        
+    cnop:
+        jump(cnext)
+        
+    cright:
+        mstore(pp, right)
+        pp := add(pp, 32)
+        jump(cnext)
     
+    cleft:
+        mstore(pp, left)
+        pp := add(pp, 32)
+        jump(cnext)
+    
+    cincr:
+        mstore(pp, incr)
+        pp := add(pp, 32)
+        jump(cnext)
+    
+    cdecr:
+        mstore(pp, decr)
+        pp := add(pp, 32)
+        jump(cnext)
+    
+    coutput:
+        mstore(pp, output)
+        pp := add(pp, 32)
+        jump(cnext)
+    
+    cinput:
+        mstore(pp, input)
+        pp := add(pp, 32)
+        jump(cnext)
+    
+    copen:
+        mstore(pp, open)
+        pp := add(pp, 32)
+        pp := add(pp, 32)
+        mstore(tp, pp)
+        tp := add(tp, 32)
+        jump(cnext)
+    
+    cclose:
+        mstore(pp, close)
+        pp := add(pp, 32)
+        tp := sub(tp, 32)
+        op := mload(tp) 
+        mstore(pp, op)
+        pp := add(pp, 32)
+        mstore(sub(op, 32), pp)
+        mstore(tp, 0)
+        jump(cnext)
+    
+    ceof:
+        mstore(pp, exit)
+        
         // Clear lookup table
+        // TODO combine writes
+        mstore(mul(0x00, 2), 0)
         mstore(mul(0x3e, 2), 0)
         mstore(mul(0x3c, 2), 0)
         mstore(mul(0x2b, 2), 0)
