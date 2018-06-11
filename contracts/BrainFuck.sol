@@ -38,10 +38,13 @@ contract BrainFuck {
                    // If stack gets very deep or source has a very low
                    // character this will fail.
         
-        for {} lt(source, eof) {} {
-            
-            let c := and(calldataload(source), 0xff)
-            let inst := and(mload(mul(c, 16)), 0xFFFF)
+        {
+            let c
+            let inst
+            // If input is empty we will see one zero byte
+        cloop:
+            c := and(calldataload(source), 0xff)
+            inst := and(mload(mul(c, 16)), 0xFFFF)
             
             if inst {
             
@@ -64,6 +67,8 @@ contract BrainFuck {
             }
             
             source := add(source, 1)
+            jumpi(cloop, lt(source, eof))
+        cend:
         }
         mstore(pp, exit)
         
