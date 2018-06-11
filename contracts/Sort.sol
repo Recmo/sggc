@@ -5,7 +5,6 @@ contract Sort {
     function () external payable { assembly {
         
         // @author Remco Bloemen <remco@wicked.ventures>
-        // Competition: 387058 gas
         
         // Copy input to memory
         calldatacopy(0, 4, calldatasize)
@@ -24,48 +23,45 @@ contract Sort {
             if lt(d, 96) {
                 
                 // Optimize for two
-                if eq(d, 32) {
-                    {
-                        let a := mload(lo)
-                        let b := mload(hi)
-                        if lt(b, a) {
-                            mstore(lo, b)
-                            mstore(hi, a)
-                        }
-                    }
-                    jump(ret)
+                jumpi(three, gt(d, 32))
+                {
+                    let a := mload(lo)
+                    let b := mload(hi)
+                    jumpi(end, gt(b, a))
+                    mstore(lo, b)
+                    mstore(hi, a)
+                end:
                 }
+                jump(ret)
                 
                 // Optimize for three
-                //if eq(sub(hi, lo), 64) {
-                    {
-                        let a := mload(lo)
-                        let b := mload(add(lo, 32))
-                        let c := mload(hi)
-                        if lt(b, a) {
-                            a
-                            b
-                            =: a
-                            =: b
-                        }
-                        if lt(c, b) {
-                            b
-                            c
-                            =: b
-                            =: c
-                            if lt(b, a) {
-                                a
-                                b
-                                =: a
-                                =: b
-                            }
-                        }
-                        mstore(lo, a)
-                        mstore(add(lo, 32), b)
-                        mstore(hi, c)
-                    }
-                    jump(ret)
-                //}
+            three:
+                {
+                    let a := mload(lo)
+                    let b := mload(add(lo, 32))
+                    let c := mload(hi)
+                    jumpi(case1, gt(b, a))
+                    a
+                    b
+                    =: a
+                    =: b
+                case1:
+                    jumpi(case3, gt(c, b))
+                    b
+                    c
+                    =: b
+                    =: c
+                    jumpi(case3, gt(b, a))
+                    a
+                    b
+                    =: a
+                    =: b
+                case3:
+                    mstore(lo, a)
+                    mstore(add(lo, 32), b)
+                    mstore(hi, c)
+                }
+                jump(ret)
             }
             
             // Partition
@@ -108,15 +104,11 @@ contract Sort {
             }
             
             // Recurse
-            
-        sortlo:
             jumpi(sorthi, eq(lolo, lo))
             sort(lolo, lo)
-        
         sorthi:
             jumpi(ret, eq(hi, hihi))
             sort(hi, hihi)
-            
         ret:
         }
         
