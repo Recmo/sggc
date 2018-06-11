@@ -150,11 +150,36 @@ contract BrainFuck {
         jump(cnext)
     
     copen:
+        // Check if next character is -
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jumpi(copen_decr, eq(op, 0x2d))
+        // Nope. Handle [ and distpach.
         mstore(pp, open)
         pp := add(pp, 32)
         pp := add(pp, 32)
         mstore(tp, pp)
         tp := add(tp, 32)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+    copen_decr:
+        // Check if next character is ]
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jumpi(copen_decr_close, eq(op, 0x5d))
+        // Nope. Handle [ and - and dispatch
+        mstore(pp, open)
+        pp := add(pp, 32)
+        pp := add(pp, 32)
+        mstore(tp, pp)
+        tp := add(tp, 32)
+        jumpi(cdecrn, eq(op, 0x2d)) // Handle [--… with cdecrn
+        mstore(pp, decr)
+        pp := add(pp, 32)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+    copen_decr_close:
+        // We got [-], so store a 'clear'
+        mstore(pp, clear)
+        pp := add(pp, 32)
         jump(cnext)
     
     cclose:
@@ -199,7 +224,7 @@ contract BrainFuck {
         pp := add(pp, 32)
         jump(mload(pp))
         
-    rightn: // >
+    rightn: // >>…
         pp := add(pp, 32)
         tp := add(tp, mload(pp))
         pp := add(pp, 32)
@@ -210,7 +235,7 @@ contract BrainFuck {
         pp := add(pp, 32)
         jump(mload(pp))
         
-    leftn: // <
+    leftn: // <<…
         pp := add(pp, 32)
         tp := sub(tp, mload(pp))
         pp := add(pp, 32)
@@ -221,7 +246,7 @@ contract BrainFuck {
         pp := add(pp, 32)
         jump(mload(pp))
         
-    incrn: // +
+    incrn: // ++…
         pp := add(pp, 32)
         mstore8(add(tp, 31), add(mload(tp), mload(pp)))
         pp := add(pp, 32)
@@ -232,9 +257,14 @@ contract BrainFuck {
         pp := add(pp, 32)
         jump(mload(pp))
         
-    decrn: // -
+    decrn: // --…
         pp := add(pp, 32)
         mstore8(add(tp, 31), sub(mload(tp), mload(pp)))
+        pp := add(pp, 32)
+        jump(mload(pp))
+        
+    clear: // [-]
+        mstore8(add(tp, 31), 0)
         pp := add(pp, 32)
         jump(mload(pp))
     
