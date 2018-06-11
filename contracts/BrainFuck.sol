@@ -89,7 +89,7 @@ contract BrainFuck {
         // a byte can be read using and(calldataload(ip), 0xff)
         
     // reset:
-        tp := 32
+        tp := 1 // offset left 31 bytes
         ip := add(calldataload(36), 5) // offset left 31 bytes
         op := 1056
         pp := 2080
@@ -106,34 +106,34 @@ contract BrainFuck {
         jump(mload(pp))
     
     incr: // +
-        mstore8(tp, add(mload(sub(tp, 31)), 1))
+        mstore8(add(tp, 31), add(mload(tp), 1))
         pp := add(pp, 32)
         jump(mload(pp))
     
     decr: // -
-        mstore8(tp, sub(mload(sub(tp, 31)), 1))
+        mstore8(add(tp, 31), sub(mload(tp), 1))
         pp := add(pp, 32)
         jump(mload(pp))
     
     output: // .
-        mstore8(op, mload(sub(tp, 31)))
+        mstore8(op, mload(tp))
         op := add(op, 1)
         pp := add(pp, 32)
         jump(mload(pp))
     
     input: // ,
-        mstore8(tp, calldataload(ip))
+        mstore8(add(tp, 31), calldataload(ip))
         ip := add(ip, 1)
         pp := add(pp, 32)
         jump(mload(pp))
     
     open: // [
-        jumpi(take, iszero(and(mload(sub(tp, 31)), 0xff))) 
+        jumpi(take, iszero(and(mload(tp), 0xff))) 
         pp := add(pp, 64)
         jump(mload(pp))
     
     close: // ]
-        jumpi(take, and(mload(sub(tp, 31)), 0xff)) 
+        jumpi(take, and(mload(tp), 0xff)) 
         pp := add(pp, 64)
         jump(mload(pp))
     
