@@ -14,13 +14,13 @@ contract BrainFuck {
         let op // Output pointer    / temp
         let pp // Program pointer
         
-        //
-        // Compiler
-        //
+    ///////////////////////////////////////////////////////
+    // Compiler
+    ///////////////////////////////////////////////////////
         
         // Create lookup table (512 bytes)
         // From high to low since we have overlaping writes
-        // XORed with cnop make cnop the default entry
+        // XORed with cnop to make cnop the default entry
         mstore(mul(0x5d, 2), xor(cclose, cnop))
         mstore(mul(0x5b, 2), xor(copen, cnop))
         mstore(mul(0x3e, 2), xor(cright, cnop))
@@ -35,13 +35,10 @@ contract BrainFuck {
         pp := 2080
         tp := 512  // stack pointer
         
-    cnext:
+    cnop:
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
-        
-    cnop:
-        jump(cnext)
         
     cright:
         // Check if next char is also >
@@ -142,12 +139,16 @@ contract BrainFuck {
     coutput:
         mstore(pp, output)
         pp := add(pp, 32)
-        jump(cnext)
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     
     cinput:
         mstore(pp, input)
         pp := add(pp, 32)
-        jump(cnext)
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     
     copen:
         // Check if next character is -
@@ -180,7 +181,9 @@ contract BrainFuck {
         // We got [-], so store a 'clear'
         mstore(pp, clear)
         pp := add(pp, 32)
-        jump(cnext)
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     
     cclose:
         mstore(pp, close)
@@ -191,7 +194,9 @@ contract BrainFuck {
         pp := add(pp, 32)
         mstore(sub(op, 32), pp)
         mstore(tp, 0)
-        jump(cnext)
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     
     ceof:
         mstore(pp, exit)
@@ -202,9 +207,9 @@ contract BrainFuck {
         mstore(mul(0x3c, 2), 0)
         mstore(mul(0x5b, 2), 0)
         
-        //
-        // BrainFuck virtual machine in the Ethereum virtual machine
-        //
+    /////////////////////////////////////////////////////////////////
+    // BrainFuck Virtual Machine (in the Ethereum virtual machine)
+    /////////////////////////////////////////////////////////////////
         
         // Tape is allocated 32...1055 in memory as bytes (use mstore8)
         // Output is allocatd 1056...2079 in memory as bytes (use mstore8)
