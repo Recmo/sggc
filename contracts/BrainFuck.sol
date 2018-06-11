@@ -37,9 +37,9 @@ contract BrainFuck {
         mstore(mul(0x2b, 2), xor(cincr, cnop))
         mstore(mul(0x00, 2), xor(ceof, cnop))
 
-        ip := 0x44 // source pointer offset left 31 bytes and ones for the first increment
-        pp := 2080
-        tp := 512  // stack pointer
+        ip := 0x44 // Source pointer offset left 32 bytes
+        pp := 2080 // Bytecode to be written starting at 2080
+        tp := 512  // Loop stack pointer, right after lookup table
         
     cnop:
         ip := add(ip, 1)
@@ -48,6 +48,7 @@ contract BrainFuck {
         
     cright:
         // Check if next char is also >
+        t := ip
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
         jumpi(crightn, eq(op, 0x3e))
@@ -56,22 +57,20 @@ contract BrainFuck {
         pp := add(pp, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     crightn:
-        t := 1
-    crightn_loop:
         // We have seen two consecutive >>, check for more
-        t := add(t, 1)
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
-        jumpi(crightn_loop, eq(op, 0x3e))
+        jumpi(crightn, eq(op, 0x3e))
         // Bulk instruction
         mstore(pp, rightn)
         pp := add(pp, 32)
-        mstore(pp, t)
+        mstore(pp, sub(ip, t))
         pp := add(pp, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
 
     cleft:
         // Check if next char is also <
+        t := ip
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
         jumpi(cleftn, eq(op, 0x3c))
@@ -80,22 +79,20 @@ contract BrainFuck {
         pp := add(pp, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     cleftn:
-        t := 1
-    cleftn_loop:
         // We have seen two consecutive <<, check for more
-        t := add(t, 1)
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
-        jumpi(cleftn_loop, eq(op, 0x3c))
+        jumpi(cleftn, eq(op, 0x3c))
         // Bulk instruction
         mstore(pp, leftn)
         pp := add(pp, 32)
-        mstore(pp, t)
+        mstore(pp, sub(ip, t))
         pp := add(pp, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
 
     cincr:
         // Check if next char is also +
+        t := ip
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
         jumpi(cincrn, eq(op, 0x2b))
@@ -104,22 +101,20 @@ contract BrainFuck {
         pp := add(pp, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     cincrn:
-        t := 1
-    cincrn_loop:
         // We have seen two consecutive ++, check for more
-        t := add(t, 1)
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
-        jumpi(cincrn_loop, eq(op, 0x2b))
+        jumpi(cincrn, eq(op, 0x2b))
         // Bulk instruction
         mstore(pp, incrn)
         pp := add(pp, 32)
-        mstore(pp, t)
+        mstore(pp, sub(ip, t))
         pp := add(pp, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
         
     cdecr:
         // Check if next char is also +
+        t := ip
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
         jumpi(cdecrn, eq(op, 0x2d))
@@ -128,17 +123,14 @@ contract BrainFuck {
         pp := add(pp, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     cdecrn:
-        t := 1
-    cdecrn_loop:
         // We have seen two consecutive ++, check for more
-        t := add(t, 1)
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
-        jumpi(cdecrn_loop, eq(op, 0x2d))
+        jumpi(cdecrn, eq(op, 0x2d))
         // Bulk instruction
         mstore(pp, decrn)
         pp := add(pp, 32)
-        mstore(pp, t)
+        mstore(pp, sub(ip, t))
         pp := add(pp, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     
