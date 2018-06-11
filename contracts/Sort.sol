@@ -83,14 +83,18 @@ contract Sort {
             loop:
                 lov := mload(lo)
                 hiv := mload(hi)
-                for {} lt(lov, pivot) {} {
-                    lo := add(lo, 32)
-                    lov := mload(lo)
-                }
-                for {} gt(hiv, pivot) {} {
-                    hi := sub(hi, 32)
-                    hiv := mload(hi)
-                }
+                jumpi(loend, iszero(lt(lov, pivot)))
+            loloop:
+                lo := add(lo, 32)
+                lov := mload(lo)
+                jumpi(loloop, lt(lov, pivot))
+            loend:
+                jumpi(hiend, iszero(gt(hiv, pivot)))
+            hiloop:
+                hi := sub(hi, 32)
+                hiv := mload(hi)
+                jumpi(hiloop, gt(hiv, pivot))
+            hiend:
                 jumpi(end, iszero(lt(lo, hi)))
                 mstore(lo, hiv)
                 mstore(hi, lov)
