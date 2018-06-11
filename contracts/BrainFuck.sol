@@ -310,4 +310,7 @@ contract BrainFuck {
         mstore(1024, sub(op, 1056))
         return(992, and(sub(op, 961), not(0x1F)))
     }}
+    
+    // Now someone needs to write an ERC20 contract in BrainFuck,
+    // so it can be runrun in this VM. Maybe I'll put a bounty on it.
 }
