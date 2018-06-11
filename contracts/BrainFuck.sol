@@ -8,6 +8,7 @@ contract BrainFuck {
         // solc likes to inject. It even gets partially optimized.
         mstore(0x40, 0x00)
         
+        let t  // temp
         let tp // Tape pointer      / stack pointer
         let ip // Input pointer     / source pointer
         let op // Output pointer    / temp
@@ -43,9 +44,28 @@ contract BrainFuck {
         jump(cnext)
         
     cright:
+        // Check if next char is also >
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jumpi(crightn, eq(op, 0x3e))
+        // Single instruction
         mstore(pp, right)
         pp := add(pp, 32)
-        jump(cnext)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+    crightn:
+        t := 1
+    crightn_loop:
+        // We have seen two consecutive >>, check for more
+        t := add(t, 1)
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jumpi(crightn_loop, eq(op, 0x3e))
+        // Bulk instruction
+        mstore(pp, rightn)
+        pp := add(pp, 32)
+        mstore(pp, t)
+        pp := add(pp, 32)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     
     cleft:
         mstore(pp, left)
@@ -119,6 +139,12 @@ contract BrainFuck {
         
     right: // >
         tp := add(tp, 1)
+        pp := add(pp, 32)
+        jump(mload(pp))
+        
+    rightn: // >
+        pp := add(pp, 32)
+        tp := add(tp, mload(pp))
         pp := add(pp, 32)
         jump(mload(pp))
     
