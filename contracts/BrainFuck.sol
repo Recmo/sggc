@@ -95,17 +95,10 @@ contract BrainFuck {
         mstore(pp, exit)
         
         // Clear lookup table
-        // TODO combine writes
         mstore(mul(0x00, 2), 0)
-        mstore(mul(0x3e, 2), 0)
-        mstore(mul(0x3c, 2), 0)
-        mstore(mul(0x2b, 2), 0)
-        mstore(mul(0x2d, 2), 0)
-        mstore(mul(0x2e, 2), 0)
         mstore(mul(0x2c, 2), 0)
+        mstore(mul(0x3c, 2), 0)
         mstore(mul(0x5b, 2), 0)
-        mstore(mul(0x5d, 2), 0)
-
         
         //
         // BrainFuck virtual machine in the Ethereum virtual machine
