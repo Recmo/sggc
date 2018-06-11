@@ -68,7 +68,7 @@ contract BrainFuck {
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
 
     cleft:
-        // Check if next char is also >
+        // Check if next char is also <
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
         jumpi(cleftn, eq(op, 0x3c))
@@ -79,7 +79,7 @@ contract BrainFuck {
     cleftn:
         t := 1
     cleftn_loop:
-        // We have seen two consecutive >>, check for more
+        // We have seen two consecutive <<, check for more
         t := add(t, 1)
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
@@ -92,9 +92,28 @@ contract BrainFuck {
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
 
     cincr:
+        // Check if next char is also +
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jumpi(cincrn, eq(op, 0x2b))
+        // Single instruction
         mstore(pp, incr)
         pp := add(pp, 32)
-        jump(cnext)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+    cincrn:
+        t := 1
+    cincrn_loop:
+        // We have seen two consecutive ++, check for more
+        t := add(t, 1)
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jumpi(cincrn_loop, eq(op, 0x2b))
+        // Bulk instruction
+        mstore(pp, incrn)
+        pp := add(pp, 32)
+        mstore(pp, t)
+        pp := add(pp, 32)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     
     cdecr:
         mstore(pp, decr)
@@ -177,9 +196,15 @@ contract BrainFuck {
         tp := sub(tp, mload(pp))
         pp := add(pp, 32)
         jump(mload(pp))
-    
+        
     incr: // +
         mstore8(add(tp, 31), add(mload(tp), 1))
+        pp := add(pp, 32)
+        jump(mload(pp))
+        
+    incrn: // +
+        pp := add(pp, 32)
+        mstore8(add(tp, 31), add(mload(tp), mload(pp)))
         pp := add(pp, 32)
         jump(mload(pp))
     
