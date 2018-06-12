@@ -12,7 +12,7 @@ contract Sort {
         uint256 l = input.length;
         if (l < 2) return input;
         
-        uint256[] memory counts = new uint256[](RADIX);
+        uint256[RADIX] memory counts;
         uint256[] memory output = new uint256[](input.length);
         
         // First pass: find upper bound to values and compute scaling factor
