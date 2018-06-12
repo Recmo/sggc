@@ -28,8 +28,7 @@ contract Sort {
         }
         uint256 acc = counts[0];
         for(i = 1; i < RADIX; i++) {
-            acc += counts[i];
-            counts[i] = acc;
+            acc = counts[i] += acc;
         }
         
         // Third pass: move to buckets
