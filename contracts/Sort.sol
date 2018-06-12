@@ -13,17 +13,17 @@ contract Sort {
         if (l < 2) return input;
         
         uint256[RADIX] memory counts;
-        uint256[] memory output = new uint256[](input.length);
+        uint256[] memory output = new uint256[](l);
         
         // First pass: find upper bound to values and compute scaling factor
         uint256 scale = RADIX;
-        for(uint256 i = 0; i < input.length; i++) {
+        for(uint256 i = 0; i < l; i++) {
             scale |= input[i];
         }
         scale = (scale + RADIX - 1) / RADIX;
         
         // Second pass: count buckets
-        for(i = 0; i < input.length; i++) {
+        for(i = 0; i < l; i++) {
             counts[input[i] / scale]++;
         }
         uint256 acc = counts[0];
@@ -32,7 +32,7 @@ contract Sort {
         }
         
         // Third pass: move to buckets
-        for(i = 0; i < input.length; i++) {
+        for(i = 0; i < l; i++) {
             uint256 val = input[i];
             output[--counts[val / scale]] = val;
         }
@@ -46,8 +46,8 @@ contract Sort {
             }
             acc = val;
         }
-        if (acc < output.length - 1) {
-            sort(output, acc, output.length - 1);
+        if (acc < l - 1) {
+            sort(output, acc, l - 1);
         }
         
         return output;
