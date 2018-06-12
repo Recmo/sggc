@@ -42,10 +42,13 @@ contract Sort {
         }
         
         // Fourth pass: sort buckets
-        for(i = 0; i < RADIX - 1; i++) {
-            sort(output, counts[i], counts[i + 1] - 1);
+        acc = counts[0];
+        for(i = 1; i < RADIX - 1; i++) {
+            val = counts[i];
+            sort(output, acc, val - 1);
+            acc = val;
         }
-        sort(output, counts[RADIX - 1], output.length - 1);
+        sort(output, acc, output.length - 1);
         
         return output;
     }
