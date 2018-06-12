@@ -161,6 +161,7 @@ contract BrainFuck {
         tp := add(tp, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     copen_decr:
+        t := ip // Count consecutive -'s
         // Check if next character is ]
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
