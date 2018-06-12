@@ -27,8 +27,10 @@ contract Sort {
         for(i = 0; i < input.length; i++) {
             counts[input[i] / scale]++;
         }
+        uint256 acc = counts[0];
         for(i = 1; i < RADIX; i++) {
-            counts[i] += counts[i - 1];
+            acc += counts[i];
+            counts[i] = acc;
         }
         
         // Third pass: move to buckets
