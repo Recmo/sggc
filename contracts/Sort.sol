@@ -35,10 +35,7 @@ contract Sort {
         // Third pass: move to buckets
         for(i = 0; i < input.length; i++) {
             uint256 val = input[i];
-            uint256 bucket = val / scale;
-            uint256 idx = counts[bucket] - 1;
-            counts[bucket] = idx;
-            output[idx] = val;
+            output[--counts[val / scale]] = val;
         }
         
         // Fourth pass: sort buckets
