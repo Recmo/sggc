@@ -4,7 +4,7 @@ contract Sort {
     
     // @author Remco Bloemen <remco@wicked.ventures>
     
-    uint256 constant RADIX = 64;
+    uint256 constant RADIX = 80;
     
     function sort(uint[] input)
         external payable returns(uint[])
@@ -21,7 +21,7 @@ contract Sort {
         for(uint256 i = 0; i < input.length; i++) {
             max |= input[i];
         }
-        scale = (max + 1) / RADIX;
+        scale = (max + RADIX - 1) / RADIX;
         
         // Second pass: count buckets
         for(i = 0; i < input.length; i++) {
