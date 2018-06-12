@@ -45,10 +45,14 @@ contract Sort {
         acc = counts[0];
         for(i = 1; i < RADIX - 1; i++) {
             val = counts[i];
-            sort(output, acc, val - 1);
+            if (acc < val - 1) {
+                sort(output, acc, val - 1);
+            }
             acc = val;
         }
-        sort(output, acc, output.length - 1);
+        if (acc < output.length - 1) {
+            sort(output, acc, output.length - 1);
+        }
         
         return output;
     }
@@ -56,9 +60,6 @@ contract Sort {
     function sort(uint[] memory input, uint256 lo, uint256 hi)
         internal view
     {
-        if (hi <= lo) return;
-        if (hi >= input.length) return;
-        
         uint256 d = hi - lo;
         if (d < 3) {
             if (d == 0) {
