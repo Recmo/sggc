@@ -58,9 +58,7 @@ contract Sort {
     {
         uint256 d = hi - lo;
         if (d < 3) {
-            if (d == 0) {
-                return;
-            }
+            
             // Optimize for two values
             if (d == 1) {
                 uint256 a = input[lo];
