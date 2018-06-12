@@ -121,21 +121,17 @@ contract Sort {
             uint iv = input[i];
             uint jv = input[j];
             while (iv < pivot) {
-                i++;
-                iv = input[i];
+                iv = input[++i];
             }
             while (jv > pivot) {
-                j--;
-                jv = input[j];
+                jv = input[--j];
             }
             if (i >= j) {
                 i = j + 1;
                 break;
             }
-            input[i] = jv;
-            input[j] = iv;
-            i += 1;
-            j -= 1;
+            input[i++] = jv;
+            input[j--] = iv;
         }
                 
         // Recurse
