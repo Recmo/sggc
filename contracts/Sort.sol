@@ -9,15 +9,59 @@ contract Sort {
     {
         uint256 l = input.length;
         if (l < 2) return input;
-        sort(input, 0, l - 1);
-        return input;
+        return radix(input);
+    }
+    
+    uint256 constant RADIX = 64;
+    
+    function radix(uint256[] memory input) internal view
+        returns (uint256[] memory output)
+    {
+        
+        uint256 max = RADIX;
+        uint256 scale = 1;
+        uint256[] memory counts = new uint256[](RADIX);
+        output = new uint256[](input.length);
+        
+        // First pass: find upper bound to values
+        for(uint256 i = 0; i < input.length; i++) {
+            max |= input[i];
+        }
+        scale = (max + 1) / RADIX;
+        
+        // Second pass: count buckets
+        for(i = 0; i < input.length; i++) {
+            counts[input[i] / scale]++;
+        }
+        for(i = 1; i < RADIX; i++) {
+            counts[i] += counts[i - 1];
+        }
+        
+        // Third pass: move to buckets
+        for(i = 0; i < input.length; i++) {
+            uint256 bucket = input[i] / scale;
+            counts[bucket]--;
+            output[counts[bucket]] = input[i];
+        }
+        
+        // Fourth pass: sort buckets
+        for(i = 0; i < RADIX - 1; i++) {
+            sort(output, counts[i], counts[i + 1] - 1);
+        }
+        sort(output, counts[RADIX - 1], output.length - 1);
     }
 
     function sort(uint[] memory input, uint256 lo, uint256 hi)
         internal view
     {
+        if (hi <= lo) return;
+        if (hi >= input.length) return;
+        
         uint256 d = hi - lo;
         if (d < 3) {
+            if (d == 0) {
+                return;
+            }
             // Optimize for two values
             if (d == 1) {
                 uint256 a = input[lo];
