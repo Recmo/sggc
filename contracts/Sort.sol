@@ -4,24 +4,18 @@ contract Sort {
     
     // @author Remco Bloemen <remco@wicked.ventures>
     
+    uint256 constant RADIX = 64;
+    
     function sort(uint[] input)
-        public payable returns(uint[])
+        external payable returns(uint[])
     {
         uint256 l = input.length;
         if (l < 2) return input;
-        return radix(input);
-    }
-    
-    uint256 constant RADIX = 64;
-    
-    function radix(uint256[] memory input) internal view
-        returns (uint256[] memory output)
-    {
         
         uint256 max = RADIX;
         uint256 scale = 1;
         uint256[] memory counts = new uint256[](RADIX);
-        output = new uint256[](input.length);
+        uint256[] memory output = new uint256[](input.length);
         
         // First pass: find upper bound to values
         for(uint256 i = 0; i < input.length; i++) {
@@ -49,8 +43,10 @@ contract Sort {
             sort(output, counts[i], counts[i + 1] - 1);
         }
         sort(output, counts[RADIX - 1], output.length - 1);
+        
+        return output;
     }
-
+    
     function sort(uint[] memory input, uint256 lo, uint256 hi)
         internal view
     {
