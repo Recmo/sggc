@@ -4,6 +4,16 @@ contract BrainFuck {
     
     /// @author Remco Bloemen <remco@wicked.ventures>
 
+    struct VMState {
+        bytes out;
+        bytes inp;
+        uint256[] arg;
+        uint256 mp;
+        uint256 ip;
+        uint256 op;
+        uint256 pp;
+    }
+
     function execute(bytes pro, bytes inp)
         public pure
         returns(bytes)
@@ -12,7 +22,7 @@ contract BrainFuck {
         uint256[] memory arg = new uint256[](pro.length);
         
         // Stress test the parser. (It's a dynamic array of function pointers)
-        function(uint256,bytes memory,uint256,bytes memory,uint256,uint256[] memory,uint256) internal pure returns(uint256,uint256,uint256,uint256)[] memory byt = new function(uint256,bytes memory,uint256,bytes memory,uint256,uint256[] memory,uint256) internal pure returns(uint256,uint256,uint256,uint256)[](pro.length + 1);
+        function(VMState memory) internal pure [] memory byt = new function(VMState memory) internal pure [] (pro.length + 1);
         
         compile(pro, arg, byt);
         
@@ -26,7 +36,7 @@ contract BrainFuck {
         return ret;
     }
     
-    function compile(bytes memory pro, uint256[] memory arg, function(uint256,bytes memory,uint256,bytes memory,uint256,uint256[] memory,uint256) internal pure returns(uint256,uint256,uint256,uint256)[] memory byt)
+    function compile(bytes memory pro, uint256[] memory arg, function(VMState memory) internal pure [] memory byt)
         private pure
     {
         // Compute arguments
@@ -109,202 +119,111 @@ contract BrainFuck {
         byt[bp] = exit;
     }
     
-    function run(function(uint256,bytes memory,uint256,bytes memory,uint256,uint256[] memory,uint256) internal pure returns(uint256,uint256,uint256,uint256)[] memory byt, bytes memory inp, bytes memory out, uint256[] memory arg) private pure returns (uint256 op)
+    function run(function(VMState memory) internal pure [] memory byt, bytes memory inp, bytes memory out, uint256[] memory arg) private pure returns (uint256 op)
     {
-        uint256 pp = 0;
-        uint256 ip = 0;
-        uint256 mp = 1024;
-        for(; pp < byt.length;) {
-            (mp, ip, op, pp) = byt[pp](mp, inp, ip, out, op, arg, pp);
+        VMState memory s = VMState({
+            out: out,
+            inp: inp,
+            arg: arg,
+            mp: 1024,
+            pp: 0,
+            ip: 0,
+            op: 0
+        });
+        for(; s.pp < byt.length;) {
+            byt[s.pp](s);
         }
+        return s.op;
     }
     
-    function nop(
-        uint256 mp,
-        bytes memory inp, uint256 ip,
-        bytes memory out, uint256 op,
-        uint256[] memory arg,
-        uint256 pp
-    ) private pure returns (uint256, uint256, uint256, uint256)
+    function nop(VMState memory s) private pure
     {
-        pp++;
-        return (mp, ip, op, pp);
+        s.pp++;
     }
     
-    function right1(
-        uint256 mp,
-        bytes memory inp, uint256 ip,
-        bytes memory out, uint256 op,
-        uint256[] memory arg,
-        uint256 pp
-    ) private pure returns (uint256, uint256, uint256, uint256)
+    function right1(VMState memory s) private pure
     {
-        mp += 1;
-        pp++;
-        return (mp, ip, op, pp);
+        s.mp += 1;
+        s.pp++;
     }
     
-    function right(
-        uint256 mp,
-        bytes memory inp, uint256 ip,
-        bytes memory out, uint256 op,
-        uint256[] memory arg,
-        uint256 pp
-    ) private pure returns (uint256, uint256, uint256, uint256)
+    function right(VMState memory s) private pure
     {
-        mp += arg[pp];
-        pp++;
-        return (mp, ip, op, pp);
+        s.mp += s.arg[s.pp];
+        s.pp++;
     }
     
-    function left1(
-        uint256 mp,
-        bytes memory inp, uint256 ip,
-        bytes memory out, uint256 op,
-        uint256[] memory arg,
-        uint256 pp
-    ) private pure returns (uint256, uint256, uint256, uint256)
+    function left1(VMState memory s) private pure
     {
-        mp -= 1;
-        pp++;
-        return (mp, ip, op, pp);
+        s.mp -= 1;
+        s.pp++;
     }
     
-    function left(
-        uint256 mp,
-        bytes memory inp, uint256 ip,
-        bytes memory out, uint256 op,
-        uint256[] memory arg,
-        uint256 pp
-    ) private pure returns (uint256, uint256, uint256, uint256)
+    function left(VMState memory s) private pure
     {
-        mp -= arg[pp];
-        pp++;
-        return (mp, ip, op, pp);
+        s.mp -= s.arg[s.pp];
+        s.pp++;
     }
     
-    function incr1(
-        uint256 mp,
-        bytes memory inp, uint256 ip,
-        bytes memory out, uint256 op,
-        uint256[] memory arg,
-        uint256 pp
-    ) private pure returns (uint256, uint256, uint256, uint256)
+    function incr1(VMState memory s) private pure
     {
-        out[mp] = bytes1(read1(out, mp) + 1);
-        pp++;
-        return (mp, ip, op, pp);
+        s.out[s.mp] = bytes1(read1(s.out, s.mp) + 1);
+        s.pp++;
     }
     
-    function incr(
-        uint256 mp,
-        bytes memory inp, uint256 ip,
-        bytes memory out, uint256 op,
-        uint256[] memory arg,
-        uint256 pp
-    ) private pure returns (uint256, uint256, uint256, uint256)
+    function incr(VMState memory s) private pure
     {
-        out[mp] = bytes1(read1(out, mp) + arg[pp]);
-        pp++;
-        return (mp, ip, op, pp);
+        s.out[s.mp] = bytes1(read1(s.out, s.mp) + s.arg[s.pp]);
+        s.pp++;
     }
     
-    function decr1(
-        uint256 mp,
-        bytes memory inp, uint256 ip,
-        bytes memory out, uint256 op,
-        uint256[] memory arg,
-        uint256 pp
-    ) private pure returns (uint256, uint256, uint256, uint256)
+    function decr1(VMState memory s) private pure
     {
-        out[mp] = bytes1(read1(out, mp) - 1);
-        pp++;
-        return (mp, ip, op, pp);
+        s.out[s.mp] = bytes1(read1(s.out, s.mp) - 1);
+        s.pp++;
     }
     
-    function decr(
-        uint256 mp,
-        bytes memory inp, uint256 ip,
-        bytes memory out, uint256 op,
-        uint256[] memory arg,
-        uint256 pp
-    ) private pure returns (uint256, uint256, uint256, uint256)
+    function decr(VMState memory s) private pure
     {
-        out[mp] = bytes1(read1(out, mp) - arg[pp]);
-        pp++;
-        return (mp, ip, op, pp);
+        s.out[s.mp] = bytes1(read1(s.out, s.mp) - s.arg[s.pp]);
+        s.pp++;
     }
     
-    function output(
-        uint256 mp,
-        bytes memory inp, uint256 ip,
-        bytes memory out, uint256 op,
-        uint256[] memory arg,
-        uint256 pp
-    ) private pure returns (uint256, uint256, uint256, uint256)
+    function output(VMState memory s) private pure
     {
-        out[op] = out[mp];
-        op++;
-        pp++;
-        return (mp, ip, op, pp);
+        s.out[s.op] = s.out[s.mp];
+        s.op++;
+        s.pp++;
     }
     
-    function input(
-        uint256 mp,
-        bytes memory inp, uint256 ip,
-        bytes memory out, uint256 op,
-        uint256[] memory arg,
-        uint256 pp
-    ) private pure returns (uint256, uint256, uint256, uint256)
+    function input(VMState memory s) private pure
     {
-        out[mp] = inp[ip];
-        ip++;
-        pp++;
-        return (mp, ip, op, pp);
+        s.out[s.mp] = s.inp[s.ip];
+        s.ip++;
+        s.pp++;
     }
     
-    function open(
-        uint256 mp,
-        bytes memory inp, uint256 ip,
-        bytes memory out, uint256 op,
-        uint256[] memory arg,
-        uint256 pp
-    ) private pure returns (uint256, uint256, uint256, uint256)
+    function open(VMState memory s) private pure
     {
-        if (out[mp] == 0) {
-            pp = arg[pp];
+        if (s.out[s.mp] == 0) {
+            s.pp = s.arg[s.pp];
         } else {
-            pp++;
+            s.pp++;
         }
-        return (mp, ip, op, pp);
     }
     
-    function close(
-        uint256 mp,
-        bytes memory inp, uint256 ip,
-        bytes memory out, uint256 op,
-        uint256[] memory arg,
-        uint256 pp
-    ) private pure returns (uint256, uint256, uint256, uint256)
+    function close(VMState memory s) private pure
     {
-        if (out[mp] != 0) {
-            pp = arg[pp];
+        if (s.out[s.mp] != 0) {
+            s.pp = s.arg[s.pp];
         } else {
-            pp++;
+            s.pp++;
         }
-        return (mp, ip, op, pp);
     }
     
-    function exit(
-        uint256 mp,
-        bytes memory inp, uint256 ip,
-        bytes memory out, uint256 op,
-        uint256[] memory arg,
-        uint256 pp
-    ) private pure returns (uint256, uint256, uint256, uint256)
+    function exit(VMState memory s) private pure
     {
-        pp = 0x123456789ABCDEF;
-        return (mp, ip, op, pp);
+        s.pp = 0x123456789ABCDEF;
     }
     
     function read1(bytes memory inp, uint256 i)
