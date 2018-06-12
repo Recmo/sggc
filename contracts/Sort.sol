@@ -11,6 +11,8 @@ contract Sort {
         mstore(0x40, 0) // Set all memory to zero
         
         let temp
+        let addr1
+        let addr2
         let scale
         let i
         
@@ -22,48 +24,61 @@ contract Sort {
         
         // First pass: find upper bound to values and compute scaling factor
         scale := 0
-        for {i := 0x44} lt(i, calldatasize) {i := add(i, 32)} {
-            scale := or(scale, calldataload(i))
-        }
+        i := 0x44
+    l1:
+        scale := or(scale, calldataload(i))
+        i := add(i, 32)
+        jumpi(l1, lt(i, calldatasize))
         scale := div(add(scale, 79), 80)
         
         // Second pass: count buckets (in multipes of 32)
-        for {i := 0x44} lt(i, calldatasize) {i := add(i, 32)} {
-            let addr := mul(div(calldataload(i), scale), 32)
-            mstore(addr, add(mload(addr), 32))
-        }
+        i := 0x44
+    l2:
+        temp := mul(div(calldataload(i), scale), 32)
+        mstore(temp, add(mload(temp), 32))
+        i := add(i, 32)
+        jumpi(l2, lt(i, calldatasize))
         temp := 2560 // Include write offset
-        for {i := 0x00} lt(i, 2560) {i := add(i, 32)} {
-            temp := add(temp, mload(i))
-            mstore(i, temp)
-        }
+        i := 0x00
+    l3:
+        temp := add(temp, mload(i))
+        mstore(i, temp)
+        i := add(i, 32)
+        jumpi(l3, lt(i, 2560))
         
         // Third pass: move to buckets
-        for {i := 0x44} lt(i, calldatasize) {i := add(i, 32)} {
-            temp := calldataload(i)
-            let addr1 := mul(div(temp, scale), 32)
-            let addr2 := sub(mload(addr1), 32)
-            mstore(addr1, addr2)
-            mstore(addr2, temp)
-        }
+        i := 0x44
+    l4:
+        temp := calldataload(i)
+        addr1 := mul(div(temp, scale), 32)
+        addr2 := sub(mload(addr1), 32)
+        mstore(addr1, addr2)
+        mstore(addr2, temp)
+        i := add(i, 32)
+        jumpi(l4, lt(i, calldatasize))
         
         // Fourth pass: sort buckets
-        temp := mload(0)
-        for {i := 0x20} lt(i, 2560) {i := add(i, 32)} {
-            let val := mload(i)
-            if lt(temp, sub(val, 32)) {
-                sort(temp, sub(val, 32))
-            }
-            temp := val
-        }
-        scale := add(sub(calldatasize, 0x44), sub(2560, 32))
-        if lt(temp, scale) {
-            sort(temp, scale)
-        }
+        addr2 := mload(0)
+        i := 0x20
+    l5:
+        addr1 := mload(i)
+        jumpi(l5n, lt(addr2, sub(addr1, 32)))
+        addr2 := addr1
+        i := add(i, 32)
+        jumpi(l5, lt(i, 2560))
+        jump(l5e)
+    l5n:
+        sort(addr2, sub(addr1, 32))
+        addr2 := addr1
+        i := add(i, 32)
+        jumpi(l5, lt(i, 2560))
+    l5e:
+        addr1 := add(sub(calldatasize, 0x44), sub(2560, 32))
+        jumpi(l5s, lt(addr2, addr1))
+        jump(done)
         
-        //scale := add(sub(calldatasize, 0x44), sub(2560, 32))
-        //calldatacopy(2560, 0x44, sub(calldatasize, 0x44))
-        //sort(2560, scale)
+    l5s:
+        sort(addr2, addr1)
         
         function sort(lo, hi) {
             
