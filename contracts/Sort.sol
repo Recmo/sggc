@@ -16,7 +16,7 @@ contract Sort {
         uint256[] memory output = new uint256[](l);
         
         // First pass: find upper bound to values and compute scaling factor
-        uint256 scale = RADIX;
+        uint256 scale = 0;
         for(uint256 i = 0; i < l; i++) {
             scale |= input[i];
         }
