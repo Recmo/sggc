@@ -12,16 +12,15 @@ contract Sort {
         uint256 l = input.length;
         if (l < 2) return input;
         
-        uint256 max = RADIX;
-        uint256 scale = 1;
         uint256[] memory counts = new uint256[](RADIX);
         uint256[] memory output = new uint256[](input.length);
         
-        // First pass: find upper bound to values
+        // First pass: find upper bound to values and compute scaling factor
+        uint256 scale = RADIX;
         for(uint256 i = 0; i < input.length; i++) {
-            max |= input[i];
+            scale |= input[i];
         }
-        scale = (max + RADIX - 1) / RADIX;
+        scale = (scale + RADIX - 1) / RADIX;
         
         // Second pass: count buckets
         for(i = 0; i < input.length; i++) {
