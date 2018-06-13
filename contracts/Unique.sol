@@ -20,7 +20,7 @@ contract Unique {
         }
         uint256[] memory out = new uint256[](l);
         
-        uint256[HTL] memory table;
+        uint256[HTL + 8] memory table;
         
         uint256 ptr = 0;
         uint256 last1 = p1;
@@ -48,6 +48,7 @@ contract Unique {
             if (r == vhash) {
                 continue;
             }
+            
             index1 += 1;
             r = table[index1];
             if (r == 0) {
@@ -58,7 +59,8 @@ contract Unique {
             if (r == vhash) {
                 continue;
             }
-            index1 += 1;
+            
+            index1 = (vhash * p2) % HTL;
             r = table[index1];
             if (r == 0) {
                 out[ptr++] = value;
