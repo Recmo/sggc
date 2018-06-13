@@ -28,9 +28,6 @@ contract Unique {
     main:
         let ptr := 64
         let i := 68
-        let htl := div(mul(l, 25), 10)
-        let skip := mul(htl, 32)
-        let scale := add(div(sub(0, htl), htl), 1)
         
     oloop:
         {
@@ -49,9 +46,7 @@ contract Unique {
             )
             
             // Compute index 1
-            index1 := add(mul(div(mul(vhash,
-0xb7094513c3a0a2641751087acb3855f3c0a80be7260acdf01a49b4661672cb23
-            ), scale), 32), calldatasize)
+            index1 := add(mul(mod(vhash, 331), 32), calldatasize)
             
             // Read index 1
             iv := mload(index1)
@@ -59,9 +54,9 @@ contract Unique {
             jumpi(seen, eq(iv, vhash))
             
             // Compute index 2
-            index2 := add(mul(div(mul(vhash,
+            index2 := add(mul(mod(mul(vhash,
 0x1b6d296aa8b7284041b9f0e36895d18399d8026b57a51e5af0ed54c3e03bd3a1
-            ), scale), 32), calldatasize)
+            ), 331), 32), calldatasize)
             
             // Read index 2
             iv := mload(index2)
@@ -70,13 +65,13 @@ contract Unique {
             
         iloop:
             // Increment and test index 1
-            index1 := add(index1, skip)
+            index1 := add(index1, 1)
             iv := mload(index1)
             jumpi(unique1, iszero(iv))
             jumpi(seen, eq(iv, vhash))
             
             // Incerment and test index 2
-            index2 := add(index2, skip)
+            index2 := add(index2, 1)
             iv := mload(index2)
             jumpi(unique2, iszero(iv))
             jumpi(seen, eq(iv, vhash))
