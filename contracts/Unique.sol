@@ -20,8 +20,6 @@ contract Unique {
         }
         uint256[] memory out = new uint256[](l);
         
-        uint256 scale = ((-HTL) / HTL) + 1;
-
         uint256[HTL] memory table;
         
         uint256 ptr = 0;
@@ -60,7 +58,7 @@ contract Unique {
             if (r == vhash) {
                 continue;
             }
-            index1 = (vhash * p3) / scale;
+            index1 += 1;
             r = table[index1];
             if (r == 0) {
                 out[ptr++] = value;
