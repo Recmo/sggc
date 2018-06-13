@@ -40,7 +40,7 @@ contract Unique {
             
             uint256 vhash = value + p1;
             
-            uint256 index1 = (vhash * p2) / scale;
+            uint256 index1 = vhash % HTL;
             uint256 r = table[index1];
             if (r == 0) {
                 out[ptr++] = value;
