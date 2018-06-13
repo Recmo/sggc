@@ -59,7 +59,7 @@ contract Unique {
             if (r == vhash) {
                 continue;
             }
-            index1 += 1;
+            index1 = (vhash * p3) / scale;
             r = table[index1];
             if (r == 0) {
                 out[ptr++] = value;
