@@ -8,7 +8,7 @@ contract Unique {
     uint256 constant p2 = 0xb7094513c3a0a2641751087acb3855f3c0a80be7260acdf01a49b4661672cb23;
     uint256 constant p3 = 0x1b6d296aa8b7284041b9f0e36895d18399d8026b57a51e5af0ed54c3e03bd3a1;
     
-    uint256 constant HTL = 513;
+    uint256 constant HTL = 263;
     
     function uniquify(uint256[] input)
         external payable
