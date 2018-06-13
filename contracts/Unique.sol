@@ -18,9 +18,10 @@ contract Unique {
         }
         uint256[] memory out = new uint256[](l);
         
-        uint256 scale = ((-l) / l) + 1;
+        uint256 htl = 2 * l;
+        uint256 scale = ((-htl) / htl) + 1;
 
-        uint256[] memory table = new uint256[](l + l);
+        uint256[] memory table = new uint256[](htl + 10);
         
         uint256 ptr = 0;
         uint256 last1 = p1;
@@ -48,7 +49,7 @@ contract Unique {
             if (r == vhash) {
                 continue;
             }
-            index1 += l;
+            index1 += 1;
             r = table[index1];
             if (r == 0) {
                 out[ptr++] = value;
@@ -90,6 +91,52 @@ contract Unique {
             if (r == vhash) {
                 continue;
             }
+            
+            index1 += 1;
+            r = table[index1];
+            if (r == 0) {
+                out[ptr++] = value;
+                table[index1] = vhash;
+                continue;
+            }
+            if (r == vhash) {
+                continue;
+            }
+            
+            index1 += 1;
+            r = table[index1];
+            if (r == 0) {
+                out[ptr++] = value;
+                table[index1] = vhash;
+                continue;
+            }
+            if (r == vhash) {
+                continue;
+            }
+            
+            index1 += 1;
+            r = table[index1];
+            if (r == 0) {
+                out[ptr++] = value;
+                table[index1] = vhash;
+                continue;
+            }
+            if (r == vhash) {
+                continue;
+            }
+            
+            index1 += 1;
+            r = table[index1];
+            if (r == 0) {
+                out[ptr++] = value;
+                table[index1] = vhash;
+                continue;
+            }
+            if (r == vhash) {
+                continue;
+            }
+            
+            revert();
             
         }
 
