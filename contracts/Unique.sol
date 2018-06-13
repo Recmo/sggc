@@ -12,7 +12,7 @@ contract Unique {
     function () external payable { assembly {
         
         // @author Remco Bloemen <remco.bloemen@gmail.com>
-        // Competition gas: 202359
+        // Competition gas: 262192
         
         // Clear all memory
         mstore(0x40, 0)
