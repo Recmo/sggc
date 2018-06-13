@@ -60,11 +60,13 @@ contract Unique {
                 continue;
             }
             
-            index1 = (vhash * p2) % HTL;
-            r = table[index1];
+            // Create second hash index and probe both
+            
+            uint256 index2 = (vhash * p2) % HTL;
+            r = table[index2];
             if (r == 0) {
                 out[ptr++] = value;
-                table[index1] = vhash;
+                table[index2] = vhash;
                 continue;
             }
             if (r == vhash) {
@@ -82,11 +84,11 @@ contract Unique {
                 continue;
             }
             
-            index1 += 1;
-            r = table[index1];
+            index2 += 1;
+            r = table[index2];
             if (r == 0) {
                 out[ptr++] = value;
-                table[index1] = vhash;
+                table[index2] = vhash;
                 continue;
             }
             if (r == vhash) {
@@ -104,11 +106,11 @@ contract Unique {
                 continue;
             }
             
-            index1 += 1;
-            r = table[index1];
+            index2 += 1;
+            r = table[index2];
             if (r == 0) {
                 out[ptr++] = value;
-                table[index1] = vhash;
+                table[index2] = vhash;
                 continue;
             }
             if (r == vhash) {
@@ -126,11 +128,11 @@ contract Unique {
                 continue;
             }
             
-            index1 += 1;
-            r = table[index1];
+            index2 += 1;
+            r = table[index2];
             if (r == 0) {
                 out[ptr++] = value;
-                table[index1] = vhash;
+                table[index2] = vhash;
                 continue;
             }
             if (r == vhash) {
