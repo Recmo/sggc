@@ -37,6 +37,8 @@ contract Unique {
         // 22 197306
         let htl := mul(add(l, l), 32) // div(mul(l, 20), 10)
         let scale := add(div(sub(0, htl), htl), 1)
+        let last1 := 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f
+        let last2 := 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f
         
     oloop:
         {
@@ -48,6 +50,12 @@ contract Unique {
             
             // Read value
             value := calldataload(i)
+            
+            // Check recent values
+            jumpi(seen, eq(value, last1))
+            jumpi(seen, eq(value, last2))
+            last2 := last1
+            last1 := value
             
             // Offset value so we don't get zeros
             vhash := add(value,
