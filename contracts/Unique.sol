@@ -28,8 +28,15 @@ contract Unique {
     main:
         let ptr := 64
         let i := 68
-        let htl := div(mul(l, 18), 10)
-        let scale := add(div(sub(0, mul(htl, 32)), mul(htl, 32)), 1)
+        // 16 197746
+        // 17 197561
+        // 18 196644
+        // 19 196804
+        // 20 196451
+        // 21 196735
+        // 22 197306
+        let htl := mul(add(l, l), 32) // div(mul(l, 20), 10)
+        let scale := add(div(sub(0, htl), htl), 1)
         
     oloop:
         {
