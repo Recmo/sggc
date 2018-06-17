@@ -28,8 +28,7 @@ contract Unique {
     main:
         let ptr := 64
         let i := 68
-        let htl := div(mul(l, 25), 10)
-        let skip := mul(htl, 32)
+        let htl := div(mul(l, 18), 10)
         let scale := add(div(sub(0, mul(htl, 32)), mul(htl, 32)), 1)
         
     oloop:
@@ -58,6 +57,12 @@ contract Unique {
             jumpi(unique1, iszero(iv))
             jumpi(seen, eq(iv, vhash))
             
+            // Increment and test index 1
+            index1 := add(index1, 32)
+            iv := mload(index1)
+            jumpi(unique1, iszero(iv))
+            jumpi(seen, eq(iv, vhash))
+            
             // Compute index 2
             index2 := add(and(div(mul(vhash,
 0x1b6d296aa8b7284041b9f0e36895d18399d8026b57a51e5af0ed54c3e03bd3a1
@@ -70,13 +75,25 @@ contract Unique {
             
         iloop:
             // Increment and test index 1
-            index1 := add(index1, skip)
+            index1 := add(index1, 32)
             iv := mload(index1)
             jumpi(unique1, iszero(iv))
             jumpi(seen, eq(iv, vhash))
             
             // Incerment and test index 2
-            index2 := add(index2, skip)
+            index2 := add(index2, 32)
+            iv := mload(index2)
+            jumpi(unique2, iszero(iv))
+            jumpi(seen, eq(iv, vhash))
+            
+            // Increment and test index 1
+            index1 := add(index1, 32)
+            iv := mload(index1)
+            jumpi(unique1, iszero(iv))
+            jumpi(seen, eq(iv, vhash))
+            
+            // Incerment and test index 2
+            index2 := add(index2, 32)
             iv := mload(index2)
             jumpi(unique2, iszero(iv))
             jumpi(seen, eq(iv, vhash))
