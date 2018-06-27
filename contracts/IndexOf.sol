@@ -55,8 +55,8 @@ contract IndexOf {
         let nh := keccak256(0, nl)
         calldatacopy(0, add(h, 32), hl)
         
-        n := and(calldataload(add(n, 1)), 0xFF)
-        let mask := not(mul(n, 0x0101010101010101010101010101010101010101010101010101010101010101))
+        let mask := not(mul(and(calldataload(add(n, 1)), 0xFF), 0x0101010101010101010101010101010101010101010101010101010101010101))
+        n := calldataload(add(n, 32))
 
         let i := 0
         let e := sub(hl, nl)
@@ -84,6 +84,17 @@ contract IndexOf {
         maybe:
             i := add(i, and(div(
             0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f, matc), 0xff))
+            
+            // Assume nl >= 32
+            hh := mload(i)
+            if sub(hh, n) {
+                i := add(i, 1)
+                if gt(i, e) {
+                    mstore(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+                    return(0, 32)
+                }
+                jump(loop)
+            }
             
             hh := keccak256(i, nl)
             if eq(nh, hh) {
