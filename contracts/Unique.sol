@@ -148,6 +148,7 @@ contract Unique {
         
         ptr := add(ptr, 32)
         
+    repeat5121:
         i := add(i, 32)
         
     oloop512:
