@@ -52,21 +52,46 @@ contract IndexOf {
         
         // General case using hashes
         calldatacopy(0, add(n, 32), nl)
-        n := keccak256(0, nl)
+        let nh := keccak256(0, nl)
         calldatacopy(0, add(h, 32), hl)
         
+        n := and(calldataload(add(n, 1)), 0xFF)
+        let mask := not(mul(n, 0x0101010101010101010101010101010101010101010101010101010101010101))
+
         let i := 0
-        let e := add(sub(hl, nl), 1)
-        let hv
+        let e := sub(hl, nl)
+        let hh
+        let matc
         
         loop:
-            hv := keccak256(i, nl)
-            if eq(n, hv) {
+            h := mload(i)
+            
+            matc := xor(mask, h)
+            matc := and(matc, div(matc, 16))
+            matc := and(matc, div(matc, 4))
+            matc := and(matc, div(matc, 2))
+            matc := and(matc, 0x0101010101010101010101010101010101010101010101010101010101010101)
+            
+            jumpi(maybe, matc)
+            
+            i := add(i, 32)
+            if gt(i, e) {
+                mstore(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+                return(0, 32)
+            }
+            jump(loop)
+            
+        maybe:
+            i := add(i, and(div(
+            0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f, matc), 0xff))
+            
+            hh := keccak256(i, nl)
+            if eq(nh, hh) {
                 mstore(0, i)
                 return(0, 32)
             }
             i := add(i, 1)
-            if eq(i, e) {
+            if gt(i, e) {
                 mstore(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
                 return(0, 32)
             }
