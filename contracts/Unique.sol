@@ -126,6 +126,12 @@ contract Unique {
         
         // Loop
         jump(iloop)
+        
+    seen:
+        // Resume loop
+        i := add(i, 32)
+        jumpi(oloop, lt(i, calldatasize))
+        jump(oloop_end)
     
     unique2:
         // Add to the hash table
@@ -134,7 +140,11 @@ contract Unique {
         // Add to start of list
         mstore(ptr, value)
         ptr := add(ptr, 32)
-        jump(seen)
+        
+        // Resume loop
+        i := add(i, 32)
+        jumpi(oloop, lt(i, calldatasize))
+        jump(oloop_end)
         
     unique1:
         // Add to the hash table
@@ -143,14 +153,12 @@ contract Unique {
         // Add to start of list
         mstore(ptr, value)
         ptr := add(ptr, 32)
-    
-    seen:
-            
-    // oloop_continue:
+        
+        // Resume loop
         i := add(i, 32)
         jumpi(oloop, lt(i, calldatasize))
-        
-    // oloop_end:
+    
+    oloop_end:
         mstore(0, 32)
         mstore(32, div(sub(ptr, 64), 32))
         return(0, ptr)
