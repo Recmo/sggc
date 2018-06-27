@@ -14,14 +14,14 @@ contract Unique {
         // @author Remco Bloemen <remco@wicked.ventures>
         mstore(0x40, 0)
         
-        let i
-        let ptr
         let index2
         let last2 := 0
         let last1 := 0
+        let ptr
         let iv
         let index1
         let vhash
+        let i
 
         i := calldataload(36)
         jumpi(main512, gt(i, 128))
