@@ -189,11 +189,6 @@ contract Unique {
         // Read value
         vhash := not(calldataload(i))
         
-        // Check recent values
-        jumpi(seen512, or(eq(vhash, last1), eq(vhash, last2)))
-        last2 := last1
-        last1 := vhash
-        
         // Compute index 1
         index1 := mul(mod(vhash, 331), 32)
         
