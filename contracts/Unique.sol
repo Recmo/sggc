@@ -30,12 +30,12 @@ contract Unique {
         // let i
         let htl
         let scale
-        let last1
-        let last2
         let vhash
         let index1
         let index2
         let iv
+        let last1
+        let last2
         let value
         
         // 16 197746
