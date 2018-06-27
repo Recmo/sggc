@@ -57,7 +57,7 @@ contract IndexOf {
         
         let mask := not(mul(and(calldataload(add(n, 1)), 0xFF), 0x0101010101010101010101010101010101010101010101010101010101010101))
         n := calldataload(add(n, 32))
-
+        
         let i := 0
         let e := sub(hl, nl)
         let hh
@@ -75,10 +75,7 @@ contract IndexOf {
             jumpi(maybe, matc)
             
             i := add(i, 32)
-            if gt(i, e) {
-                mstore(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
-                return(0, 32)
-            }
+            jumpi(notfound, gt(i, e))
             jump(loop)
             
         maybe:
@@ -87,25 +84,24 @@ contract IndexOf {
             
             // Assume nl >= 32
             hh := mload(i)
-            if sub(hh, n) {
-                i := add(i, 1)
-                if gt(i, e) {
-                    mstore(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
-                    return(0, 32)
-                }
-                jump(loop)
-            }
-            
-            hh := keccak256(i, nl)
-            if eq(nh, hh) {
-                mstore(0, i)
-                return(0, 32)
-            }
+            jumpi(check_hash, eq(hh, n))
             i := add(i, 1)
-            if gt(i, e) {
-                mstore(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
-                return(0, 32)
-            }
+            jumpi(notfound, gt(i, e))
             jump(loop)
+            
+        check_hash:
+            hh := keccak256(i, nl)
+            jumpi(found, eq(nh, hh))
+            i := add(i, 1)
+            jumpi(notfound, gt(i, e))
+            jump(loop)
+            
+        found:
+            mstore(0, i)
+            return(0, 32)
+            
+        notfound:
+            mstore(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+            return(0, 32)
     }}
 }
