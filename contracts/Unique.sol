@@ -42,14 +42,13 @@ contract Unique {
         //let last3 := 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f
         //let last4 := 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f
         
+        let value
+        let vhash
+        let index1
+        let index2
+        let iv
     oloop:
         {
-            let value
-            let vhash
-            let index1
-            let index2
-            let iv
-            
             // Read value
             value := calldataload(i)
             
