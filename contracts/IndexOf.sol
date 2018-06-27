@@ -86,7 +86,8 @@ contract IndexOf {
             hh := mload(i)
             jumpi(check_hash, eq(hh, n))
             i := add(i, 1)
-            jumpi(notfound, gt(i, e))
+            // Assume we don't end on a first char, or at least we'll recover
+            //jumpi(notfound, gt(i, e))
             jump(loop)
             
         check_hash:
