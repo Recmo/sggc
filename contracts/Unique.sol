@@ -11,10 +11,7 @@ contract Unique {
     
     function () external payable { assembly {
         
-        // @author Remco Bloemen <remco.bloemen@gmail.com>
-        // Competition gas: 202359
-        
-        // Clear all memory
+        // @author Remco Bloemen <remco@wicked.ventures>
         mstore(0x40, 0)
         
         let i := calldataload(36)
@@ -37,21 +34,12 @@ contract Unique {
         let last1
         let vhash
         
-        // 16 197746
-        // 17 197561
-        // 18 196644
-        // 19 196804
-        // 20 196451
-        // 21 196735
-        // 22 197306
-        htl := and(mul(i, 64), 0xFFFFFFFFFFFFFE0) // div(mul(l, 20), 10)
-        scale := add(div(sub(0, htl), htl), 1)
+        // htl := and(mul(i, 64), 0xFFFFFFFFFFFFFE0)
+        // scale := add(div(sub(0, htl), htl), 1)
         last1 := 0
         last2 := 0
-        //let last3 := 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f
-        //let last4 := 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f
         
-        ptr := 64
+        ptr := 0x2040
         i := 68
         
     oloop:
@@ -60,18 +48,11 @@ contract Unique {
         
         // Check recent values
         jumpi(seen, or(eq(vhash, last1), eq(vhash, last2)))
-        //jumpi(seen, eq(value, last2))
-        //jumpi(seen, eq(value, last3))
-        //jumpi(seen, eq(value, last4))
-        //last4 := last3
-        //last3 := last2
         last2 := last1
         last1 := vhash
         
         // Compute index 1
-        index1 := add(and(div(mul(vhash,
-0xb7094513c3a0a2641751087acb3855f3c0a80be7260acdf01a49b4661672cb23
-        ), scale), 0xFFFFFFFFFFFFFE0), calldatasize)
+        index1 := and(mul(vhash, 32), 0x1fe0)
         
         // Read index 1
         iv := mload(index1)
@@ -79,15 +60,15 @@ contract Unique {
         jumpi(seen, eq(iv, vhash))
         
         // Increment and test index 1
-        index1 := add(index1, 32)
+        index1 := and(add(index1, 32), 0x1fe0)
         iv := mload(index1)
         jumpi(unique1, iszero(iv))
         jumpi(seen, eq(iv, vhash))
         
         // Compute index 2
-        index2 := add(and(div(mul(vhash,
+        index2 := and(div(mul(vhash,
 0x1b6d296aa8b7284041b9f0e36895d18399d8026b57a51e5af0ed54c3e03bd3a1
-        ), scale), 0xFFFFFFFFFFFFFE0), calldatasize)
+        ), 0x1000000000000001), 0x3fe0)
         
         // Read index 2
         iv := mload(index2)
@@ -96,25 +77,25 @@ contract Unique {
         
     iloop:
         // Increment and test index 1
-        index1 := add(index1, 32)
+        index1 := and(add(index1, 32), 0x1fe0)
         iv := mload(index1)
         jumpi(unique1, iszero(iv))
         jumpi(seen, eq(iv, vhash))
         
         // Incerment and test index 2
-        index2 := add(index2, 32)
+        index2 := and(add(index2, 32), 0x1fe0)
         iv := mload(index2)
         jumpi(unique2, iszero(iv))
         jumpi(seen, eq(iv, vhash))
         
         // Increment and test index 1
-        index1 := add(index1, 32)
+        index1 := and(add(index1, 32), 0x1fe0)
         iv := mload(index1)
         jumpi(unique1, iszero(iv))
         jumpi(seen, eq(iv, vhash))
         
         // Incerment and test index 2
-        index2 := add(index2, 32)
+        index2 := and(add(index2, 32), 0x1fe0)
         iv := mload(index2)
         jumpi(unique2, iszero(iv))
         jumpi(seen, eq(iv, vhash))
@@ -154,9 +135,9 @@ contract Unique {
         jumpi(oloop, lt(i, calldatasize))
     
     oloop_end:
-        mstore(0, 32)
-        mstore(32, div(sub(ptr, 64), 32))
-        return(0, ptr)
+        mstore(0x2000, 32)
+        mstore(0x2020, div(sub(ptr, 0x2040), 32))
+        return(0x2000, sub(ptr, 0x2000))
     }}
     
 }
