@@ -1,94 +1,77 @@
-/**
- * This file is part of the 1st Solidity Gas Golfing Contest.
- *
- * This work is licensed under Creative Commons Attribution ShareAlike 3.0.
- * https://creativecommons.org/licenses/by-sa/3.0/
- */
-
 pragma solidity 0.4.24;
 
 contract IndexOf {
 
-    uint256 constant firstBits = 0x0101010101010101010101010101010101010101010101010101010101010101;
-    
-    uint256 constant firstByte = 0x0100000000000000000000000000000000000000000000000000000000000000;
-
-    function indexOf(string haystack, string needle)
-        public pure
-        returns(int)
-    {
-        bytes memory n = bytes(needle);
-        uint256 nl = n.length;
-        if (nl == 0) {
-            return 0;
+    function () external payable { assembly {
+        // indexOf(string haystack, string needle)
+        
+        // @author Remco Bloemen <remco@wicked.ventures>
+        
+        let h := add(calldataload(0x04), 4)
+        let n := add(calldataload(0x24), 4)
+        let hl := calldataload(h)
+        let nl := calldataload(n)
+        
+        // Empty needle 
+        if iszero(nl) {
+            mstore(0, 0)
+            return(0, 32)
         }
-        bytes memory h = bytes(haystack);
-        uint256 hl = h.length;
-        if (nl > hl) {
-            return -1;
+        // Needle longer than haystack
+        if gt(nl, hl) {
+            mstore(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+            return(0, 32)
         }
         
-        if (nl < 32) {
+        // Special case for single character needle
+        if eq(nl, 1) {
             
-            assembly {
-                let mask
-                let pat
-                let value
-                let i
-                let end
-                
-                mask := 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-                mask := mul(mask, exp(256, sub(32, nl)))
-                
-                i := add(h, 32)
-                end := add(sub(add(i, hl), nl), 1) // Why the 1?
-                pat := and(mload(add(n, 32)), mask)
-                
-                for {} lt(i, end) {} {
-                    value := mload(i)
-                    value := and(not(xor(value, pat)), mask)
-                    if eq(value, mask) {
-                        mstore(0, sub(i, add(h, 32)))
-                        return(0, 32)
-                    }
-                    i := add(i, 1)
-                }
-                
-                mstore(0, not(0))
+            n := and(calldataload(add(n, 1)), 0xFF)
+            let mask := not(mul(n, 0x0101010101010101010101010101010101010101010101010101010101010101))
+            
+            h := calldataload(add(h, 32))
+            
+            let matc := xor(mask, h)
+            matc := and(matc, div(matc, 16))
+            matc := and(matc, div(matc, 4))
+            matc := and(matc, div(matc, 2))
+            matc := and(matc, 0x0101010101010101010101010101010101010101010101010101010101010101)
+            
+            if iszero(matc) {
+                mstore(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
                 return(0, 32)
             }
             
-        } else {
-            
-            assembly {
-                let nh
-                let pat
-                let value
-                let i
-                let end
-
-                nh := keccak256(add(n, 32), nl)
-                
-                i := add(h, 32)
-                end := add(sub(add(i, hl), nl), 1)
-                pat := mload(add(n, 32))
-                
-                for {} lt(i, end) {} {
-                    value := mload(i)
-                    if eq(value, pat) {
-                        let hh := keccak256(i, nl)
-                        if eq(nh, hh) {
-                            mstore(0, sub(i, add(h, 32)))
-                            return(0, 32)
-                        }
-                    }
-                    i := add(i, 1)
-                }
-                mstore(0, not(0))
-                return(0, 32)
+            let result := 0
+            for {} lt(matc, 0x0100000000000000000000000000000000000000000000000000000000000000) {} {
+                result := add(result, 1)
+                matc := mul(matc, 256)
             }
             
+            mstore(0, result)
+            return(0, 32)
         }
-        return -1;
-    }
+        
+        // General case using hashes
+        calldatacopy(0, add(n, 32), nl)
+        n := keccak256(0, nl)
+        calldatacopy(0, add(h, 32), hl)
+        
+        let i := 0
+        let e := add(sub(hl, nl), 1)
+        let hv
+        
+        loop:
+            hv := keccak256(i, nl)
+            if eq(n, hv) {
+                mstore(0, i)
+                return(0, 32)
+            }
+            i := add(i, 1)
+            if eq(i, e) {
+                mstore(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+                return(0, 32)
+            }
+            jump(loop)
+    }}
 }
