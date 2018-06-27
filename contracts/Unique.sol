@@ -203,16 +203,6 @@ contract Unique {
         jumpi(unique1512, iszero(iv))
         jumpi(seen512, eq(iv, vhash))
         
-        // Compute index 2
-        index2 := mul(mod(mul(vhash,
-0x1b6d296aa8b7284041b9f0e36895d18399d8026b57a51e5af0ed54c3e03bd3a1
-        ), 331), 32)
-        
-        // Read index 2
-        iv := mload(index2)
-        jumpi(unique2512, iszero(iv))
-        jumpi(seen512, eq(iv, vhash))
-        
     iloop512:
         // Increment and test index 1
         index1 := mod(add(index1, 32), 0x2960)
@@ -220,22 +210,10 @@ contract Unique {
         jumpi(unique1512, iszero(iv))
         jumpi(seen512, eq(iv, vhash))
         
-        // Incerment and test index 2
-        index2 := mod(add(index2, 32), 0x2960)
-        iv := mload(index2)
-        jumpi(unique2512, iszero(iv))
-        jumpi(seen512, eq(iv, vhash))
-        
         // Increment and test index 1
         index1 := mod(add(index1, 32), 0x2960)
         iv := mload(index1)
         jumpi(unique1512, iszero(iv))
-        jumpi(seen512, eq(iv, vhash))
-        
-        // Incerment and test index 2
-        index2 := mod(add(index2, 32), 0x2960)
-        iv := mload(index2)
-        jumpi(unique2512, iszero(iv))
         jumpi(seen512, eq(iv, vhash))
         
         // Loop
