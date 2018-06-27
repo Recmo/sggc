@@ -17,8 +17,8 @@ contract Unique {
         // Clear all memory
         mstore(0x40, 0)
         
-        let l := calldataload(36)
-        jumpi(main, l)
+        let i := calldataload(36)
+        jumpi(main, i)
         
         // Empty list
         mstore(0, 32)
@@ -27,7 +27,7 @@ contract Unique {
         
     main:
         let ptr
-        let i
+        // let i
         let htl
         let scale
         let last1
@@ -38,8 +38,6 @@ contract Unique {
         let iv
         let value
         
-        ptr := 64
-        i := 68
         // 16 197746
         // 17 197561
         // 18 196644
@@ -47,12 +45,15 @@ contract Unique {
         // 20 196451
         // 21 196735
         // 22 197306
-        htl := mul(add(l, l), 32) // div(mul(l, 20), 10)
+        htl := mul(add(i, i), 32) // div(mul(l, 20), 10)
         scale := add(div(sub(0, htl), htl), 1)
         last1 := 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f
         last2 := 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f
         //let last3 := 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f
         //let last4 := 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f
+        
+        ptr := 64
+        i := 68
         
     oloop:
         // Read value
