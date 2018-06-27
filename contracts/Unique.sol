@@ -146,9 +146,43 @@ contract Unique {
         ptr := 0x29A0
         i := 68
         
+        // Write first value
+        vhash := calldataload(i)
+        mstore(ptr, vhash)
         ptr := add(ptr, 32)
+        last1 := vhash
         
     repeat5121:
+        i := add(i, 32)
+        jumpi(oloop_end512, eq(i, calldatasize))
+        vhash := calldataload(i)
+        jumpi(repeat5121, eq(vhash, last1))
+        
+        // Write second value
+        mstore(ptr, vhash)
+        ptr := add(ptr, 32)
+        last2 := last1
+        last1 := vhash
+        
+    repeat5122:
+        i := add(i, 32)
+        jumpi(oloop_end512, eq(i, calldatasize))
+        vhash := calldataload(i)
+        jumpi(repeat5122, or(eq(vhash, last1), eq(vhash, last2)))
+        
+        // Write third value
+        mstore(ptr, vhash)
+        ptr := add(ptr, 32)
+        
+        // Convert to main loop
+        vhash := not(vhash)
+        last1 := not(last1)
+        last2 := not(last2)
+        // Assume no collisions in first three unique values :/
+        mstore(mul(mod(vhash, 331), 32), vhash)
+        mstore(mul(mod(last1, 331), 32), last1)
+        mstore(mul(mod(last2, 331), 32), last2)
+        
         i := add(i, 32)
         
     oloop512:
