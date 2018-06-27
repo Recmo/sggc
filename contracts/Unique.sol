@@ -26,13 +26,21 @@ contract Unique {
         i := calldataload(36)
         jumpi(main512, gt(i, 128))
         jumpi(main256, gt(i, 64))
-        jumpi(main128, gt(i, 0))
+        jumpi(main128, gt(i, 1))
+        jumpi(main1, gt(i, 0))
         
     main0:
         // Empty list
         mstore(0, 32)
         mstore(32, 0)
         return(0, 64)
+        
+    main1:
+        // Singleton
+        mstore(0, 32)
+        mstore(32, 1)
+        mstore(64, calldataload(68))
+        return(0, 96)
         
     main128:
         // Table size 97
