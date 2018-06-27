@@ -33,10 +33,9 @@ contract Unique {
         let iv
         let index1
         let scale
-        let vhash
         let last2
         let last1
-        let value
+        let vhash
         
         // 16 197746
         // 17 197561
@@ -45,10 +44,10 @@ contract Unique {
         // 20 196451
         // 21 196735
         // 22 197306
-        htl := mul(add(i, i), 32) // div(mul(l, 20), 10)
+        htl := and(mul(i, 64), 0xFFFFFFFFFFFFFE0) // div(mul(l, 20), 10)
         scale := add(div(sub(0, htl), htl), 1)
-        last1 := 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f
-        last2 := 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f
+        last1 := 0
+        last2 := 0
         //let last3 := 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f
         //let last4 := 0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f
         
@@ -57,22 +56,17 @@ contract Unique {
         
     oloop:
         // Read value
-        value := calldataload(i)
+        vhash := not(calldataload(i))
         
         // Check recent values
-        jumpi(seen, or(eq(value, last1), eq(value, last2)))
+        jumpi(seen, or(eq(vhash, last1), eq(vhash, last2)))
         //jumpi(seen, eq(value, last2))
         //jumpi(seen, eq(value, last3))
         //jumpi(seen, eq(value, last4))
         //last4 := last3
         //last3 := last2
         last2 := last1
-        last1 := value
-        
-        // Offset value so we don't get zeros
-        vhash := add(value,
-0xed6d961a586550c76591d3943b3c6f76b621934aa7ffad3360fac1cf4aa0473f
-        )
+        last1 := vhash
         
         // Compute index 1
         index1 := add(and(div(mul(vhash,
@@ -139,7 +133,7 @@ contract Unique {
         mstore(index2, vhash)
         
         // Add to start of list
-        mstore(ptr, value)
+        mstore(ptr, not(vhash))
         ptr := add(ptr, 32)
         
         // Resume loop
@@ -152,7 +146,7 @@ contract Unique {
         mstore(index1, vhash)
         
         // Add to start of list
-        mstore(ptr, value)
+        mstore(ptr, not(vhash))
         ptr := add(ptr, 32)
         
         // Resume loop
