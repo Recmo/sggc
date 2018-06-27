@@ -24,6 +24,7 @@ contract IndexOf {
         }
         
         // Special case for single character needle
+        // We assume hl is less than 32
         if eq(nl, 1) {
             
             n := and(calldataload(add(n, 1)), 0xFF)
@@ -37,18 +38,15 @@ contract IndexOf {
             matc := and(matc, div(matc, 2))
             matc := and(matc, 0x0101010101010101010101010101010101010101010101010101010101010101)
             
-            if iszero(matc) {
-                mstore(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
-                return(0, 32)
-            }
+            jumpi(found, matc)
             
-            let result := 0
-            for {} lt(matc, 0x0100000000000000000000000000000000000000000000000000000000000000) {} {
-                result := add(result, 1)
-                matc := mul(matc, 256)
-            }
+        //notfound:
+            mstore(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+            return(0, 32)
             
-            mstore(0, result)
+        found:
+            mstore(0, and(div(
+            0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f, matc), 0xff))
             return(0, 32)
         }
         
