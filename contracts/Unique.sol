@@ -26,16 +26,16 @@ contract Unique {
         return(0, 64)
         
     main:
-        let ptr
         // let i
         let htl
-        let scale
-        let vhash
-        let index1
+        let ptr
         let index2
         let iv
-        let last1
+        let index1
+        let scale
+        let vhash
         let last2
+        let last1
         let value
         
         // 16 197746
