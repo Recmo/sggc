@@ -14,102 +14,98 @@ contract Unique {
         // @author Remco Bloemen <remco@wicked.ventures>
         mstore(0x40, 0)
         
-        let i := calldataload(36)
-        jumpi(main, i)
+        let i
+        let ptr
+        let index2
+        let iv
+        let index1
+        let last2 := 0
+        let last1 := 0
+        let vhash
+
+        i := calldataload(36)
+        jumpi(main512, gt(i, 128))
+        jumpi(main256, gt(i, 64))
+        jumpi(main128, gt(i, 0))
         
+    main0:
         // Empty list
         mstore(0, 32)
         mstore(32, 0)
         return(0, 64)
         
-    main:
-        // let i
-        let htl
-        let ptr
-        let index2
-        let iv
-        let index1
-        let scale
-        let last2
-        let last1
-        let vhash
-        
-        // htl := and(mul(i, 64), 0xFFFFFFFFFFFFFE0)
-        // scale := add(div(sub(0, htl), htl), 1)
-        last1 := 0
-        last2 := 0
-        
-        ptr := 0x2040
+    main128:
+        ptr := 0x1040
         i := 68
         
-    oloop:
+    oloop128:
         // Read value
         vhash := not(calldataload(i))
         
         // Check recent values
-        jumpi(seen, or(eq(vhash, last1), eq(vhash, last2)))
+        jumpi(seen128, or(eq(vhash, last1), eq(vhash, last2)))
         last2 := last1
         last1 := vhash
         
         // Compute index 1
-        index1 := and(mul(vhash, 32), 0x1fe0)
+        index1 := and(mul(vhash, 32), 0x0fe0)
         
         // Read index 1
         iv := mload(index1)
-        jumpi(unique1, iszero(iv))
-        jumpi(seen, eq(iv, vhash))
+        jumpi(unique1128, iszero(iv))
+        jumpi(seen128, eq(iv, vhash))
         
         // Increment and test index 1
-        index1 := and(add(index1, 32), 0x1fe0)
+        index1 := and(add(index1, 32), 0x0fe0)
         iv := mload(index1)
-        jumpi(unique1, iszero(iv))
-        jumpi(seen, eq(iv, vhash))
+        jumpi(unique1128, iszero(iv))
+        jumpi(seen128, eq(iv, vhash))
         
         // Compute index 2
         index2 := and(div(mul(vhash,
 0x1b6d296aa8b7284041b9f0e36895d18399d8026b57a51e5af0ed54c3e03bd3a1
-        ), 0x1000000000000001), 0x3fe0)
+        ), 0x1000000000000001), 0x0fe0)
         
         // Read index 2
         iv := mload(index2)
-        jumpi(unique2, iszero(iv))
-        jumpi(seen, eq(iv, vhash))
+        jumpi(unique2128, iszero(iv))
+        jumpi(seen128, eq(iv, vhash))
         
-    iloop:
+    iloop128:
         // Increment and test index 1
-        index1 := and(add(index1, 32), 0x1fe0)
+        index1 := and(add(index1, 32), 0x0fe0)
         iv := mload(index1)
-        jumpi(unique1, iszero(iv))
-        jumpi(seen, eq(iv, vhash))
+        jumpi(unique1128, iszero(iv))
+        jumpi(seen128, eq(iv, vhash))
         
         // Incerment and test index 2
-        index2 := and(add(index2, 32), 0x1fe0)
+        index2 := and(add(index2, 32), 0x0fe0)
         iv := mload(index2)
-        jumpi(unique2, iszero(iv))
-        jumpi(seen, eq(iv, vhash))
+        jumpi(unique2128, iszero(iv))
+        jumpi(seen128, eq(iv, vhash))
         
         // Increment and test index 1
-        index1 := and(add(index1, 32), 0x1fe0)
+        index1 := and(add(index1, 32), 0x0fe0)
         iv := mload(index1)
-        jumpi(unique1, iszero(iv))
-        jumpi(seen, eq(iv, vhash))
+        jumpi(unique1128, iszero(iv))
+        jumpi(seen128, eq(iv, vhash))
         
         // Incerment and test index 2
-        index2 := and(add(index2, 32), 0x1fe0)
+        index2 := and(add(index2, 32), 0x0fe0)
         iv := mload(index2)
-        jumpi(unique2, iszero(iv))
-        jumpi(seen, eq(iv, vhash))
+        jumpi(unique2128, iszero(iv))
+        jumpi(seen128, eq(iv, vhash))
         
         // Loop
-        jump(iloop)
+        jump(iloop128)
         
-    seen:
+    seen128:
         // Resume loop
         i := add(i, 32)
-        jumpi(oloop, lt(i, calldatasize))
-        jump(oloop_end)
+        jumpi(oloop128, lt(i, calldatasize))
+        jump(oloop_end128)
     
-    unique2:
+    unique2128:
         // Add to the hash table
         mstore(index2, vhash)
         
@@ -119,10 +115,10 @@ contract Unique {
         
         // Resume loop
         i := add(i, 32)
-        jumpi(oloop, lt(i, calldatasize))
-        jump(oloop_end)
+        jumpi(oloop128, lt(i, calldatasize))
+        jump(oloop_end128)
         
-    unique1:
+    unique1128:
         // Add to the hash table
         mstore(index1, vhash)
         
@@ -132,12 +128,220 @@ contract Unique {
         
         // Resume loop
         i := add(i, 32)
-        jumpi(oloop, lt(i, calldatasize))
+        jumpi(oloop128, lt(i, calldatasize))
     
-    oloop_end:
+    oloop_end128:
+        mstore(0x1000, 32)
+        mstore(0x1020, div(sub(ptr, 0x1040), 32))
+        return(0x1000, sub(ptr, 0x1000))
+    
+
+    main256:
+        ptr := 0x2040
+        i := 68
+        
+    oloop256:
+        // Read value
+        vhash := not(calldataload(i))
+        
+        // Check recent values
+        jumpi(seen256, or(eq(vhash, last1), eq(vhash, last2)))
+        last2 := last1
+        last1 := vhash
+        
+        // Compute index 1
+        index1 := and(mul(vhash, 32), 0x1fe0)
+        
+        // Read index 1
+        iv := mload(index1)
+        jumpi(unique1256, iszero(iv))
+        jumpi(seen256, eq(iv, vhash))
+        
+        // Increment and test index 1
+        index1 := and(add(index1, 32), 0x1fe0)
+        iv := mload(index1)
+        jumpi(unique1256, iszero(iv))
+        jumpi(seen256, eq(iv, vhash))
+        
+        // Compute index 2
+        index2 := and(div(mul(vhash,
+0x1b6d296aa8b7284041b9f0e36895d18399d8026b57a51e5af0ed54c3e03bd3a1
+        ), 0x1000000000000001), 0x0fe0)
+        
+        // Read index 2
+        iv := mload(index2)
+        jumpi(unique2256, iszero(iv))
+        jumpi(seen256, eq(iv, vhash))
+        
+    iloop256:
+        // Increment and test index 1
+        index1 := and(add(index1, 32), 0x1fe0)
+        iv := mload(index1)
+        jumpi(unique1256, iszero(iv))
+        jumpi(seen256, eq(iv, vhash))
+        
+        // Incerment and test index 2
+        index2 := and(add(index2, 32), 0x1fe0)
+        iv := mload(index2)
+        jumpi(unique2256, iszero(iv))
+        jumpi(seen256, eq(iv, vhash))
+        
+        // Increment and test index 1
+        index1 := and(add(index1, 32), 0x1fe0)
+        iv := mload(index1)
+        jumpi(unique1256, iszero(iv))
+        jumpi(seen256, eq(iv, vhash))
+        
+        // Incerment and test index 2
+        index2 := and(add(index2, 32), 0x1fe0)
+        iv := mload(index2)
+        jumpi(unique2256, iszero(iv))
+        jumpi(seen256, eq(iv, vhash))
+        
+        // Loop
+        jump(iloop256)
+        
+    seen256:
+        // Resume loop
+        i := add(i, 32)
+        jumpi(oloop256, lt(i, calldatasize))
+        jump(oloop_end256)
+    
+    unique2256:
+        // Add to the hash table
+        mstore(index2, vhash)
+        
+        // Add to start of list
+        mstore(ptr, not(vhash))
+        ptr := add(ptr, 32)
+        
+        // Resume loop
+        i := add(i, 32)
+        jumpi(oloop256, lt(i, calldatasize))
+        jump(oloop_end256)
+        
+    unique1256:
+        // Add to the hash table
+        mstore(index1, vhash)
+        
+        // Add to start of list
+        mstore(ptr, not(vhash))
+        ptr := add(ptr, 32)
+        
+        // Resume loop
+        i := add(i, 32)
+        jumpi(oloop256, lt(i, calldatasize))
+    
+    oloop_end256:
         mstore(0x2000, 32)
         mstore(0x2020, div(sub(ptr, 0x2040), 32))
         return(0x2000, sub(ptr, 0x2000))
+
+
+    main512:
+        ptr := 0x4040
+        i := 68
+        
+    oloop512:
+        // Read value
+        vhash := not(calldataload(i))
+        
+        // Check recent values
+        jumpi(seen512, or(eq(vhash, last1), eq(vhash, last2)))
+        last2 := last1
+        last1 := vhash
+        
+        // Compute index 1
+        index1 := and(mul(vhash, 32), 0x3fe0)
+        
+        // Read index 1
+        iv := mload(index1)
+        jumpi(unique1512, iszero(iv))
+        jumpi(seen512, eq(iv, vhash))
+        
+        // Increment and test index 1
+        index1 := and(add(index1, 32), 0x3fe0)
+        iv := mload(index1)
+        jumpi(unique1512, iszero(iv))
+        jumpi(seen512, eq(iv, vhash))
+        
+        // Compute index 2
+        index2 := and(div(mul(vhash,
+0x1b6d296aa8b7284041b9f0e36895d18399d8026b57a51e5af0ed54c3e03bd3a1
+        ), 0x1000000000000001), 0x0fe0)
+        
+        // Read index 2
+        iv := mload(index2)
+        jumpi(unique2512, iszero(iv))
+        jumpi(seen512, eq(iv, vhash))
+        
+    iloop512:
+        // Increment and test index 1
+        index1 := and(add(index1, 32), 0x3fe0)
+        iv := mload(index1)
+        jumpi(unique1512, iszero(iv))
+        jumpi(seen512, eq(iv, vhash))
+        
+        // Incerment and test index 2
+        index2 := and(add(index2, 32), 0x3fe0)
+        iv := mload(index2)
+        jumpi(unique2512, iszero(iv))
+        jumpi(seen512, eq(iv, vhash))
+        
+        // Increment and test index 1
+        index1 := and(add(index1, 32), 0x3fe0)
+        iv := mload(index1)
+        jumpi(unique1512, iszero(iv))
+        jumpi(seen512, eq(iv, vhash))
+        
+        // Incerment and test index 2
+        index2 := and(add(index2, 32), 0x3fe0)
+        iv := mload(index2)
+        jumpi(unique2512, iszero(iv))
+        jumpi(seen512, eq(iv, vhash))
+        
+        // Loop
+        jump(iloop512)
+        
+    seen512:
+        // Resume loop
+        i := add(i, 32)
+        jumpi(oloop512, lt(i, calldatasize))
+        jump(oloop_end512)
+    
+    unique2512:
+        // Add to the hash table
+        mstore(index2, vhash)
+        
+        // Add to start of list
+        mstore(ptr, not(vhash))
+        ptr := add(ptr, 32)
+        
+        // Resume loop
+        i := add(i, 32)
+        jumpi(oloop512, lt(i, calldatasize))
+        jump(oloop_end512)
+        
+    unique1512:
+        // Add to the hash table
+        mstore(index1, vhash)
+        
+        // Add to start of list
+        mstore(ptr, not(vhash))
+        ptr := add(ptr, 32)
+        
+        // Resume loop
+        i := add(i, 32)
+        jumpi(oloop512, lt(i, calldatasize))
+    
+    oloop_end512:
+        mstore(0x4000, 32)
+        mstore(0x4020, div(sub(ptr, 0x4040), 32))
+        return(0x4000, sub(ptr, 0x4000))
+
+
+
+
     }}
     
 }
