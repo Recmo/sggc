@@ -154,9 +154,9 @@ contract Unique {
         
     repeat5121:
         i := add(i, 32)
-        jumpi(oloop_end512, eq(i, calldatasize))
         vhash := calldataload(i)
         jumpi(repeat5121, eq(vhash, last1))
+        jumpi(oloop_end512, eq(i, calldatasize))
         
         // Write second value
         mstore(ptr, vhash)
@@ -166,9 +166,9 @@ contract Unique {
         
     repeat5122:
         i := add(i, 32)
-        jumpi(oloop_end512, eq(i, calldatasize))
         vhash := calldataload(i)
         jumpi(repeat5122, or(eq(vhash, last1), eq(vhash, last2)))
+        jumpi(oloop_end512, eq(i, calldatasize))
         
         // Write third value
         mstore(ptr, vhash)
