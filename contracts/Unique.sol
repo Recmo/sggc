@@ -17,10 +17,10 @@ contract Unique {
         let i
         let ptr
         let index2
-        let iv
-        let index1
         let last2 := 0
         let last1 := 0
+        let iv
+        let index1
         let vhash
 
         i := calldataload(36)
@@ -197,13 +197,13 @@ contract Unique {
         jumpi(unique1512, iszero(iv))
         jumpi(seen512, eq(iv, vhash))
         
+    iloop512:
         // Increment and test index 1
         index1 := mod(add(index1, 32), 0x2960)
         iv := mload(index1)
         jumpi(unique1512, iszero(iv))
         jumpi(seen512, eq(iv, vhash))
         
-    iloop512:
         // Increment and test index 1
         index1 := mod(add(index1, 32), 0x2960)
         iv := mload(index1)
@@ -220,19 +220,6 @@ contract Unique {
         jump(iloop512)
         
     seen512:
-        // Resume loop
-        i := add(i, 32)
-        jumpi(oloop512, lt(i, calldatasize))
-        jump(oloop_end512)
-    
-    unique2512:
-        // Add to the hash table
-        mstore(index2, vhash)
-        
-        // Add to start of list
-        mstore(ptr, not(vhash))
-        ptr := add(ptr, 32)
-        
         // Resume loop
         i := add(i, 32)
         jumpi(oloop512, lt(i, calldatasize))
