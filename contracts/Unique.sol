@@ -136,7 +136,8 @@ contract Unique {
     
 
     main256:
-        ptr := 0x2040
+        // Table size 193
+        ptr := 0x1860
         i := 68
         
     oloop256:
@@ -149,7 +150,7 @@ contract Unique {
         last1 := vhash
         
         // Compute index 1
-        index1 := and(mul(vhash, 32), 0x1fe0)
+        index1 := mul(mod(vhash, 193), 32)
         
         // Read index 1
         iv := mload(index1)
@@ -157,15 +158,15 @@ contract Unique {
         jumpi(seen256, eq(iv, vhash))
         
         // Increment and test index 1
-        index1 := and(add(index1, 32), 0x1fe0)
+        index1 := mod(add(index1, 32), 0x1820)
         iv := mload(index1)
         jumpi(unique1256, iszero(iv))
         jumpi(seen256, eq(iv, vhash))
         
         // Compute index 2
-        index2 := and(div(mul(vhash,
+        index2 := mul(mod(mul(vhash,
 0x1b6d296aa8b7284041b9f0e36895d18399d8026b57a51e5af0ed54c3e03bd3a1
-        ), 0x1000000000000001), 0x0fe0)
+        ), 193), 32)
         
         // Read index 2
         iv := mload(index2)
@@ -174,25 +175,25 @@ contract Unique {
         
     iloop256:
         // Increment and test index 1
-        index1 := and(add(index1, 32), 0x1fe0)
+        index1 := mod(add(index1, 32), 0x1820)
         iv := mload(index1)
         jumpi(unique1256, iszero(iv))
         jumpi(seen256, eq(iv, vhash))
         
         // Incerment and test index 2
-        index2 := and(add(index2, 32), 0x1fe0)
+        index2 := mod(add(index2, 32), 0x1820)
         iv := mload(index2)
         jumpi(unique2256, iszero(iv))
         jumpi(seen256, eq(iv, vhash))
         
         // Increment and test index 1
-        index1 := and(add(index1, 32), 0x1fe0)
+        index1 := mod(add(index1, 32), 0x1820)
         iv := mload(index1)
         jumpi(unique1256, iszero(iv))
         jumpi(seen256, eq(iv, vhash))
         
         // Incerment and test index 2
-        index2 := and(add(index2, 32), 0x1fe0)
+        index2 := mod(add(index2, 32), 0x1820)
         iv := mload(index2)
         jumpi(unique2256, iszero(iv))
         jumpi(seen256, eq(iv, vhash))
@@ -232,13 +233,13 @@ contract Unique {
         jumpi(oloop256, lt(i, calldatasize))
     
     oloop_end256:
-        mstore(0x2000, 32)
-        mstore(0x2020, div(sub(ptr, 0x2040), 32))
-        return(0x2000, sub(ptr, 0x2000))
-
+        mstore(0x1820, 32)
+        mstore(0x1840, div(sub(ptr, 0x1860), 32))
+        return(0x1820, sub(ptr, 0x1820))
 
     main512:
-        ptr := 0x4040
+        // Table size 331
+        ptr := 0x29A0
         i := 68
         
     oloop512:
@@ -251,7 +252,7 @@ contract Unique {
         last1 := vhash
         
         // Compute index 1
-        index1 := and(mul(vhash, 32), 0x3fe0)
+        index1 := mul(mod(vhash, 331), 32)
         
         // Read index 1
         iv := mload(index1)
@@ -259,15 +260,15 @@ contract Unique {
         jumpi(seen512, eq(iv, vhash))
         
         // Increment and test index 1
-        index1 := and(add(index1, 32), 0x3fe0)
+        index1 := mod(add(index1, 32), 0x2960)
         iv := mload(index1)
         jumpi(unique1512, iszero(iv))
         jumpi(seen512, eq(iv, vhash))
         
         // Compute index 2
-        index2 := and(div(mul(vhash,
+        index2 := mul(mod(mul(vhash,
 0x1b6d296aa8b7284041b9f0e36895d18399d8026b57a51e5af0ed54c3e03bd3a1
-        ), 0x1000000000000001), 0x0fe0)
+        ), 331), 32)
         
         // Read index 2
         iv := mload(index2)
@@ -276,25 +277,25 @@ contract Unique {
         
     iloop512:
         // Increment and test index 1
-        index1 := and(add(index1, 32), 0x3fe0)
+        index1 := mod(add(index1, 32), 0x2960)
         iv := mload(index1)
         jumpi(unique1512, iszero(iv))
         jumpi(seen512, eq(iv, vhash))
         
         // Incerment and test index 2
-        index2 := and(add(index2, 32), 0x3fe0)
+        index2 := mod(add(index2, 32), 0x2960)
         iv := mload(index2)
         jumpi(unique2512, iszero(iv))
         jumpi(seen512, eq(iv, vhash))
         
         // Increment and test index 1
-        index1 := and(add(index1, 32), 0x3fe0)
+        index1 := mod(add(index1, 32), 0x2960)
         iv := mload(index1)
         jumpi(unique1512, iszero(iv))
         jumpi(seen512, eq(iv, vhash))
         
         // Incerment and test index 2
-        index2 := and(add(index2, 32), 0x3fe0)
+        index2 := mod(add(index2, 32), 0x2960)
         iv := mload(index2)
         jumpi(unique2512, iszero(iv))
         jumpi(seen512, eq(iv, vhash))
@@ -334,11 +335,9 @@ contract Unique {
         jumpi(oloop512, lt(i, calldatasize))
     
     oloop_end512:
-        mstore(0x4000, 32)
-        mstore(0x4020, div(sub(ptr, 0x4040), 32))
-        return(0x4000, sub(ptr, 0x4000))
-
-
+        mstore(0x2960, 32)
+        mstore(0x2980, div(sub(ptr, 0x29A0), 32))
+        return(0x2960, sub(ptr, 0x2960))
 
 
     }}
