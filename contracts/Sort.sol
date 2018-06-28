@@ -94,6 +94,20 @@ contract Sort {
         i := add(i, 2)
         jumpi(l3, lt(i, 128))
         
+        
+        // DEBUG
+    if 0 { // DEBUG: Dump the buckets to output
+        i := 0x00
+    ldebug:
+        mstore(add(mul(i, 16), 0x1000), and(mload(i), 0xFFFF))
+        i := add(i, 2)
+        jumpi(ldebug, lt(i, 128))
+        mstore(sub(0x1000, 0x40), 0x20)
+        mstore(sub(0x1000, 0x20), 64)
+        return(sub(0x1000, 0x40), add(64, mul(64, 32)))
+    }
+        
+        
         // Third pass: move to buckets
         i := 0x44
     l4: {
@@ -110,10 +124,31 @@ contract Sort {
         }
         jumpi(l4, lt(i, calldatasize))
         
+        
+        // DEBUG
+    if 0 { // DEBUG: Dump the buckets to output
+        i := 0x00
+    ldebug:
+        mstore(add(mul(i, 16), 0x1000), and(mload(i), 0xFFFF))
+        i := add(i, 2)
+        jumpi(ldebug, lt(i, 128))
+        mstore(sub(0x1000, 0x40), 0x20)
+        mstore(sub(0x1000, 0x20), 64)
+        return(sub(0x1000, 0x40), add(64, mul(64, 32)))
+    }
+    
+    if 0 { // DEBUG: Dump the result space to output
+        mstore(sub(0x1000, 0x40), 0x20)
+        mstore(sub(0x1000, 0x20), calldataload(0x24))
+        return(sub(0x1000, 0x40), sub(calldatasize, 4))
+    }
+    
+    if 1 { // DEBUG: Sort entire result space and return
         addr1 := 0x1000
         addr2 := add(sub(calldatasize, 0x44), sub(0x1000, 32))
         sort(addr1, addr2)
         jump(done)
+    }
         
         // Fourth pass (buckets): sort buckets
         addr2 := and(mload(0), 0xFFFF)
