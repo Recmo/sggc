@@ -37,6 +37,7 @@ contract Sort {
         // 140 * 32 = 4480    gas: 314657        186329
         // 160 * 32 = 5120    gas: 317469        189141
         // 30 + 256 * 2 = 542
+        // 64
         
         // First pass:
         // * find upper bound to values
@@ -61,7 +62,7 @@ contract Sort {
         // max(input size) = 299
         
         // Compute scaling factor (twice what it should be, we mask)
-        scale := div(add(scale, 511), 512)
+        scale := div(add(scale, 63), 64)
         
         // Second pass: count buckets (in multipes of 32)
         i := 0x44
@@ -73,9 +74,10 @@ contract Sort {
         
         // Bucket pass: compute running sum of the buckets
         // TODO: SWAR
-        temp1 := 542 // Add offset to write area
+        temp1 := 0x1000 // Add offset to write area
         i := 0x00
     l3:
+        
         temp2 := mload(i)
         temp1 := and(add(temp1, temp2), 0xFFFF)
         temp2 := or(and(temp2, 
@@ -83,7 +85,7 @@ contract Sort {
         ), temp1)
         mstore(i, temp2)
         i := add(i, 2)
-        jumpi(l3, lt(i, 512))
+        jumpi(l3, lt(i, 64))
         
         // Third pass: move to buckets
         i := 0x44
@@ -100,6 +102,11 @@ contract Sort {
         i := add(i, 32)
         jumpi(l4, lt(i, calldatasize))
         
+        addr1 := 0x1000
+        addr2 := add(sub(calldatasize, 0x44), sub(0x1000, 32))
+        sort(addr1, addr2)
+        jump(done)
+        
         // Fourth pass (buckets): sort buckets
         addr2 := and(mload(0), 0xFFFF)
         i := 0x02
@@ -108,13 +115,13 @@ contract Sort {
         jumpi(l5n, lt(addr2, sub(addr1, 32)))
         addr2 := addr1
         i := add(i, 2)
-        jumpi(l5, lt(i, 512))
+        jumpi(l5, lt(i, 64))
         jump(l5e)
     l5n:
         sort(addr2, sub(addr1, 32))
         addr2 := addr1
         i := add(i, 32)
-        jumpi(l5, lt(i, 542))
+        jumpi(l5, lt(i, 64))
     l5e:
         addr1 := add(sub(calldatasize, 0x44), sub(542, 32))
         jumpi(l5s, lt(addr2, addr1))
@@ -125,9 +132,9 @@ contract Sort {
         // jump(done)
         
     done:
-        mstore(sub(542, 0x40), 0x20)
-        mstore(sub(542, 0x20), calldataload(0x24))
-        return(sub(542, 0x40), sub(calldatasize, 4))
+        mstore(sub(0x1000, 0x40), 0x20)
+        mstore(sub(0x1000, 0x20), calldataload(0x24))
+        return(sub(0x1000, 0x40), sub(calldatasize, 4))
         
     trivial:
         calldatacopy(0, 4, calldatasize)
