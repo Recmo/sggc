@@ -154,6 +154,11 @@ contract BrainFuck {
         // TODO: Detect [->+<]
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
+        
+        // Skip nops
+        jumpi(copen, iszero(and(mload(add(op, op)), 0xFFFF)))
+        
+        
         jumpi(copen_decr, eq(op, 0x2d))
         // Nope. Handle [ and distpach.
         mstore(pp, open)
@@ -274,7 +279,7 @@ contract BrainFuck {
         pp := add(pp, 32)
         jump(mload(pp))
         
-    add: // [->+<]
+    addnext: // [->+<]
         mstore8(add(tp, 32), add(mload(tp), mload(add(tp, 1))))
         mstore8(add(tp, 31), 0)
         pp := add(pp, 32)
