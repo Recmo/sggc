@@ -150,6 +150,8 @@ contract BrainFuck {
     
     copen:
         // Check if next character is -
+        // TODO: Skip nops
+        // TODO: Detect [->+<]
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
         jumpi(copen_decr, eq(op, 0x2d))
@@ -268,6 +270,12 @@ contract BrainFuck {
         jump(mload(pp))
         
     clear: // [-]
+        mstore8(add(tp, 31), 0)
+        pp := add(pp, 32)
+        jump(mload(pp))
+        
+    add: // [->+<]
+        mstore8(add(tp, 32), add(mload(tp), mload(add(tp, 1))))
         mstore8(add(tp, 31), 0)
         pp := add(pp, 32)
         jump(mload(pp))
