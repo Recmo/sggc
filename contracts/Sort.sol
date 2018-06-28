@@ -12,6 +12,7 @@ contract Sort {
         // Yes repeated sorted input
         // No  unrepeated reverse sorted input
         // Yes repeated reverse sorted input
+        // max(input size) = 299
         
         mstore(0x40, 0) // Set all memory to zero
         
@@ -39,7 +40,9 @@ contract Sort {
         // 30 + 256 * 2 = 542
         // 64
         
-        // First pass:
+        ////////////////////////////////////////////////////
+        // First pass
+        ////////////////////////////////////////////////////
         // * find upper bound to values
         // * check for sorted input
         // * check for reverse sorted input
@@ -56,6 +59,7 @@ contract Sort {
             mul(scale, gt(scale, temp2)),
             mul(temp2, iszero(gt(scale, temp2)))
         )
+        //scale := or(scale, temp2)
         temp1 := temp2
         i := add(i, 32)
         jumpi(l1, lt(i, calldatasize))
@@ -65,12 +69,12 @@ contract Sort {
         // DEBUG
         // jumpi(explode, sub(65401, scale))
         
-        // max(input size) = 299
-        
         // Compute scaling factor (twice what it should be, we mask)
         scale := div(add(scale, 511), 512)
         
+        ////////////////////////////////////////////////////
         // Second pass: count buckets (in multipes of 32)
+        ////////////////////////////////////////////////////
         i := 0x44
     l2:
         temp1 := and(div(calldataload(i), scale), 0xFFFFFE)
@@ -78,7 +82,10 @@ contract Sort {
         i := add(i, 32)
         jumpi(l2, lt(i, calldatasize))
         
+        
+        ////////////////////////////////////////////////////
         // Bucket pass: compute running sum of the buckets
+        ////////////////////////////////////////////////////
         // TODO: SWAR
         temp1 := 0x1000 // Add offset to write area
         i := 0x00
@@ -93,7 +100,9 @@ contract Sort {
         i := add(i, 2)
         jumpi(l3, lt(i, 512))
         
+        ////////////////////////////////////////////////////
         // Third pass: move to buckets
+        ////////////////////////////////////////////////////
         i := 0x44
     l4: {
         let value  := calldataload(i)
@@ -109,7 +118,9 @@ contract Sort {
         }
         jumpi(l4, lt(i, calldatasize))
         
+        ////////////////////////////////////////////////////
         // Fourth pass (buckets): sort buckets
+        ////////////////////////////////////////////////////
         addr2 := and(mload(0), 0xFFFF)
         i := 0x02
     l5:
@@ -140,6 +151,9 @@ contract Sort {
         mstore(sub(0x1000, 0x20), calldataload(0x24))
         return(sub(0x1000, 0x40), sub(calldatasize, 4))
         
+        ////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////
     trivial:
         calldatacopy(0, 4, calldatasize)
         return(0, sub(calldatasize, 4))
