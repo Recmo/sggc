@@ -6,6 +6,10 @@ contract BrainFuck {
         
         /// @author Remco Bloemen <remco@wicked.ventures> 
         
+        // max(output size) = 257
+        // max(tape) = 1024
+        // Tape is very sparse and can be used modulo 11 or 16
+        
         // This canceles out the "mstore(0x40, 0x80)" that
         // solc likes to inject. It even gets partially optimized.
         mstore(0x40, 0x00)
