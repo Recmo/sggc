@@ -55,27 +55,12 @@ contract Sort {
         temp2 := calldataload(i)
         addr1 := and(addr1, slt(sub(temp1, 1), temp2))
         addr2 := and(addr2, gt(add(temp1, 1), temp2))
-        // jumpi(l1max, lt(scale, temp2))
         scale := or(scale, temp2)
         temp1 := temp2
         i := add(i, 32)
         jumpi(l1, lt(i, calldatasize))
         jumpi(trivial, addr1)
         jumpi(reverse, addr2)
-        jump(l1done)
-        
-        
-    l1max:
-        scale := temp2
-        temp1 := temp2
-        i := add(i, 32)
-        jumpi(l1, lt(i, calldatasize))
-        jumpi(trivial, addr1)
-        jumpi(reverse, addr2)
-        jump(l1done)
-        
-        
-    l1done:
         
         // DEBUG
         // jumpi(explode, sub(65401, scale))
