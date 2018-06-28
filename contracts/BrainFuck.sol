@@ -150,16 +150,15 @@ contract BrainFuck {
     
     copen:
         // Check if next character is -
-        // TODO: Skip nops
-        // TODO: Detect [->+<]
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
         
         // Skip nops
         jumpi(copen, iszero(and(mload(add(op, op)), 0xFFFF)))
         
-        
+        // Check if next operator is -
         jumpi(copen_decr, eq(op, 0x2d))
+        
         // Nope. Handle [ and distpach.
         mstore(pp, open)
         pp := add(pp, 32)
@@ -173,7 +172,9 @@ contract BrainFuck {
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
         jumpi(copen_decr_close, eq(op, 0x5d))
-        // Nope. Handle [ and - and dispatch
+        // Check if next character is >
+        jumpi(copen_decr_right, eq(op, 0x3e))
+        // Nope. Handle [- and dispatch
         mstore(pp, open)
         pp := add(pp, 32)
         pp := add(pp, 32)
@@ -186,6 +187,34 @@ contract BrainFuck {
     copen_decr_close:
         // We got [-], so store a 'clear'
         mstore(pp, clear)
+        pp := add(pp, 32)
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+    copen_decr_right:
+        // Check if next character is +
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jumpi(copen_decr_right_incr, eq(op, 0x2b))
+        // Nope. Handle [-> and dispatch
+        selfdestruct(0) // TODO
+    copen_decr_right_incr:
+        // Check if next character is <
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jumpi(copen_decr_right_incr_left, eq(op, 0x3c))
+        // Nope. Handle [->+ and dispatch
+        selfdestruct(0) // TODO
+    copen_decr_right_incr_left:
+        // Check if next character is ]
+        ip := add(ip, 1)
+        op := and(calldataload(ip), 0xFF)
+        jumpi(copen_decr_right_incr_left_close, eq(op, 0x5d))
+        // Nope. Handle [->+< and dispatch
+        selfdestruct(0) // TODO
+    copen_decr_right_incr_left_close:
+        // We got [->+<], so store a 'addnext'
+        mstore(pp, addnext)
         pp := add(pp, 32)
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
