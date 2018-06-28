@@ -68,7 +68,7 @@ contract Sort {
         // max(input size) = 299
         
         // Compute scaling factor (twice what it should be, we mask)
-        scale := div(add(scale, 127), 128)
+        scale := div(add(scale, 511), 512)
         
         // Second pass: count buckets (in multipes of 32)
         i := 0x44
@@ -92,7 +92,7 @@ contract Sort {
         ), temp1)
         mstore(i, temp2)
         i := add(i, 2)
-        jumpi(l3, lt(i, 128))
+        jumpi(l3, lt(i, 512))
         
         
         // DEBUG
@@ -104,7 +104,7 @@ contract Sort {
         jumpi(ldebug, lt(i, 128))
         mstore(sub(0x1000, 0x40), 0x20)
         mstore(sub(0x1000, 0x20), 64)
-        return(sub(0x1000, 0x40), add(64, mul(64, 32)))
+        return(sub(0x1000, 0x40), add(64, mul(256, 32)))
     }
         
         
@@ -134,7 +134,7 @@ contract Sort {
         jumpi(ldebug, lt(i, 128))
         mstore(sub(0x1000, 0x40), 0x20)
         mstore(sub(0x1000, 0x20), 64)
-        return(sub(0x1000, 0x40), add(64, mul(64, 32)))
+        return(sub(0x1000, 0x40), add(64, mul(256, 32)))
     }
     
     if 0 { // DEBUG: Dump the result space to output
@@ -158,14 +158,14 @@ contract Sort {
         jumpi(l5n, lt(addr2, sub(addr1, 32)))
         addr2 := addr1
         i := add(i, 2)
-        jumpi(l5, lt(i, 128))
+        jumpi(l5, lt(i, 512))
         jump(l5e)
     l5n:
         // Sort the current range and resume loop
         sort(addr2, sub(addr1, 32))
         addr2 := addr1
         i := add(i, 2)
-        jumpi(l5, lt(i, 128))
+        jumpi(l5, lt(i, 512))
     l5e:
         // Check if the last range needs sorting
         addr1 := add(sub(calldatasize, 0x44), 0x1000)
