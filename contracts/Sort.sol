@@ -36,6 +36,7 @@ contract Sort {
         // 130 * 32 = 4160    gas: 314771        188363
         // 140 * 32 = 4480    gas: 314657        186329
         // 160 * 32 = 5120    gas: 317469        189141
+        // 256 *  1 = 256
         
         // First pass:
         // * find upper bound to values
@@ -56,6 +57,8 @@ contract Sort {
         jumpi(l1, lt(i, calldatasize))
         jumpi(trivial, addr1)
         jumpi(reverse, addr2)
+        
+        // max(input size) = 299
         
         // Compute scaling factor
         scale := div(add(scale, 119), 120)
