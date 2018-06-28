@@ -44,8 +44,8 @@ contract BrainFuck {
         mstore(0x00, xor(cnop, ceof))
 
         ip := 0x44 // Source pointer offset left 32 bytes
-        pp := 2080 // Bytecode to be written starting at 2080
-        tp := 512  // Loop stack pointer, right after lookup table
+        pp := 321  // Bytecode to be written starting at 321
+        tp := 256  // Loop stack pointer, right after lookup table
         
     cnop:
         ip := add(ip, 1)
@@ -254,36 +254,36 @@ contract BrainFuck {
         
         // Tape is allocated 32...48 in memory as bytes (use mstore8)
         // Output is allocatd 64...321 in memory as bytes (use mstore8)
-        // Program is stored as 2080... as uint256 in direct threading
+        // Program is stored as 321... as uint256 in direct threading
         // Input is kept in calldata. Input pointer is offset by -31 so
         // a byte can be read using and(calldataload(ip), 0xff)
         
     // reset:
         tp := 1 // offset left 31 bytes
         ip := add(calldataload(36), 5) // offset left 31 bytes
-        op := 1056
-        pp := 2080
+        op := 0x40
+        pp := 321
         jump(mload(pp))
         
     right: // >
-        tp := add(tp, 1)
+        tp := and(add(tp, 1), 0xF)
         pp := add(pp, 32)
         jump(mload(pp))
         
     rightn: // >>…
         pp := add(pp, 32)
-        tp := add(tp, mload(pp))
+        tp := and(add(tp, mload(pp)), 0xF)
         pp := add(pp, 32)
         jump(mload(pp))
         
     left: // <
-        tp := sub(tp, 1)
+        tp := and(sub(tp, 1), 0xF)
         pp := add(pp, 32)
         jump(mload(pp))
         
     leftn: // <<…
         pp := add(pp, 32)
-        tp := sub(tp, mload(pp))
+        tp := and(sub(tp, mload(pp)), 0xF)
         pp := add(pp, 32)
         jump(mload(pp))
         
@@ -347,9 +347,12 @@ contract BrainFuck {
         jump(mload(pp))
     
     exit: // EOF
-        mstore(992, 32)
-        mstore(1024, sub(op, 1056))
-        return(992, and(sub(op, 961), not(0x1F)))
+        mstore(0x00, 0x20)
+        mstore(0x20, sub(op, 0x40))
+        return(0x00, and(add(op, 0x1F), 0xFE0))
+        
+    explode:
+        selfdestruct(0x0)
     }}
     
     // Now someone needs to write an ERC20 contract in BrainFuck,
