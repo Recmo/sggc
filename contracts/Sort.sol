@@ -128,21 +128,21 @@ contract Sort {
         ////////////////////////////////////////////////////
         // Fourth pass (buckets): sort buckets
         ////////////////////////////////////////////////////
-        addr2 := and(mload(0), 0xFFFF)
+        
         i := 510
+        addr2 := and(mload(i), 0xFFFF)
     l5:
+        i := sub(i, 2)
         addr1 := and(mload(i), 0xFFFF)
         jumpi(l5n, lt(addr2, sub(addr1, 32)))
         addr2 := addr1
-        i := sub(i, 2)
-        jumpi(l5, lt(i, 512))
+        jumpi(l5, i)
         jump(l5e)
     l5n:
         // Sort the current range and resume loop
         sort(addr2, sub(addr1, 32))
         addr2 := addr1
-        i := sub(i, 2)
-        jumpi(l5, lt(i, 512))
+        jumpi(l5, i)
     l5e:
         // Check if the last range needs sorting
         addr1 := add(sub(calldatasize, 0x44), 0x220)
