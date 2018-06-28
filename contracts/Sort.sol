@@ -52,25 +52,32 @@ contract Sort {
         temp2 := calldataload(i)
         addr1 := and(addr1, slt(sub(temp1, 1), temp2))
         addr2 := and(addr2, gt(add(temp1, 1), temp2))
-        scale := or(scale, temp2)
+        scale := or(
+            mul(scale, gt(scale, temp2)),
+            mul(temp2, iszero(gt(scale, temp2)))
+        )
         temp1 := temp2
         i := add(i, 32)
         jumpi(l1, lt(i, calldatasize))
         jumpi(trivial, addr1)
         jumpi(reverse, addr2)
         
+        // DEBUG
+        // jumpi(explode, sub(65401, scale))
+        
         // max(input size) = 299
         
         // Compute scaling factor (twice what it should be, we mask)
-        scale := div(add(scale, 63), 64)
+        scale := div(add(scale, 127), 128)
         
         // Second pass: count buckets (in multipes of 32)
         i := 0x44
     l2:
-        temp1 := and(div(calldataload(i), scale), 0x1FE)
-        mstore8(add(temp1, 31), add(mload(temp1), 32))
+        temp1 := and(div(calldataload(i), scale), 0xFFFFFE)
+        mstore8(add(temp1, 31), add(mload(temp1), 1))
         i := add(i, 32)
         jumpi(l2, lt(i, calldatasize))
+        
         
         // Bucket pass: compute running sum of the buckets
         // TODO: SWAR
