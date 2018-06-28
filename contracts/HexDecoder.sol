@@ -49,9 +49,7 @@ contract HexDecoder {
         mstore(32, ol)
         
         // Add 64 to ol and round to the next multiple of 32
-        return(0, and(add(ol, 95),
-            0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE0
-        ))
+        return(0, and(add(ol, 95), 0xFFFFFFFFFFFFFFFE0))
         
     empty:
         mstore(0, 32)
