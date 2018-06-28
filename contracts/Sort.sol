@@ -67,7 +67,7 @@ contract Sort {
         i := 0x44
     l2:
         temp1 := and(div(calldataload(i), scale), 0x1FE)
-        mstore8(add(temp1, 31), add(mload(temp1), 1))
+        mstore8(add(temp1, 31), add(mload(temp1), 32))
         i := add(i, 32)
         jumpi(l2, lt(i, calldatasize))
         
@@ -101,7 +101,7 @@ contract Sort {
         jumpi(l4, lt(i, calldatasize))
         
         // Fourth pass (buckets): sort buckets
-        addr2 := mload(0)
+        addr2 := and(mload(0), 0xFFFF)
         i := 0x02
     l5:
         addr1 := and(mload(i), 0xFFFF)
