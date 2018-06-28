@@ -71,12 +71,17 @@ contract Sort {
         ////////////////////////////////////////////////////
         // Second pass: count buckets
         ////////////////////////////////////////////////////
-        i := 0x44
+        0x44
     l2:
-        temp1 := sub(510, and(div(calldataload(i), scale), 0xFFFFFE))
-        mstore8(add(temp1, 31), add(mload(temp1), 1))
-        i := add(i, 32)
-        jumpi(l2, lt(i, calldatasize))
+        // temp1 := sub(510, and(div(calldataload(i), scale), 0xFFFFFE))
+        scale dup2 calldataload div 0xfffffe and 510 sub
+        // mstore8(add(temp1, 31), add(mload(temp1), 1))
+        dup1 mload 1 add swap1 31 add mstore8
+        // i := add(i, 32)
+        32 add
+        // jumpi(l2, lt(i, calldatasize))
+        dup1 calldatasize gt l2 jumpi
+        pop
         
         ////////////////////////////////////////////////////
         // Bucket pass: compute running sum of the buckets
