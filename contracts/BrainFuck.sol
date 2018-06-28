@@ -13,6 +13,7 @@ contract BrainFuck {
         // Tape is very sparse and can be used modulo 11 or 16
         // max(loop stack) = 2
         // Assume input characters < 128
+        // max(program) > 272 <= 276
         
         // This canceles out the "mstore(0x40, 0x80)" that
         // solc likes to inject. It even gets partially optimized.
@@ -50,6 +51,7 @@ contract BrainFuck {
         // 0x000 .. 0x100  instruction lookup table 
         // 0x110 .. 0x120  tape
         // 0x200 .. 0x341  output
+        // 0x360 .. 0x588  cache of matching brackets
         // Program is kept in calldata. Program pointer offset by -31 bytes.
         // Input is kept in calldata. Input pointer is offset by -31 bytes.
         
@@ -58,6 +60,8 @@ contract BrainFuck {
         ip := add(calldataload(0x24), 5) // offset left 31 bytes
         tp := 0x100
         op := 0x200
+        
+        jumpi(explode, gt(calldataload(pp), 263))
         
     cnop:
         pp := add(pp, 1)
@@ -91,9 +95,15 @@ contract BrainFuck {
         jump(cnop)
     
     copen:
-        jumpi(copen_take, and(mload(tp), 0xff))
-        // Find matching ]
-        // TODO: nested brackets
+        jumpi(cnop, and(mload(tp), 0xff))
+        
+        // Skip, try cache first
+        t2 := pp
+        pp := and(mload(add(add(pp, pp), 0x342)), 0xFFFF)
+        jumpi(cnop, pp)
+        
+        // No cache, find bracket
+        pp := t2
         js := 1
     copen_find:
         pp := add(pp, 1)
@@ -101,14 +111,29 @@ contract BrainFuck {
         js := add(js, eq(t, 0x5b)) // [
         js := sub(js, eq(t, 0x5d)) // ]
         jumpi(copen_find, js)
-        jump(cnop)
-    copen_take:
+        
+        // Cache brackets
+        // cache[t2] = pp
+        // cache[pp] = t2
+        t := add(add(pp, pp), 0x342)
+        mstore(t, or(and(mload(t), not(0xFFFF)), t2))
+        t := add(add(t2, t2), 0x342)
+        mstore(t, or(and(mload(t), not(0xFFFF)), pp))
+        
         jump(cnop)
         
     cclose:
-        jumpi(cclose_find, and(mload(tp), 0xff))
+        jumpi(cclose_take, and(mload(tp), 0xff))
         jump(cnop)
-    cclose_find:
+        
+    cclose_take:
+        // Take, try cache first
+        t2 := pp
+        pp := and(mload(add(add(pp, pp), 0x342)), 0xFFFF)
+        jumpi(cnop, pp)
+        
+        // No cache, find bracket
+        pp := t2
         js := 1
     cclose_find_loop:
         pp := sub(pp, 1)
@@ -116,6 +141,15 @@ contract BrainFuck {
         js := sub(js, eq(t, 0x5b)) // [
         js := add(js, eq(t, 0x5d)) // ]
         jumpi(cclose_find_loop, js)
+        
+        // Cache brackets
+        // cache[t2] = pp
+        // cache[pp] = t2
+        t := add(add(pp, pp), 0x342)
+        mstore(t, or(and(mload(t), not(0xFFFF)), t2))
+        t := add(add(t2, t2), 0x342)
+        mstore(t, or(and(mload(t), not(0xFFFF)), pp))
+
         jump(cnop)
         
     ceof:
