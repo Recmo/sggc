@@ -129,6 +129,8 @@ contract Sort {
         // Fourth pass (buckets): sort buckets
         ////////////////////////////////////////////////////
         
+        // At this point unsorted groups have max 5 elements
+        
         i := 510
         addr2 := and(mload(i), 0xFFFF)
     l5:
@@ -186,6 +188,10 @@ contract Sort {
             let lolo := lo
             let hihi := hi
             let d := sub(hi, lo)
+            
+            if gt(d, mul(sub(5, 1), 32)) {
+                selfdestruct(0)
+            }
             
             if lt(d, 96) {
                 
