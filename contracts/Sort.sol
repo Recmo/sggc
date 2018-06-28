@@ -22,6 +22,23 @@ contract Sort {
         // Radix sort
         // 80 * 32 = 2560  = size of bucket table
         
+        // Check for input that is already sorted
+        i := 0x64
+        addr1 := 1
+        addr2 := calldataload(0x44)
+    l0:
+        temp := calldataload(i)
+        addr1 := and(addr1, lt(addr2, temp))  // TODO: Repeated elements
+        addr2 :=temp
+        i := add(i, 32)
+        jumpi(l0, lt(i, calldatasize))
+        jumpi(trivial, addr1)
+        
+        // 407039
+        // 407087
+        // 355362
+        
+        
         // First pass: find upper bound to values and compute scaling factor
         scale := 0
         i := 0x44
@@ -187,5 +204,9 @@ contract Sort {
     trivial:
         calldatacopy(0, 4, calldatasize)
         return(0, sub(calldatasize, 4))
+        
+    explode:
+        selfdestruct(0)
+        
     }}
 }
