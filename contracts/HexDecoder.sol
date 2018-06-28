@@ -9,8 +9,8 @@ contract HexDecoder {
         let o := 64
         let i := 68
         
-    loop:
-        i
+    loop: // Stack: [o i]
+        dup1
         calldataload
         
         // Convert characters to nibbles
@@ -49,11 +49,25 @@ contract HexDecoder {
         // Store
         o
         mstore
-        o := add(o, 16)
+        
+        // Stack: [o i]
+        
+        // o := add(o, 16)
+        swap1
+        16
+        add
+        swap1
+        
+        // i := add(i, 32)
+        32
+        add
         
         // Loop
-        i := add(i, 32)
-        jumpi(loop, lt(i, calldatasize))
+        dup1
+        calldatasize
+        gt
+        loop
+        jumpi
         
     exit:
         let ol := div(calldataload(36), 2)
