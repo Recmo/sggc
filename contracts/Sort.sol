@@ -143,7 +143,7 @@ contract Sort {
         return(sub(0x1000, 0x40), sub(calldatasize, 4))
     }
     
-    if 1 { // DEBUG: Sort entire result space and return
+    if 0 { // DEBUG: Sort entire result space and return
         addr1 := 0x1000
         addr2 := add(sub(calldatasize, 0x44), sub(0x1000, 32))
         sort(addr1, addr2)
@@ -161,17 +161,19 @@ contract Sort {
         jumpi(l5, lt(i, 128))
         jump(l5e)
     l5n:
+        // Sort the current range and resume loop
         sort(addr2, sub(addr1, 32))
         addr2 := addr1
-        i := add(i, 32)
+        i := add(i, 2)
         jumpi(l5, lt(i, 128))
     l5e:
-        addr1 := add(sub(calldatasize, 0x44), sub(542, 32))
+        // Check if the last range needs sorting
+        addr1 := add(sub(calldatasize, 0x44), 0x1000)
         jumpi(l5s, lt(addr2, addr1))
         jump(done)
         
     l5s:
-        sort(addr2, addr1)
+        sort(addr2, sub(addr1, 32))
         // jump(done)
         
     done:
