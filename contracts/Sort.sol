@@ -36,7 +36,7 @@ contract Sort {
         // 130 * 32 = 4160    gas: 314771        188363
         // 140 * 32 = 4480    gas: 314657        186329
         // 160 * 32 = 5120    gas: 317469        189141
-        // 256 *  1 = 256
+        // 30 + 256 * 2 = 542
         
         // First pass:
         // * find upper bound to values
@@ -47,7 +47,7 @@ contract Sort {
         i := 0x64
         addr1 := 1
         addr2 := 1
-    l1: // [temp1 addr1 addr2 scale i]
+    l1:
         temp2 := calldataload(i)
         addr1 := and(addr1, slt(sub(temp1, 1), temp2))
         addr2 := and(addr2, gt(add(temp1, 1), temp2))
@@ -60,57 +60,94 @@ contract Sort {
         
         // max(input size) = 299
         
-        // Compute scaling factor
-        scale := div(add(scale, 119), 120)
+        // Compute scaling factor (twice what it should be, we mask)
+        scale := div(add(scale, 511), 512)
         
         // Second pass: count buckets (in multipes of 32)
         i := 0x44
     l2:
-        temp1 := mul(div(calldataload(i), scale), 32)
-        mstore(temp1, add(mload(temp1), 32))
+        temp1 := and(div(calldataload(i), scale), 0x1FE)
+        mstore8(add(temp1, 31), add(mload(temp1), 1))
         i := add(i, 32)
         jumpi(l2, lt(i, calldatasize))
-        temp1 := 3840 // Include write offset
+        
+        // Bucket pass: compute running sum of the buckets
+        // TODO: SWAR
+        temp1 := 542 // Add offset to write area
         i := 0x00
     l3:
-        temp1 := add(temp1, mload(i))
-        mstore(i, temp1)
-        i := add(i, 32)
-        jumpi(l3, lt(i, 3840))
+        temp2 := mload(i)
+        temp1 := and(add(temp1, temp2), 0xFFFF)
+        temp2 := or(and(temp2, 
+        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000
+        ), temp1)
+        mstore(i, temp2)
+        i := add(i, 2)
+        jumpi(l3, lt(i, 512))
         
         // Third pass: move to buckets
         i := 0x44
     l4:
         temp1 := calldataload(i)
-        addr1 := mul(div(temp1, scale), 32)
-        addr2 := sub(mload(addr1), 32)
+        addr1 := and(div(temp1, scale), 0x1FE)
+        temp2 := mload(addr1)
+        addr2 := and(sub(temp2, 32), 0xFFFF)
+        mstore(addr1, or(and(temp2,
+        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000
+        ), addr2))
         mstore(addr1, addr2)
         mstore(addr2, temp1)
         i := add(i, 32)
         jumpi(l4, lt(i, calldatasize))
         
-        // Fourth pass: sort buckets
+        // Fourth pass (buckets): sort buckets
         addr2 := mload(0)
-        i := 0x20
+        i := 0x02
     l5:
-        addr1 := mload(i)
+        addr1 := and(mload(i), 0xFFFF)
         jumpi(l5n, lt(addr2, sub(addr1, 32)))
         addr2 := addr1
-        i := add(i, 32)
-        jumpi(l5, lt(i, 3840))
+        i := add(i, 2)
+        jumpi(l5, lt(i, 512))
         jump(l5e)
     l5n:
         sort(addr2, sub(addr1, 32))
         addr2 := addr1
         i := add(i, 32)
-        jumpi(l5, lt(i, 3840))
+        jumpi(l5, lt(i, 542))
     l5e:
-        addr1 := add(sub(calldatasize, 0x44), sub(3840, 32))
+        addr1 := add(sub(calldatasize, 0x44), sub(542, 32))
         jumpi(l5s, lt(addr2, addr1))
         jump(done)
         
     l5s:
         sort(addr2, addr1)
+        // jump(done)
+        
+    done:
+        mstore(sub(542, 0x40), 0x20)
+        mstore(sub(542, 0x20), calldataload(0x24))
+        return(sub(542, 0x40), sub(calldatasize, 4))
+        
+    trivial:
+        calldatacopy(0, 4, calldatasize)
+        return(0, sub(calldatasize, 4))
+        
+    reverse:
+        calldatacopy(0, 4, 0x40)
+        i := 0x44
+        temp1 := sub(calldatasize, 36)
+        
+    lr:
+        mstore(temp1, calldataload(i))
+        i := add(i, 32)
+        temp1 := sub(temp1, 32)
+        jumpi(lr, lt(i, calldatasize))
+        
+        return(0, sub(calldatasize, 4))
+        
+    explode:
+        selfdestruct(0)
         
         function sort(lo, hi) {
             
@@ -209,31 +246,6 @@ contract Sort {
             sort(hi, hihi)
         ret:
         }
-        
-    done:
-        mstore(sub(3840, 0x40), 0x20)
-        mstore(sub(3840, 0x20), calldataload(0x24))
-        return(sub(3840, 0x40), sub(calldatasize, 4))
-        
-    trivial:
-        calldatacopy(0, 4, calldatasize)
-        return(0, sub(calldatasize, 4))
-        
-    reverse:
-        calldatacopy(0, 4, 0x40)
-        i := 0x44
-        temp1 := sub(calldatasize, 36)
-        
-    lr:
-        mstore(temp1, calldataload(i))
-        i := add(i, 32)
-        temp1 := sub(temp1, 32)
-        jumpi(lr, lt(i, calldatasize))
-        
-        return(0, sub(calldatasize, 4))
-        
-    explode:
-        selfdestruct(0)
         
     }}
 }
