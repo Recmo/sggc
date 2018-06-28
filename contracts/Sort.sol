@@ -92,7 +92,7 @@ contract Sort {
         ), temp1)
         mstore(i, temp2)
         i := add(i, 2)
-        jumpi(l3, lt(i, 64))
+        jumpi(l3, lt(i, 128))
         
         // Third pass: move to buckets
         i := 0x44
@@ -122,13 +122,13 @@ contract Sort {
         jumpi(l5n, lt(addr2, sub(addr1, 32)))
         addr2 := addr1
         i := add(i, 2)
-        jumpi(l5, lt(i, 64))
+        jumpi(l5, lt(i, 128))
         jump(l5e)
     l5n:
         sort(addr2, sub(addr1, 32))
         addr2 := addr1
         i := add(i, 32)
-        jumpi(l5, lt(i, 64))
+        jumpi(l5, lt(i, 128))
     l5e:
         addr1 := add(sub(calldatasize, 0x44), sub(542, 32))
         jumpi(l5s, lt(addr2, addr1))
