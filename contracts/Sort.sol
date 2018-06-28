@@ -72,13 +72,127 @@ contract Sort {
         jumpi(l2, lt(i, calldatasize))
         
         // Third pass (buckets): running total in buckets
-        temp1 := 3840 // Include write offset
-        i := 0x00
-    l3:
-        temp1 := add(temp1, mload(i))
-        mstore(i, temp1)
-        i := add(i, 32)
-        jumpi(l3, lt(i, 3840))
+        3840 // Start with write offset
+        0x0 mload add dup1 0x0 mstore
+        0x20 mload add dup1 0x20 mstore
+        0x40 mload add dup1 0x40 mstore
+        0x60 mload add dup1 0x60 mstore
+        0x80 mload add dup1 0x80 mstore
+        0xa0 mload add dup1 0xa0 mstore
+        0xc0 mload add dup1 0xc0 mstore
+        0xe0 mload add dup1 0xe0 mstore
+        0x100 mload add dup1 0x100 mstore
+        0x120 mload add dup1 0x120 mstore
+        0x140 mload add dup1 0x140 mstore
+        0x160 mload add dup1 0x160 mstore
+        0x180 mload add dup1 0x180 mstore
+        0x1a0 mload add dup1 0x1a0 mstore
+        0x1c0 mload add dup1 0x1c0 mstore
+        0x1e0 mload add dup1 0x1e0 mstore
+        0x200 mload add dup1 0x200 mstore
+        0x220 mload add dup1 0x220 mstore
+        0x240 mload add dup1 0x240 mstore
+        0x260 mload add dup1 0x260 mstore
+        0x280 mload add dup1 0x280 mstore
+        0x2a0 mload add dup1 0x2a0 mstore
+        0x2c0 mload add dup1 0x2c0 mstore
+        0x2e0 mload add dup1 0x2e0 mstore
+        0x300 mload add dup1 0x300 mstore
+        0x320 mload add dup1 0x320 mstore
+        0x340 mload add dup1 0x340 mstore
+        0x360 mload add dup1 0x360 mstore
+        0x380 mload add dup1 0x380 mstore
+        0x3a0 mload add dup1 0x3a0 mstore
+        0x3c0 mload add dup1 0x3c0 mstore
+        0x3e0 mload add dup1 0x3e0 mstore
+        0x400 mload add dup1 0x400 mstore
+        0x420 mload add dup1 0x420 mstore
+        0x440 mload add dup1 0x440 mstore
+        0x460 mload add dup1 0x460 mstore
+        0x480 mload add dup1 0x480 mstore
+        0x4a0 mload add dup1 0x4a0 mstore
+        0x4c0 mload add dup1 0x4c0 mstore
+        0x4e0 mload add dup1 0x4e0 mstore
+        0x500 mload add dup1 0x500 mstore
+        0x520 mload add dup1 0x520 mstore
+        0x540 mload add dup1 0x540 mstore
+        0x560 mload add dup1 0x560 mstore
+        0x580 mload add dup1 0x580 mstore
+        0x5a0 mload add dup1 0x5a0 mstore
+        0x5c0 mload add dup1 0x5c0 mstore
+        0x5e0 mload add dup1 0x5e0 mstore
+        0x600 mload add dup1 0x600 mstore
+        0x620 mload add dup1 0x620 mstore
+        0x640 mload add dup1 0x640 mstore
+        0x660 mload add dup1 0x660 mstore
+        0x680 mload add dup1 0x680 mstore
+        0x6a0 mload add dup1 0x6a0 mstore
+        0x6c0 mload add dup1 0x6c0 mstore
+        0x6e0 mload add dup1 0x6e0 mstore
+        0x700 mload add dup1 0x700 mstore
+        0x720 mload add dup1 0x720 mstore
+        0x740 mload add dup1 0x740 mstore
+        0x760 mload add dup1 0x760 mstore
+        0x780 mload add dup1 0x780 mstore
+        0x7a0 mload add dup1 0x7a0 mstore
+        0x7c0 mload add dup1 0x7c0 mstore
+        0x7e0 mload add dup1 0x7e0 mstore
+        0x800 mload add dup1 0x800 mstore
+        0x820 mload add dup1 0x820 mstore
+        0x840 mload add dup1 0x840 mstore
+        0x860 mload add dup1 0x860 mstore
+        0x880 mload add dup1 0x880 mstore
+        0x8a0 mload add dup1 0x8a0 mstore
+        0x8c0 mload add dup1 0x8c0 mstore
+        0x8e0 mload add dup1 0x8e0 mstore
+        0x900 mload add dup1 0x900 mstore
+        0x920 mload add dup1 0x920 mstore
+        0x940 mload add dup1 0x940 mstore
+        0x960 mload add dup1 0x960 mstore
+        0x980 mload add dup1 0x980 mstore
+        0x9a0 mload add dup1 0x9a0 mstore
+        0x9c0 mload add dup1 0x9c0 mstore
+        0x9e0 mload add dup1 0x9e0 mstore
+        0xa00 mload add dup1 0xa00 mstore
+        0xa20 mload add dup1 0xa20 mstore
+        0xa40 mload add dup1 0xa40 mstore
+        0xa60 mload add dup1 0xa60 mstore
+        0xa80 mload add dup1 0xa80 mstore
+        0xaa0 mload add dup1 0xaa0 mstore
+        0xac0 mload add dup1 0xac0 mstore
+        0xae0 mload add dup1 0xae0 mstore
+        0xb00 mload add dup1 0xb00 mstore
+        0xb20 mload add dup1 0xb20 mstore
+        0xb40 mload add dup1 0xb40 mstore
+        0xb60 mload add dup1 0xb60 mstore
+        0xb80 mload add dup1 0xb80 mstore
+        0xba0 mload add dup1 0xba0 mstore
+        0xbc0 mload add dup1 0xbc0 mstore
+        0xbe0 mload add dup1 0xbe0 mstore
+        0xc00 mload add dup1 0xc00 mstore
+        0xc20 mload add dup1 0xc20 mstore
+        0xc40 mload add dup1 0xc40 mstore
+        0xc60 mload add dup1 0xc60 mstore
+        0xc80 mload add dup1 0xc80 mstore
+        0xca0 mload add dup1 0xca0 mstore
+        0xcc0 mload add dup1 0xcc0 mstore
+        0xce0 mload add dup1 0xce0 mstore
+        0xd00 mload add dup1 0xd00 mstore
+        0xd20 mload add dup1 0xd20 mstore
+        0xd40 mload add dup1 0xd40 mstore
+        0xd60 mload add dup1 0xd60 mstore
+        0xd80 mload add dup1 0xd80 mstore
+        0xda0 mload add dup1 0xda0 mstore
+        0xdc0 mload add dup1 0xdc0 mstore
+        0xde0 mload add dup1 0xde0 mstore
+        0xe00 mload add dup1 0xe00 mstore
+        0xe20 mload add dup1 0xe20 mstore
+        0xe40 mload add dup1 0xe40 mstore
+        0xe60 mload add dup1 0xe60 mstore
+        0xe80 mload add dup1 0xe80 mstore
+        0xea0 mload add dup1 0xea0 mstore
+        0xec0 mload add dup1 0xec0 mstore
+        0xee0 mload add 0xee0 mstore
         
         // Fourth pass (input): move to buckets
         i := 0x44
