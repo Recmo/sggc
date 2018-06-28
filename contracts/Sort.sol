@@ -86,7 +86,7 @@ contract Sort {
     l3:
         
         temp2 := mload(i)
-        temp1 := and(add(temp1, temp2), 0xFFFF)
+        temp1 := and(add(mul(temp2, 32), temp1), 0xFFFF)
         temp2 := or(and(temp2, 
         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000
         ), temp1)
