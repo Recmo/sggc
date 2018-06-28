@@ -8,6 +8,11 @@ contract Sort {
         
         // @author Remco Bloemen <remco@wicked.ventures>
         
+        // No  unrepeated sorted input
+        // Yes repeated sorted input
+        // No  unrepeated reverse sorted input
+        // Yes repeated reverse sorted input
+        
         mstore(0x40, 0) // Set all memory to zero
         
         let temp
@@ -28,16 +33,11 @@ contract Sort {
         addr2 := calldataload(0x44)
     l0:
         temp := calldataload(i)
-        addr1 := and(addr1, lt(addr2, temp))  // TODO: Repeated elements
-        addr2 :=temp
+        addr1 := and(addr1, gt(add(addr2, 1), temp))
+        addr2 := temp
         i := add(i, 32)
         jumpi(l0, lt(i, calldatasize))
-        jumpi(trivial, addr1)
-        
-        // 407039
-        // 407087
-        // 355362
-        
+        jumpi(reverse, addr1)
         
         // First pass: find upper bound to values and compute scaling factor
         scale := 0
@@ -203,6 +203,19 @@ contract Sort {
         
     trivial:
         calldatacopy(0, 4, calldatasize)
+        return(0, sub(calldatasize, 4))
+        
+    reverse:
+        calldatacopy(0, 4, 0x40)
+        i := 0x44
+        temp := sub(calldatasize, 36)
+        
+    lr:
+        mstore(temp, calldataload(i))
+        i := add(i, 32)
+        temp := sub(temp, 32)
+        jumpi(lr, lt(i, calldatasize))
+        
         return(0, sub(calldatasize, 4))
         
     explode:
