@@ -88,7 +88,7 @@ contract Sort {
         
         0x0001000000000000000000000000000000000000000000000000000000000000
         0x0001000100010001000100010001000100010001000100010001000100010001
-        0x1000
+        0x220
         0x200 mload 32 mul add dup2 mul dup1 0x200 mstore dup3 swap1 div
         0x1e0 mload 32 mul add dup2 mul dup1 0x1e0 mstore dup3 swap1 div
         0x1c0 mload 32 mul add dup2 mul dup1 0x1c0 mstore dup3 swap1 div
@@ -146,7 +146,7 @@ contract Sort {
         jumpi(l5, lt(i, 512))
     l5e:
         // Check if the last range needs sorting
-        addr1 := add(sub(calldatasize, 0x44), 0x1000)
+        addr1 := add(sub(calldatasize, 0x44), 0x220)
         jumpi(l5s, lt(addr2, addr1))
         jump(done)
         
@@ -155,9 +155,9 @@ contract Sort {
         // jump(done)
         
     done:
-        mstore(sub(0x1000, 0x40), 0x20)
-        mstore(sub(0x1000, 0x20), calldataload(0x24))
-        return(sub(0x1000, 0x40), sub(calldatasize, 4))
+        mstore(sub(0x220, 0x40), 0x20)
+        mstore(sub(0x220, 0x20), calldataload(0x24))
+        return(sub(0x220, 0x40), sub(calldatasize, 4))
         
         ////////////////////////////////////////////////////
         ////////////////////////////////////////////////////
