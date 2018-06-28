@@ -96,17 +96,18 @@ contract Sort {
         
         // Third pass: move to buckets
         i := 0x44
-    l4:
-        temp1 := calldataload(i)
-        addr1 := and(div(temp1, scale), 0x1FE)
-        temp2 := mload(addr1)
-        addr2 := and(sub(temp2, 32), 0xFFFF)
-        mstore(addr1, or(and(temp2,
+    l4: {
+        let value  := calldataload(i)
+        let bucket := and(div(value, scale), 0xFFFFFE)
+        let bval   := mload(bucket)
+        let addr   := and(bval, 0xFFFF)
+        let naddr  := sub(addr, 32)
+        mstore(bucket, or(and(bval,
         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000
-        ), addr2))
-        mstore(addr1, addr2)
-        mstore(addr2, temp1)
+        ), naddr))
+        mstore(naddr, value)
         i := add(i, 32)
+        }
         jumpi(l4, lt(i, calldatasize))
         
         addr1 := 0x1000
