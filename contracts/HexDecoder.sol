@@ -11,29 +11,42 @@ contract HexDecoder {
         let a
         
     loop:
-        a := calldataload(i)
+        i
+        calldataload
         
         // Convert characters to nibbles
-        a := add(and(a,
-0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F
-        ), mul(9, and(div(a, 64),
-0x0101010101010101010101010101010101010101010101010101010101010101
-        )))
+        64
+        dup2
+        div
+        0x0101010101010101010101010101010101010101010101010101010101010101
+        and
+        9
+        mul
+        swap1
+        0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F
+        and
+        add
         
         // Shuffle odd nibbles to consecutive bytes
-        a := and(mul(a, 0x11),
-0x0FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF0
-        )
-        a := and(mul(a, 0x101),
-0x0FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF000
-        )
-        a := and(mul(a, 0x10001),
-0x0FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF0000000
-        )
-        a := and(mul(a, 0x100000001),
-0x0FFFFFFFFFFFFFFFF0000000000000000FFFFFFFFFFFFFFFF000000000000000
-        )
-        a := mul(a, 0x100000000000000010)
+        0x11
+        mul
+        0x0FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF0
+        and
+        0x101
+        mul
+        0x0FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF000
+        and
+        0x10001
+        mul
+        0x0FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF0000000
+        and
+        0x100000001
+        mul
+        0x0FFFFFFFFFFFFFFFF0000000000000000FFFFFFFFFFFFFFFF000000000000000
+        and
+        0x100000000000000010
+        mul
+        =: a
         
         // Store
         mstore(o, a)
@@ -49,7 +62,7 @@ contract HexDecoder {
         mstore(32, ol)
         
         // Add 64 to ol and round to the next multiple of 32
-        return(0, and(add(ol, 95), 0xFFFFFFFFFFFFFFFE0))
+        return(0, and(add(ol, 95), 0xFFFFFFE0))
         
     empty:
         mstore(0, 32)
