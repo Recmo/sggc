@@ -9,6 +9,8 @@ contract BrainFuck {
         // max(output size) = 257
         // max(tape) = 1024
         // Tape is very sparse and can be used modulo 11 or 16
+        // max(loop stack) = 2
+        // Assume input characters < 128
         
         // This canceles out the "mstore(0x40, 0x80)" that
         // solc likes to inject. It even gets partially optimized.
@@ -55,7 +57,7 @@ contract BrainFuck {
         t := ip
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
-        //jumpi(crightn, eq(op, 0x3e))
+        jumpi(crightn, eq(op, 0x3e))
         // Single instruction
         mstore(pp, right)
         pp := add(pp, 32)
@@ -77,7 +79,7 @@ contract BrainFuck {
         t := ip
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
-        //jumpi(cleftn, eq(op, 0x3c))
+        jumpi(cleftn, eq(op, 0x3c))
         // Single instruction
         mstore(pp, left)
         pp := add(pp, 32)
@@ -99,7 +101,7 @@ contract BrainFuck {
         t := ip
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
-        //jumpi(cincrn, eq(op, 0x2b))
+        jumpi(cincrn, eq(op, 0x2b))
         // Single instruction
         mstore(pp, incr)
         pp := add(pp, 32)
@@ -121,7 +123,7 @@ contract BrainFuck {
         t := ip
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
-        //jumpi(cdecrn, eq(op, 0x2d))
+        jumpi(cdecrn, eq(op, 0x2d))
         // Single instruction
         mstore(pp, decr)
         pp := add(pp, 32)
@@ -177,14 +179,14 @@ contract BrainFuck {
         op := and(calldataload(ip), 0xFF)
         jumpi(copen_decr_close, eq(op, 0x5d))
         // Check if next character is >
-        //jumpi(copen_decr_right, eq(op, 0x3e))
+        jumpi(copen_decr_right, eq(op, 0x3e))
         // Nope. Handle [- and dispatch
         mstore(pp, open)
         pp := add(pp, 32)
         pp := add(pp, 32)
         mstore(tp, pp)
         tp := add(tp, 32)
-        //jumpi(cdecrn, eq(op, 0x2d)) // Handle [--… with cdecrn
+        jumpi(cdecrn, eq(op, 0x2d)) // Handle [--… with cdecrn
         mstore(pp, decr)
         pp := add(pp, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
@@ -257,109 +259,86 @@ contract BrainFuck {
         // a byte can be read using and(calldataload(ip), 0xff)
         
     // reset:
-        t  := 0 // Tape is all zero
-        tp := 1 // Start at least significant byte
+        tp := 1 // offset left 31 bytes
         ip := add(calldataload(36), 5) // offset left 31 bytes
         op := 1056
         pp := 2080
         jump(mload(pp))
         
     right: // >
-        tp := mul(tp, 0x10000)
-        tp := or(tp, iszero(tp)) // Wrap arround
+        tp := add(tp, 1)
         pp := add(pp, 32)
         jump(mload(pp))
         
     rightn: // >>…
-        jump(explode) // TODO
         pp := add(pp, 32)
         tp := add(tp, mload(pp))
         pp := add(pp, 32)
         jump(mload(pp))
         
     left: // <
-        tp := div(tp, 0x10000)
-        tp := or(tp, mul(iszero(tp),
-        0x0001000000000000000000000000000000000000000000000000000000000000
-        )) // Wrap arround
+        tp := sub(tp, 1)
         pp := add(pp, 32)
         jump(mload(pp))
         
     leftn: // <<…
-        jump(explode) // TODO
         pp := add(pp, 32)
         tp := sub(tp, mload(pp))
         pp := add(pp, 32)
         jump(mload(pp))
         
     incr: // +
-        //mstore8(add(tp, 31), add(mload(tp), 1))
-        t := and(add(t, tp),
-        0x00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF
-        )
+        mstore8(add(tp, 31), add(mload(tp), 1))
         pp := add(pp, 32)
         jump(mload(pp))
         
     incrn: // ++…
-        jump(explode) // TODO
         pp := add(pp, 32)
         mstore8(add(tp, 31), add(mload(tp), mload(pp)))
         pp := add(pp, 32)
         jump(mload(pp))
     
     decr: // -
-        t := and(sub(or(t, 
-        0x0100010010010010010010010010010010010010010010010010010010010010
-        ), tp),
-        0x00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF
-        )
-        //mstore8(add(tp, 31), sub(mload(tp), 1))
+        mstore8(add(tp, 31), sub(mload(tp), 1))
         pp := add(pp, 32)
         jump(mload(pp))
         
     decrn: // --…
-        jump(explode) // TODO
         pp := add(pp, 32)
         mstore8(add(tp, 31), sub(mload(tp), mload(pp)))
         pp := add(pp, 32)
         jump(mload(pp))
         
     clear: // [-]
-        t := and(t, not(mul(tp, 0xFF)))
+        mstore8(add(tp, 31), 0)
         pp := add(pp, 32)
         jump(mload(pp))
         
     addnext: // [->+<]
-        jump(explode) // TODO
-        t := add(t, mul(t, 0x10000))
-        t := and(t, 0x00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF)
-        t := and(t, not(mul(tp, 0xFF)))
-        
-        //mstore8(add(tp, 32), add(mload(tp), mload(add(tp, 1))))
-        //mstore8(add(tp, 31), 0)
+        mstore8(add(tp, 32), add(mload(tp), mload(add(tp, 1))))
+        mstore8(add(tp, 31), 0)
         pp := add(pp, 32)
         jump(mload(pp))
     
     output: // .
-        mstore8(op, div(t, tp))
+        mstore8(op, mload(tp))
         op := add(op, 1)
         pp := add(pp, 32)
         jump(mload(pp))
     
     input: // ,
-        t := and(t, not(mul(tp, 0xFF)))
-        t := or(t, mul(and(calldataload(ip), 0xFF), tp))
+        mstore8(add(tp, 31), calldataload(ip))
         ip := add(ip, 1)
         pp := add(pp, 32)
         jump(mload(pp))
     
     open: // [
-        jumpi(take, iszero(and(div(t, tp), 0xff))) 
+        jumpi(take, iszero(and(mload(tp), 0xff))) 
         pp := add(pp, 64)
         jump(mload(pp))
     
     close: // ]
-        jumpi(take, and(div(t, tp), 0xff))
+        jumpi(take, and(mload(tp), 0xff))
         pp := add(pp, 64)
         jump(mload(pp))
     
@@ -371,9 +350,6 @@ contract BrainFuck {
         mstore(992, 32)
         mstore(1024, sub(op, 1056))
         return(992, and(sub(op, 961), not(0x1F)))
-        
-    explode:
-        selfdestruct(0)
     }}
     
     // Now someone needs to write an ERC20 contract in BrainFuck,
