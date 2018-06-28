@@ -99,7 +99,7 @@ contract BrainFuck {
         
         // Skip, try cache first
         t2 := pp
-        pp := and(mload(add(add(pp, pp), 0x342)), 0xFFFF)
+        pp := and(mload(add(add(pp, pp), 0x362)), 0xFFFF)
         jumpi(cnop, pp)
         
         // No cache, find bracket
@@ -115,9 +115,9 @@ contract BrainFuck {
         // Cache brackets
         // cache[t2] = pp
         // cache[pp] = t2
-        t := add(add(pp, pp), 0x342)
+        t := add(add(pp, pp), 0x362)
         mstore(t, or(and(mload(t), not(0xFFFF)), t2))
-        t := add(add(t2, t2), 0x342)
+        t := add(add(t2, t2), 0x362)
         mstore(t, or(and(mload(t), not(0xFFFF)), pp))
         
         jump(cnop)
@@ -129,7 +129,7 @@ contract BrainFuck {
     cclose_take:
         // Take, try cache first
         t2 := pp
-        pp := and(mload(add(add(pp, pp), 0x342)), 0xFFFF)
+        pp := and(mload(add(add(pp, pp), 0x362)), 0xFFFF)
         jumpi(cnop, pp)
         
         // No cache, find bracket
@@ -145,9 +145,9 @@ contract BrainFuck {
         // Cache brackets
         // cache[t2] = pp
         // cache[pp] = t2
-        t := add(add(pp, pp), 0x342)
+        t := add(add(pp, pp), 0x362)
         mstore(t, or(and(mload(t), not(0xFFFF)), t2))
-        t := add(add(t2, t2), 0x342)
+        t := add(add(t2, t2), 0x362)
         mstore(t, or(and(mload(t), not(0xFFFF)), pp))
 
         jump(cnop)
