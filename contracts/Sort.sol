@@ -73,7 +73,7 @@ contract Sort {
         scale := div(add(scale, 511), 512)
         
         ////////////////////////////////////////////////////
-        // Second pass: count buckets (in multipes of 32)
+        // Second pass: count buckets
         ////////////////////////////////////////////////////
         i := 0x44
     l2:
@@ -82,22 +82,31 @@ contract Sort {
         i := add(i, 32)
         jumpi(l2, lt(i, calldatasize))
         
-        
         ////////////////////////////////////////////////////
         // Bucket pass: compute running sum of the buckets
         ////////////////////////////////////////////////////
-        // TODO: SWAR
-        temp1 := 0x1000 // Add offset to write area
-        i := 512
-    l3:
-        i := sub(i, 2)
-        temp2 := mload(i)
-        temp1 := and(add(mul(temp2, 32), temp1), 0xFFFF)
-        temp2 := or(and(temp2, 
-        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000
-        ), temp1)
-        mstore(i, temp2)
-        jumpi(l3, i)
+        
+        0x0001000000000000000000000000000000000000000000000000000000000000
+        0x0001000100010001000100010001000100010001000100010001000100010001
+        0x1000
+        0x200 mload 32 mul add dup2 mul dup1 0x200 mstore dup3 swap1 div
+        0x1e0 mload 32 mul add dup2 mul dup1 0x1e0 mstore dup3 swap1 div
+        0x1c0 mload 32 mul add dup2 mul dup1 0x1c0 mstore dup3 swap1 div
+        0x1a0 mload 32 mul add dup2 mul dup1 0x1a0 mstore dup3 swap1 div
+        0x180 mload 32 mul add dup2 mul dup1 0x180 mstore dup3 swap1 div
+        0x160 mload 32 mul add dup2 mul dup1 0x160 mstore dup3 swap1 div
+        0x140 mload 32 mul add dup2 mul dup1 0x140 mstore dup3 swap1 div
+        0x120 mload 32 mul add dup2 mul dup1 0x120 mstore dup3 swap1 div
+        0x100 mload 32 mul add dup2 mul dup1 0x100 mstore dup3 swap1 div
+        0xe0 mload 32 mul add dup2 mul dup1 0xe0 mstore dup3 swap1 div
+        0xc0 mload 32 mul add dup2 mul dup1 0xc0 mstore dup3 swap1 div
+        0xa0 mload 32 mul add dup2 mul dup1 0xa0 mstore dup3 swap1 div
+        0x80 mload 32 mul add dup2 mul dup1 0x80 mstore dup3 swap1 div
+        0x60 mload 32 mul add dup2 mul dup1 0x60 mstore dup3 swap1 div
+        0x40 mload 32 mul add dup2 mul dup1 0x40 mstore dup3 swap1 div
+        0x20 mload 32 mul add dup2 mul dup1 0x20 mstore dup3 swap1 div
+        0x0 mload 32 mul add dup2 mul dup1 0x0 mstore dup3 swap1 div
+        pop pop pop
         
         ////////////////////////////////////////////////////
         // Third pass: move to buckets
