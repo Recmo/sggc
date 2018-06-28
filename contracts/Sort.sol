@@ -38,7 +38,7 @@ contract Sort {
         // 160 * 32 = 5120    gas: 317469        189141
         // 256 *  1 = 256
         
-        // First pass:
+        // First pass (input):
         // * find upper bound to values
         // * check for sorted input
         // * check for reverse sorted input
@@ -63,13 +63,15 @@ contract Sort {
         // Compute scaling factor
         scale := div(add(scale, 119), 120)
         
-        // Second pass: count buckets (in multipes of 32)
+        // Second pass (input): count buckets (in multipes of 32)
         i := 0x44
     l2:
         temp1 := mul(div(calldataload(i), scale), 32)
         mstore(temp1, add(mload(temp1), 32))
         i := add(i, 32)
         jumpi(l2, lt(i, calldatasize))
+        
+        // Third pass (buckets): running total in buckets
         temp1 := 3840 // Include write offset
         i := 0x00
     l3:
@@ -78,7 +80,7 @@ contract Sort {
         i := add(i, 32)
         jumpi(l3, lt(i, 3840))
         
-        // Third pass: move to buckets
+        // Fourth pass (input): move to buckets
         i := 0x44
     l4:
         temp1 := calldataload(i)
@@ -89,7 +91,7 @@ contract Sort {
         i := add(i, 32)
         jumpi(l4, lt(i, calldatasize))
         
-        // Fourth pass: sort buckets
+        // Fifth pass (buckets): sort buckets
         addr2 := mload(0)
         i := 0x20
     l5:
