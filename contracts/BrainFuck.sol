@@ -44,7 +44,7 @@ contract BrainFuck {
         mstore(0x00, xor(cnop, ceof))
 
         ip := 0x44 // Source pointer offset left 32 bytes
-        pp := 321  // Bytecode to be written starting at 321
+        pp := 322  // Bytecode to be written starting at 322
         tp := 256  // Loop stack pointer, right after lookup table
         
     cnop:
@@ -254,7 +254,7 @@ contract BrainFuck {
         
         // Tape is allocated 32...48 in memory as bytes (use mstore8)
         // Output is allocatd 64...321 in memory as bytes (use mstore8)
-        // Program is stored as 321... as uint256 in direct threading
+        // Program is stored as 322... as uint256 in direct threading
         // Input is kept in calldata. Input pointer is offset by -31 so
         // a byte can be read using and(calldataload(ip), 0xff)
         
@@ -262,7 +262,7 @@ contract BrainFuck {
         tp := 1 // offset left 31 bytes
         ip := add(calldataload(36), 5) // offset left 31 bytes
         op := 0x40
-        pp := 321
+        pp := 322
         jump(mload(pp))
         
     right: // >
