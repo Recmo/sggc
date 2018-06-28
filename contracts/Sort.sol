@@ -77,7 +77,7 @@ contract Sort {
         ////////////////////////////////////////////////////
         i := 0x44
     l2:
-        temp1 := and(div(calldataload(i), scale), 0xFFFFFE)
+        temp1 := sub(510, and(div(calldataload(i), scale), 0xFFFFFE))
         mstore8(add(temp1, 31), add(mload(temp1), 1))
         i := add(i, 32)
         jumpi(l2, lt(i, calldatasize))
@@ -88,17 +88,16 @@ contract Sort {
         ////////////////////////////////////////////////////
         // TODO: SWAR
         temp1 := 0x1000 // Add offset to write area
-        i := 0x00
+        i := 512
     l3:
-        
+        i := sub(i, 2)
         temp2 := mload(i)
         temp1 := and(add(mul(temp2, 32), temp1), 0xFFFF)
         temp2 := or(and(temp2, 
         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000
         ), temp1)
         mstore(i, temp2)
-        i := add(i, 2)
-        jumpi(l3, lt(i, 512))
+        jumpi(l3, i)
         
         ////////////////////////////////////////////////////
         // Third pass: move to buckets
@@ -106,7 +105,7 @@ contract Sort {
         i := 0x44
     l4: {
         let value  := calldataload(i)
-        let bucket := and(div(value, scale), 0xFFFFFE)
+        let bucket := sub(510, and(div(value, scale), 0xFFFFFE))
         let bval   := mload(bucket)
         let addr   := and(bval, 0xFFFF)
         let naddr  := sub(addr, 32)
@@ -122,19 +121,19 @@ contract Sort {
         // Fourth pass (buckets): sort buckets
         ////////////////////////////////////////////////////
         addr2 := and(mload(0), 0xFFFF)
-        i := 0x02
+        i := 510
     l5:
         addr1 := and(mload(i), 0xFFFF)
         jumpi(l5n, lt(addr2, sub(addr1, 32)))
         addr2 := addr1
-        i := add(i, 2)
+        i := sub(i, 2)
         jumpi(l5, lt(i, 512))
         jump(l5e)
     l5n:
         // Sort the current range and resume loop
         sort(addr2, sub(addr1, 32))
         addr2 := addr1
-        i := add(i, 2)
+        i := sub(i, 2)
         jumpi(l5, lt(i, 512))
     l5e:
         // Check if the last range needs sorting
