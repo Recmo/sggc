@@ -27,15 +27,15 @@ contract BrainFuck {
         // Create lookup table (512 bytes)
         // From high to low since we have overlaping writes
         // XORed with cnop to make cnop the default entry
-        mstore(mul(0x5d, 2), xor(cclose, cnop))
-        mstore(mul(0x5b, 2), xor(copen, cnop))
-        mstore(mul(0x3e, 2), xor(cright, cnop))
-        mstore(mul(0x3c, 2), xor(cleft, cnop))
-        mstore(mul(0x2e, 2), xor(coutput, cnop))
-        mstore(mul(0x2d, 2), xor(cdecr, cnop))
-        mstore(mul(0x2c, 2), xor(cinput, cnop))
-        mstore(mul(0x2b, 2), xor(cincr, cnop))
-        mstore(mul(0x00, 2), xor(ceof, cnop))
+        mstore(0xBA, xor(cclose, cnop))
+        mstore(0xB6, xor(copen, cnop))
+        mstore(0x7C, xor(cright, cnop))
+        mstore(0x78, xor(cleft, cnop))
+        mstore(0x5C, xor(coutput, cnop))
+        mstore(0x5A, xor(cdecr, cnop))
+        mstore(0x58, xor(cinput, cnop))
+        mstore(0x56, xor(cincr, cnop))
+        mstore(0x00, xor(ceof, cnop))
 
         ip := 0x44 // Source pointer offset left 32 bytes
         pp := 2080 // Bytecode to be written starting at 2080
