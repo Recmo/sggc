@@ -2,9 +2,9 @@ pragma solidity ^0.4.23;
 
 contract Sort {
     
-    //function () external payable { assembly {
+    function () external payable { assembly {
     
-    function sort(uint[] input) external payable returns(uint[]) { assembly {
+    // function sort(uint[] input) external payable returns(uint[]) { assembly {
         
         // @author Remco Bloemen <remco@wicked.ventures>
         
