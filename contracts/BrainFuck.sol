@@ -30,7 +30,7 @@ contract BrainFuck {
     // BrainFuck Optimizing Compiler (optimized)
     ///////////////////////////////////////////////////////
         
-        // Create lookup table (512 bytes)
+        // Create lookup table (256 bytes)
         // From high to low since we have overlaping writes
         // XORed with cnop to make cnop the default entry
         mstore(0xBA, xor(cnop, cclose))
@@ -243,17 +243,17 @@ contract BrainFuck {
         mstore(pp, exit)
         
         // Clear lookup table
-        mstore(mul(0x00, 2), 0)
-        mstore(mul(0x2c, 2), 0)
-        mstore(mul(0x3c, 2), 0)
-        mstore(mul(0x5b, 2), 0)
+        mstore(0x00, 0)
+        mstore(0x58, 0)
+        mstore(0x78, 0)
+        mstore(0xB6, 0)
         
     /////////////////////////////////////////////////////////////////
     // BrainFuck Virtual Machine (in the Ethereum virtual machine)
     /////////////////////////////////////////////////////////////////
         
-        // Tape is allocated 32...1055 in memory as bytes (use mstore8)
-        // Output is allocatd 1056...2079 in memory as bytes (use mstore8)
+        // Tape is allocated 32...48 in memory as bytes (use mstore8)
+        // Output is allocatd 64...321 in memory as bytes (use mstore8)
         // Program is stored as 2080... as uint256 in direct threading
         // Input is kept in calldata. Input pointer is offset by -31 so
         // a byte can be read using and(calldataload(ip), 0xff)
