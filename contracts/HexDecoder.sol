@@ -8,7 +8,6 @@ contract HexDecoder {
         
         let o := 64
         let i := 68
-        let a
         
     loop:
         i
@@ -46,10 +45,10 @@ contract HexDecoder {
         and
         0x100000000000000010
         mul
-        =: a
         
         // Store
-        mstore(o, a)
+        o
+        mstore
         o := add(o, 16)
         
         // Loop
