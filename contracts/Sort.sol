@@ -211,6 +211,9 @@ contract Sort {
         jumpi(l4, lt(i, calldatasize))
         
         // Fifth pass (buckets): sort buckets
+        
+        // Max group size: 7
+        
         addr2 := mload(0)
         i := 0x20
     l5:
