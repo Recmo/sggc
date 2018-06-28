@@ -15,7 +15,8 @@ contract Sort {
         
         mstore(0x40, 0) // Set all memory to zero
         
-        let temp
+        let temp1
+        let temp2
         let addr1
         let addr2
         let scale
@@ -27,50 +28,52 @@ contract Sort {
         // Radix sort
         // 80 * 32 = 2560  = size of bucket table
         
-        // Check for input that is already sorted
+        // First pass:
+        // * find upper bound to values
+        // * check for sorted input
+        // * check for reverse sorted input
+        temp1 := calldataload(0x44)
+        scale := temp1
         i := 0x64
         addr1 := 1
-        addr2 := calldataload(0x44)
-    l0:
-        temp := calldataload(i)
-        addr1 := and(addr1, gt(add(addr2, 1), temp))
-        addr2 := temp
-        i := add(i, 32)
-        jumpi(l0, lt(i, calldatasize))
-        jumpi(reverse, addr1)
-        
-        // First pass: find upper bound to values and compute scaling factor
-        scale := 0
-        i := 0x44
+        addr2 := 1
     l1:
-        scale := or(scale, calldataload(i))
+        temp2 := calldataload(i)
+        addr1 := and(addr1, slt(sub(temp1, 1), temp2))
+        addr2 := and(addr2, gt(add(temp1, 1), temp2))
+        scale := or(scale, temp2)
+        temp1 := temp2
         i := add(i, 32)
         jumpi(l1, lt(i, calldatasize))
+        jumpi(trivial, addr1)
+        jumpi(reverse, addr2)
+        
+        // Compute scaling factor
         scale := div(add(scale, 79), 80)
         
         // Second pass: count buckets (in multipes of 32)
         i := 0x44
     l2:
-        temp := mul(div(calldataload(i), scale), 32)
-        mstore(temp, add(mload(temp), 32))
+        temp1 := mul(div(calldataload(i), scale), 32)
+        mstore(temp1, add(mload(temp1), 32))
         i := add(i, 32)
         jumpi(l2, lt(i, calldatasize))
-        temp := 2560 // Include write offset
+        temp1 := 2560 // Include write offset
         i := 0x00
     l3:
-        temp := add(temp, mload(i))
-        mstore(i, temp)
+        temp1 := add(temp1, mload(i))
+        mstore(i, temp1)
         i := add(i, 32)
         jumpi(l3, lt(i, 2560))
         
         // Third pass: move to buckets
         i := 0x44
     l4:
-        temp := calldataload(i)
-        addr1 := mul(div(temp, scale), 32)
+        temp1 := calldataload(i)
+        addr1 := mul(div(temp1, scale), 32)
         addr2 := sub(mload(addr1), 32)
         mstore(addr1, addr2)
-        mstore(addr2, temp)
+        mstore(addr2, temp1)
         i := add(i, 32)
         jumpi(l4, lt(i, calldatasize))
         
@@ -208,12 +211,12 @@ contract Sort {
     reverse:
         calldatacopy(0, 4, 0x40)
         i := 0x44
-        temp := sub(calldatasize, 36)
+        temp1 := sub(calldatasize, 36)
         
     lr:
-        mstore(temp, calldataload(i))
+        mstore(temp1, calldataload(i))
         i := add(i, 32)
-        temp := sub(temp, 32)
+        temp1 := sub(temp1, 32)
         jumpi(lr, lt(i, calldatasize))
         
         return(0, sub(calldatasize, 4))
