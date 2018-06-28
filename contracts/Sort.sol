@@ -64,12 +64,17 @@ contract Sort {
         scale := div(add(scale, 119), 120)
         
         // Second pass (input): count buckets (in multipes of 32)
-        i := 0x44
-    l2:
-        temp1 := mul(div(calldataload(i), scale), 32)
-        mstore(temp1, add(mload(temp1), 32))
-        i := add(i, 32)
-        jumpi(l2, lt(i, calldatasize))
+        0x44
+    l2: // Stack: i
+        // temp1 := mul(div(calldataload(i), scale), 32)
+        dup1 scale swap1 calldataload div 32 mul
+        // mstore(temp1, add(mload(temp1), 32))
+        dup1 mload 32 add swap1 mstore
+        // i := add(i, 32)
+        32 add
+        // jumpi(l2, lt(i, calldatasize))
+        dup1 calldatasize gt l2 jumpi
+        pop
         
         // Third pass (buckets): running total in buckets
         3840 // Start with write offset
