@@ -132,33 +132,112 @@ contract Sort {
         // At this point unsorted groups have max 5 elements
         
         i := 510
-        addr2 := and(mload(i), 0xFFFF)
+        addr1 := 0x220
     l5:
         i := sub(i, 2)
+        jumpi(last, slt(i, 0))
+        addr2 := addr1
         addr1 := and(mload(i), 0xFFFF)
-        jumpi(l5n, lt(addr2, sub(addr1, 32)))
-        addr2 := addr1
-        jumpi(l5, i)
-        jump(l5e)
-    l5n:
-        // Sort the current range and resume loop
-        sort(addr2, sub(addr1, 32))
-        addr2 := addr1
-        jumpi(l5, i)
-    l5e:
-        // Check if the last range needs sorting
-        addr1 := add(sub(calldatasize, 0x44), 0x220)
-        jumpi(l5s, lt(addr2, addr1))
-        jump(done)
         
-    l5s:
-        sort(addr2, sub(addr1, 32))
-        // jump(done)
+        jumpi(l5, eq(addr1, addr2))
+        temp1 := sub(addr1, addr2)
+        jumpi(l5, eq(temp1, 32))
+        jumpi(sort2, eq(temp1, 64))
+        jumpi(sort3, eq(temp1, 96))
+        jumpi(sort4, eq(temp1, 128))
+        jumpi(sort5, eq(temp1, 160))
+        selfdestruct(0)
+        
+    last:
+        addr2 := addr1
+        addr1 := add(sub(calldatasize, 0x44), 0x220)
+        jumpi(done, eq(addr1, addr2))
+        temp1 := sub(addr1, addr2)
+        jumpi(done, eq(temp1, 32))
+        jumpi(sort2, eq(temp1, 64))
+        jumpi(sort3, eq(temp1, 96))
+        jumpi(sort4, eq(temp1, 128))
+        jumpi(sort5, eq(temp1, 160))
+        selfdestruct(0)
         
     done:
         mstore(sub(0x220, 0x40), 0x20)
         mstore(sub(0x220, 0x20), calldataload(0x24))
         return(sub(0x220, 0x40), sub(calldatasize, 4))
+        
+    sort2: {
+            let a := mload(addr2)
+            let b := mload(add(addr2, 32))
+            jumpi(end, gt(b, a))
+            mstore(addr2, b)
+            mstore(add(addr2, 32), a)
+        end:
+        }
+        jump(l5)
+    
+    sort3: {
+            let a := mload(addr2)
+            let b := mload(add(addr2, 32))
+            let c := mload(add(addr2, 64))
+            jumpi(case1, gt(b, a))
+            a b =: a =: b
+        case1:
+            jumpi(case3, gt(c, b))
+            b c =: b =: c
+            jumpi(case3, gt(b, a))
+            a b =: a =: b
+        case3:
+            mstore(addr2, a)
+            mstore(add(addr2, 32), b)
+            mstore(add(addr2, 64), c)
+        }
+        jump(l5)
+    
+    sort4: {
+            let a := mload(addr2)
+            let b := mload(add(addr2, 32))
+            let c := mload(add(addr2, 64))
+            let d := mload(add(addr2, 96))
+            
+            // [[1 2][3 4][1 3][2 4][2 3]]
+            if gt(a, b) { a b =: a =: b }
+            if gt(c, d) { c d =: c =: d }
+            if gt(a, c) { a c =: a =: c }
+            if gt(b, d) { b d =: b =: d }
+            if gt(b, c) { b c =: b =: c }
+            
+            mstore(addr2, a)
+            mstore(add(addr2, 32), b)
+            mstore(add(addr2, 64), c)
+            mstore(add(addr2, 96), d)
+        }
+        jump(l5)
+
+    sort5: {
+            let a := mload(addr2)
+            let b := mload(add(addr2, 32))
+            let c := mload(add(addr2, 64))
+            let d := mload(add(addr2, 96))
+            let e := mload(add(addr2, 128))
+            
+            // [[1 2][3 4][1 3][2 5][1 2][3 4][2 3][4 5][3 4]]
+            if gt(a, b) { a b =: a =: b }
+            if gt(c, d) { c d =: c =: d }
+            if gt(a, c) { a c =: a =: c }
+            if gt(b, e) { b e =: b =: e }
+            if gt(a, b) { a b =: a =: b }
+            if gt(c, d) { c d =: c =: d }
+            if gt(b, c) { b c =: b =: c }
+            if gt(d, e) { d e =: d =: e }
+            if gt(c, d) { c d =: c =: d }
+            
+            mstore(addr2, a)
+            mstore(add(addr2, 32), b)
+            mstore(add(addr2, 64), c)
+            mstore(add(addr2, 96), d)
+            mstore(add(addr2, 128), e)
+        }
+        jump(l5)
         
         ////////////////////////////////////////////////////
         ////////////////////////////////////////////////////
@@ -182,108 +261,5 @@ contract Sort {
         
     explode:
         selfdestruct(0)
-        
-        function sort(lo, hi) {
-            
-            let lolo := lo
-            let hihi := hi
-            let d := sub(hi, lo)
-            
-            if gt(d, mul(sub(5, 1), 32)) {
-                selfdestruct(0)
-            }
-            
-            if lt(d, 96) {
-                
-                // Optimize for two
-                jumpi(three, gt(d, 32))
-                {
-                    let a := mload(lo)
-                    let b := mload(hi)
-                    jumpi(end, gt(b, a))
-                    mstore(lo, b)
-                    mstore(hi, a)
-                end:
-                }
-                jump(ret)
-                
-                // Optimize for three
-            three:
-                {
-                    let a := mload(lo)
-                    let b := mload(add(lo, 32))
-                    let c := mload(hi)
-                    jumpi(case1, gt(b, a))
-                    a
-                    b
-                    =: a
-                    =: b
-                case1:
-                    jumpi(case3, gt(c, b))
-                    b
-                    c
-                    =: b
-                    =: c
-                    jumpi(case3, gt(b, a))
-                    a
-                    b
-                    =: a
-                    =: b
-                case3:
-                    mstore(lo, a)
-                    mstore(add(lo, 32), b)
-                    mstore(hi, c)
-                }
-                jump(ret)
-            }
-            
-            // Partition
-            {
-                let pivot
-                let lov
-                let hiv
-                
-                // Compute pivot value
-                pivot := and(div(add(lo, hi), 2),
-0x0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0
-                )
-                pivot := mload(pivot)
-                
-            loop:
-                lov := mload(lo)
-                hiv := mload(hi)
-                jumpi(loend, iszero(lt(lov, pivot)))
-            loloop:
-                lo := add(lo, 32)
-                lov := mload(lo)
-                jumpi(loloop, lt(lov, pivot))
-            loend:
-                jumpi(hiend, iszero(gt(hiv, pivot)))
-            hiloop:
-                hi := sub(hi, 32)
-                hiv := mload(hi)
-                jumpi(hiloop, gt(hiv, pivot))
-            hiend:
-                jumpi(end, iszero(lt(lo, hi)))
-                mstore(lo, hiv)
-                mstore(hi, lov)
-                lo := add(lo, 32)
-                hi := sub(hi, 32)
-                jump(loop)
-                
-            end:
-                lo := hi
-                hi := add(lo, 32)
-            }
-            
-            // Recurse
-            jumpi(sorthi, eq(lolo, lo))
-            sort(lolo, lo)
-        sorthi:
-            jumpi(ret, eq(hi, hihi))
-            sort(hi, hihi)
-        ret:
-        }
-        
     }}
 }
