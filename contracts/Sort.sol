@@ -26,7 +26,16 @@ contract Sort {
         jumpi(trivial, lt(calldatasize, 0x84))
         
         // Radix sort
-        // 80 * 32 = 2560  = size of bucket table
+        // Size of bucket table:
+        //                                      Competition
+        //  60 * 32 = 1920    gas: 337644        208971
+        //  80 * 32 = 2560    gas: 323985        194330
+        // 100 * 32 = 3200    gas: 321639        193251
+        // 110 * 32 = 3520    gas: 318570        190720
+        // 120 * 32 = 3840    gas: 315349        186302
+        // 130 * 32 = 4160    gas: 314771        188363
+        // 140 * 32 = 4480    gas: 314657        186329
+        // 160 * 32 = 5120    gas: 317469        189141
         
         // First pass:
         // * find upper bound to values
@@ -37,7 +46,7 @@ contract Sort {
         i := 0x64
         addr1 := 1
         addr2 := 1
-    l1:
+    l1: // [temp1 addr1 addr2 scale i]
         temp2 := calldataload(i)
         addr1 := and(addr1, slt(sub(temp1, 1), temp2))
         addr2 := and(addr2, gt(add(temp1, 1), temp2))
@@ -49,7 +58,7 @@ contract Sort {
         jumpi(reverse, addr2)
         
         // Compute scaling factor
-        scale := div(add(scale, 79), 80)
+        scale := div(add(scale, 119), 120)
         
         // Second pass: count buckets (in multipes of 32)
         i := 0x44
@@ -58,13 +67,13 @@ contract Sort {
         mstore(temp1, add(mload(temp1), 32))
         i := add(i, 32)
         jumpi(l2, lt(i, calldatasize))
-        temp1 := 2560 // Include write offset
+        temp1 := 3840 // Include write offset
         i := 0x00
     l3:
         temp1 := add(temp1, mload(i))
         mstore(i, temp1)
         i := add(i, 32)
-        jumpi(l3, lt(i, 2560))
+        jumpi(l3, lt(i, 3840))
         
         // Third pass: move to buckets
         i := 0x44
@@ -85,15 +94,15 @@ contract Sort {
         jumpi(l5n, lt(addr2, sub(addr1, 32)))
         addr2 := addr1
         i := add(i, 32)
-        jumpi(l5, lt(i, 2560))
+        jumpi(l5, lt(i, 3840))
         jump(l5e)
     l5n:
         sort(addr2, sub(addr1, 32))
         addr2 := addr1
         i := add(i, 32)
-        jumpi(l5, lt(i, 2560))
+        jumpi(l5, lt(i, 3840))
     l5e:
-        addr1 := add(sub(calldatasize, 0x44), sub(2560, 32))
+        addr1 := add(sub(calldatasize, 0x44), sub(3840, 32))
         jumpi(l5s, lt(addr2, addr1))
         jump(done)
         
@@ -198,11 +207,10 @@ contract Sort {
         ret:
         }
         
-        
     done:
-        mstore(sub(2560, 0x40), 0x20)
-        mstore(sub(2560, 0x20), calldataload(0x24))
-        return(sub(2560, 0x40), sub(calldatasize, 4))
+        mstore(sub(3840, 0x40), 0x20)
+        mstore(sub(3840, 0x20), calldataload(0x24))
+        return(sub(3840, 0x40), sub(calldatasize, 4))
         
     trivial:
         calldatacopy(0, 4, calldatasize)
