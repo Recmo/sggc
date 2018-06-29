@@ -43,15 +43,16 @@ contract BrainFuck {
         
         // Interpret this one immediately
         jumpi(precompile1, eq(calldataload(0x64), 0x2c3e2c3c5b2d3e2b3c5d3e2e0000000000000000000000000000000000000000))
-        // No: -[.-]..
-        // No: >,+.<.
-        // No: >-.<.
         
-        // Optimization patterns (all are implemented, just disabled)
-        // Yes: [<]
-        // No: [>]
-        // No: [-]
-        // No: [->+<]
+        // Optimization patterns
+        // Yes: ,>,<[->+<]>. implemented
+        // Yes: [<]          implemented
+        // No:  [>]          unfinished, disabled
+        // No:  [-]          implemented, disabled
+        // No:  [->+<]       implemented, disabled, breakouts missing
+        // No:  -[.-]..
+        // No:  >,+.<.
+        // No:  >-.<.
         
     cnop: // [t tp ip op pp]
         // pp := add(pp, 1)
@@ -162,9 +163,9 @@ contract BrainFuck {
         // Check if next character is -
         pp := add(pp, 1)
         op := and(calldataload(pp), 0xFF)
-        //jumpi(copen_decr, eq(op, 0x2d)) // -
+        // DISABLED jumpi(copen_decr, eq(op, 0x2d)) // -
         jumpi(copen_left, eq(op, 0x3c)) // <
-        //jumpi(copen_right, eq(op, 0x3c)) // >
+        //DISABLED  jumpi(copen_right, eq(op, 0x3c)) // >
         // Nope. Handle [ and distpach.
         mstore(ip, open)
         ip := add(ip, 32)
