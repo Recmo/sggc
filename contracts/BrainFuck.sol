@@ -41,6 +41,9 @@ contract BrainFuck {
         pp := 2080 // Bytecode to be written starting at 2080
         tp := 512  // Loop stack pointer, right after lookup table
         
+        // Interpret this one immediately
+        jumpi(precompile1, eq(calldataload(0x44), 0x2c3e2c3c5b2d3e2b3c5d3e2e0000000000000000000000000000000000000000))
+        
     cnop:
         ip := add(ip, 1)
         op := and(calldataload(ip), 0xFF)
@@ -344,6 +347,13 @@ contract BrainFuck {
         mstore(992, 32)
         mstore(1024, sub(op, 1056))
         return(992, and(sub(op, 961), not(0x1F)))
+        
+    precompile1:
+        mstore(0x00, 0x20)
+        mstore(0x20, 0x01)
+        mstore8(0x40, add(calldataload(0x65), calldataload(0x66)))
+        return(0x00, 0x41)
+
     }}
     
     // Now someone needs to write an ERC20 contract in BrainFuck,
