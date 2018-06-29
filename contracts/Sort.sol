@@ -208,7 +208,7 @@ contract Sort {
         0xe80 mload add dup1 0xe80 mstore
         0xea0 mload add dup1 0xea0 mstore
         0xec0 mload add dup1 0xec0 mstore
-        0xee0 mload add 0xee0 mstore
+        0xee0 mload add      0xee0 mstore
         
         ////////////////////////////////////////////////////
         // Fourth pass (input): move to buckets
