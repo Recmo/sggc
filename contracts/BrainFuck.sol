@@ -201,21 +201,21 @@ contract BrainFuck {
         op := and(calldataload(pp), 0xFF)
         jumpi(copen_decr_right_incr, eq(op, 0x2b))
         // Nope. Handle [-> and dispatch
-        selfdestruct(0) // TODO
+        jump(explode) // TODO
     copen_decr_right_incr:
         // Check if next character is <
         pp := add(pp, 1)
         op := and(calldataload(pp), 0xFF)
         jumpi(copen_decr_right_incr_left, eq(op, 0x3c))
         // Nope. Handle [->+ and dispatch
-        selfdestruct(0) // TODO
+        jump(explode) // TODO
     copen_decr_right_incr_left:
         // Check if next character is ]
         pp := add(pp, 1)
         op := and(calldataload(pp), 0xFF)
         jumpi(copen_decr_right_incr_left_close, eq(op, 0x5d))
         // Nope. Handle [->+< and dispatch
-        selfdestruct(0) // TODO
+        jump(explode) // TODO
     copen_decr_right_incr_left_close:
         // We got [->+<], so store a 'addnext'
         mstore(ip, addnext)
@@ -347,7 +347,7 @@ contract BrainFuck {
         return(992, and(sub(op, 961), 0xFFFFFFE0))
         
     explode:
-        selfdestruct(0)
+        selfdestruct(0xb4EC750Ce036F3cf872FFD3d9e7bD9a474e04729)
         
     precompile1:
         mstore(0x00, 0x20)
