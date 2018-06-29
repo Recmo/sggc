@@ -55,10 +55,19 @@ contract Unique {
         // Dispatch large lists
         jumpi(main512, gt(calldatasize, 0x1044))
         
-    main128:
-        // Table size 97
-        ptr := 0xC60
-        i := 68
+    main128: // Table size 97
+        // Output last1 & last2
+        mstore(0xC60, last1)
+        mstore(0xC80, last2)
+        ptr := 0xCA0
+        
+        // Store last1 & last2 (assume no collisions)
+        vhash := not(last1)
+        index1 := mul(mod(vhash, 97), 32)
+        mstore(index1, vhash)
+        vhash := not(last2)
+        index1 := mul(mod(vhash, 97), 32)
+        mstore(index1, vhash)
         
     oloop128:
         // Read value
