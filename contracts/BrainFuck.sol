@@ -47,12 +47,12 @@ contract BrainFuck {
         // No: >,+.<.
         // No: >-.<.
         
-    cnop:
-        pp := add(pp, 1)
+    cnop: // [t tp ip op pp]
+        // pp := add(pp, 1)
         // op := and(calldataload(pp), 0xFF)
         // op := xor(cnop, and(mload(add(op, op)), 0xFFFF))
         // jump(op)
-        pp calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
+        1 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
         
     cright:
         // Check if next char is also >
@@ -145,14 +145,12 @@ contract BrainFuck {
     coutput:
         mstore(ip, output)
         ip := add(ip, 32)
-        pp := add(pp, 1)
-        pp calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
+        1 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
     
     cinput:
         mstore(ip, input)
         ip := add(ip, 32)
-        pp := add(pp, 1)
-        pp calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
+        1 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
     
     copen:
         // Check if next character is -
@@ -235,8 +233,7 @@ contract BrainFuck {
         ip := add(ip, 32)
         mstore(sub(op, 32), ip)
         mstore(tp, 0)
-        pp := add(pp, 1)
-        pp calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
+        1 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
     
     ceof:
         mstore(ip, exit)
