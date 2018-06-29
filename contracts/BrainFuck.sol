@@ -163,6 +163,9 @@ contract BrainFuck {
         // Check if next operator is -
         jumpi(copen_decr, eq(op, 0x2d))
         
+        // Check if next operator is <
+        jumpi(copen_left, eq(op, 0x3c))
+        
         // Nope. Handle [ and distpach.
         mstore(ip, open)
         ip := add(ip, 32)
@@ -223,7 +226,29 @@ contract BrainFuck {
         pp := add(pp, 1)
         op := and(calldataload(pp), 0xFF)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
-    
+    copen_left:
+        // Check if next character is ]
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
+        jumpi(copen_left_close, eq(op, 0x5d))
+        // Nope. Handle [< and dispatch
+        mstore(ip, open)
+        ip := add(ip, 32)
+        ip := add(ip, 32)
+        mstore(tp, ip)
+        tp := add(tp, 32)
+        jumpi(cleftn, eq(op, 0x3c)) // Handle [--… with cleftn
+        mstore(ip, cleft)
+        ip := add(ip, 32)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+    copen_left_close:
+        // We got [<], so store a 'scan_left'
+        mstore(ip, scan_left)
+        ip := add(ip, 32)
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+
     cclose:
         mstore(ip, close)
         ip := add(ip, 32)
@@ -306,6 +331,15 @@ contract BrainFuck {
         
     clear: // [-]
         mstore8(add(tp, 31), 0)
+        pp := add(pp, 32)
+        jump(mload(pp))
+    
+    scan_left: // [<]
+        jumpi(scan_left_done, iszero(and(mload(tp), 0xff)))
+    scan_left_loop:
+        tp := sub(tp, 1)
+        jumpi(scan_left_loop, and(mload(tp), 0xff))
+    scan_left_done:
         pp := add(pp, 32)
         jump(mload(pp))
         
