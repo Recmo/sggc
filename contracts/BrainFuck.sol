@@ -157,9 +157,6 @@ contract BrainFuck {
         pp := add(pp, 1)
         op := and(calldataload(pp), 0xFF)
         
-        // Skip nops
-        jumpi(copen, iszero(and(mload(add(op, op)), 0xFFFF)))
-        
         // Check if next operator is -
         jumpi(copen_decr, eq(op, 0x2d))
         
