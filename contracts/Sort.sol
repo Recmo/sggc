@@ -235,21 +235,28 @@ contract Sort {
         ///////////////////////////////////////////////////
         // Max group size: 7
         
-        addr2 := mload(0)
-        i := 0x20
+        addr1 := mload(0)
+        i := 0x00
     l5:
-        addr1 := mload(i)
-        jumpi(l5n, lt(addr2, sub(addr1, 32)))
-        addr2 := addr1
         i := add(i, 32)
+        jumpi(last, eq(i, 3840))
+        addr2 := addr1
+        addr1 := mload(i)
+        temp1 := sub(addr1, addr2)
+        jumpi(l5, lt(temp1, 64))
+        
+        
+        jumpi(l5n, lt(addr2, sub(addr1, 32)))
         jumpi(l5, lt(i, 3840))
-        jump(l5e)
+        jump(last)
     l5n:
+        i := add(i, 32)
+        temp1 := sub(addr1, addr2)
         sort(addr2, sub(addr1, 32))
         addr2 := addr1
         i := add(i, 32)
         jumpi(l5, lt(i, 3840))
-    l5e:
+    last:
         addr1 := add(sub(calldatasize, 0x44), sub(3840, 32))
         jumpi(l5s, lt(addr2, addr1))
         jump(done)
