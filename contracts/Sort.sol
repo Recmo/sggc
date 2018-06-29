@@ -71,8 +71,7 @@ contract Sort {
         jumpi(l1_reverse, and(lt(i, 0xE4), lt(temp2, add(temp1, 1))))
         jumpi(reverse, eq(i, 0xE4))
     l1:
-        temp2 := calldataload(i)
-        scale := or(scale, temp2)
+        scale := or(calldataload(i), scale)
         i := add(i, 32)
         jumpi(l1, lt(i, calldatasize))
         
