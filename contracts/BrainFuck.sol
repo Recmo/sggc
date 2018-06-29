@@ -47,6 +47,12 @@ contract BrainFuck {
         // No: >,+.<.
         // No: >-.<.
         
+        // Optimization patterns (all are implemented, just disabled)
+        // Yes: [<]
+        // No: [>]
+        // No: [-]
+        // No: [->+<]
+        
     cnop: // [t tp ip op pp]
         // pp := add(pp, 1)
         // op := and(calldataload(pp), 0xFF)
@@ -156,13 +162,9 @@ contract BrainFuck {
         // Check if next character is -
         pp := add(pp, 1)
         op := and(calldataload(pp), 0xFF)
-        
-        // Check if next operator is -
-        jumpi(copen_decr, eq(op, 0x2d))
-        
-        // Check if next operator is <
-        jumpi(copen_left, eq(op, 0x3c))
-        
+        //jumpi(copen_decr, eq(op, 0x2d)) // -
+        jumpi(copen_left, eq(op, 0x3c)) // <
+        //jumpi(copen_right, eq(op, 0x3c)) // >
         // Nope. Handle [ and distpach.
         mstore(ip, open)
         ip := add(ip, 32)
@@ -234,7 +236,7 @@ contract BrainFuck {
         ip := add(ip, 32)
         mstore(tp, ip)
         tp := add(tp, 32)
-        jumpi(cleftn, eq(op, 0x3c)) // Handle [--… with cleftn
+        jumpi(cleftn, eq(op, 0x3c)) // Handle [<<… with cleftn
         mstore(ip, cleft)
         ip := add(ip, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
@@ -245,6 +247,24 @@ contract BrainFuck {
         pp := add(pp, 1)
         op := and(calldataload(pp), 0xFF)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+    copen_right:
+        // Check if next character is ]
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
+        jumpi(copen_right_close, eq(op, 0x5d))
+        // Nope. Handle [> and dispatch
+        mstore(ip, open)
+        ip := add(ip, 32)
+        ip := add(ip, 32)
+        mstore(tp, ip)
+        tp := add(tp, 32)
+        jumpi(crightn, eq(op, 0x3e)) // Handle [>>… with crightn
+        mstore(ip, cright)
+        ip := add(ip, 32)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+    copen_right_close:
+        jump(explode) // TODO
+
 
     cclose:
         mstore(ip, close)
