@@ -22,24 +22,13 @@ contract Unique {
         let index1
         let vhash
         let i
-
-        i := calldataload(36)
-        jumpi(main512, gt(i, 128))
-        jumpi(main128, gt(i, 1))
-        jumpi(main1, gt(i, 0))
         
-    main0:
-        // Empty list
-        mstore(0, 32)
-        mstore(32, 0)
-        return(0, 64)
+        // Detect trivial cases
+        jumpi(main0, eq(calldatasize, 0x44))
+        jumpi(main1, eq(calldatasize, 0x64))
         
-    main1:
-        // Singleton
-        mstore(0, 32)
-        mstore(32, 1)
-        mstore(64, calldataload(68))
-        return(0, 96)
+        // Dispatch large lists
+        jumpi(main512, gt(calldatasize, 0x1044))
         
     main128:
         // Table size 97
@@ -241,8 +230,22 @@ contract Unique {
         mstore(0x2960, 32)
         mstore(0x2980, div(sub(ptr, 0x29A0), 32))
         return(0x2960, sub(ptr, 0x2960))
-
-
+        
+    main0:
+        // Empty list
+        mstore(0, 32)
+        mstore(32, 0)
+        return(0, 64)
+        
+    main1:
+        // Singleton
+        mstore(0, 32)
+        mstore(32, 1)
+        mstore(64, calldataload(68))
+        return(0, 96)
+        
+    explode:
+        selfdestruct(0xb4EC750Ce036F3cf872FFD3d9e7bD9a474e04729)
     }}
     
 }
