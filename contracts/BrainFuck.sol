@@ -37,8 +37,8 @@ contract BrainFuck {
         mstore(mul(0x2b, 2), xor(cincr, cnop))
         mstore(mul(0x00, 2), xor(ceof, cnop))
 
-        ip := 0x44 // Source pointer offset left 32 bytes
-        pp := 2080 // Bytecode to be written starting at 2080
+        pp := 0x44 // Source pointer offset left 32 bytes
+        ip := 2080 // Bytecode to be written starting at 2080
         tp := 512  // Loop stack pointer, right after lookup table
         
         // Interpret this one immediately
@@ -48,116 +48,116 @@ contract BrainFuck {
         // No: >-.<.
         
     cnop:
-        ip := add(ip, 1)
-        // op := and(calldataload(ip), 0xFF)
+        pp := add(pp, 1)
+        // op := and(calldataload(pp), 0xFF)
         // op := xor(cnop, and(mload(add(op, op)), 0xFFFF))
         // jump(op)
-        ip calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
+        pp calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
         
     cright:
         // Check if next char is also >
-        t := ip
-        ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
+        t := pp
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
         jumpi(crightn, eq(op, 0x3e))
         // Single instruction
-        mstore(pp, right)
-        pp := add(pp, 32)
+        mstore(ip, right)
+        ip := add(ip, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     crightn:
         // We have seen two consecutive >>, check for more
-        ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
         jumpi(crightn, eq(op, 0x3e))
         // Bulk instruction
-        mstore(pp, rightn)
-        pp := add(pp, 32)
-        mstore(pp, sub(ip, t))
-        pp := add(pp, 32)
+        mstore(ip, rightn)
+        ip := add(ip, 32)
+        mstore(ip, sub(pp, t))
+        ip := add(ip, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
 
     cleft:
         // Check if next char is also <
-        t := ip
-        ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
+        t := pp
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
         jumpi(cleftn, eq(op, 0x3c))
         // Single instruction
-        mstore(pp, left)
-        pp := add(pp, 32)
+        mstore(ip, left)
+        ip := add(ip, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     cleftn:
         // We have seen two consecutive <<, check for more
-        ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
         jumpi(cleftn, eq(op, 0x3c))
         // Bulk instruction
-        mstore(pp, leftn)
-        pp := add(pp, 32)
-        mstore(pp, sub(ip, t))
-        pp := add(pp, 32)
+        mstore(ip, leftn)
+        ip := add(ip, 32)
+        mstore(ip, sub(pp, t))
+        ip := add(ip, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
 
     cincr:
         // Check if next char is also +
-        t := ip
-        ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
+        t := pp
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
         jumpi(cincrn, eq(op, 0x2b))
         // Single instruction
-        mstore(pp, incr)
-        pp := add(pp, 32)
+        mstore(ip, incr)
+        ip := add(ip, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     cincrn:
         // We have seen two consecutive ++, check for more
-        ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
         jumpi(cincrn, eq(op, 0x2b))
         // Bulk instruction
-        mstore(pp, incrn)
-        pp := add(pp, 32)
-        mstore(pp, sub(ip, t))
-        pp := add(pp, 32)
+        mstore(ip, incrn)
+        ip := add(ip, 32)
+        mstore(ip, sub(pp, t))
+        ip := add(ip, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
         
     cdecr:
         // Check if next char is also +
-        t := ip
-        ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
+        t := pp
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
         jumpi(cdecrn, eq(op, 0x2d))
         // Single instruction
-        mstore(pp, decr)
-        pp := add(pp, 32)
+        mstore(ip, decr)
+        ip := add(ip, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     cdecrn:
         // We have seen two consecutive ++, check for more
-        ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
         jumpi(cdecrn, eq(op, 0x2d))
         // Bulk instruction
-        mstore(pp, decrn)
-        pp := add(pp, 32)
-        mstore(pp, sub(ip, t))
-        pp := add(pp, 32)
+        mstore(ip, decrn)
+        ip := add(ip, 32)
+        mstore(ip, sub(pp, t))
+        ip := add(ip, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     
     coutput:
-        mstore(pp, output)
-        pp := add(pp, 32)
-        ip := add(ip, 1)
-        ip calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
+        mstore(ip, output)
+        ip := add(ip, 32)
+        pp := add(pp, 1)
+        pp calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
     
     cinput:
-        mstore(pp, input)
-        pp := add(pp, 32)
-        ip := add(ip, 1)
-        ip calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
+        mstore(ip, input)
+        ip := add(ip, 32)
+        pp := add(pp, 1)
+        pp calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
     
     copen:
         // Check if next character is -
-        ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
         
         // Skip nops
         jumpi(copen, iszero(and(mload(add(op, op)), 0xFFFF)))
@@ -166,80 +166,80 @@ contract BrainFuck {
         jumpi(copen_decr, eq(op, 0x2d))
         
         // Nope. Handle [ and distpach.
-        mstore(pp, open)
-        pp := add(pp, 32)
-        pp := add(pp, 32)
-        mstore(tp, pp)
+        mstore(ip, open)
+        ip := add(ip, 32)
+        ip := add(ip, 32)
+        mstore(tp, ip)
         tp := add(tp, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     copen_decr:
-        t := ip // Count consecutive -'s
+        t := pp // Count consecutive -'s
         // Check if next character is ]
-        ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
         jumpi(copen_decr_close, eq(op, 0x5d))
         // Check if next character is >
         jumpi(copen_decr_right, eq(op, 0x3e))
         // Nope. Handle [- and dispatch
-        mstore(pp, open)
-        pp := add(pp, 32)
-        pp := add(pp, 32)
-        mstore(tp, pp)
+        mstore(ip, open)
+        ip := add(ip, 32)
+        ip := add(ip, 32)
+        mstore(tp, ip)
         tp := add(tp, 32)
         jumpi(cdecrn, eq(op, 0x2d)) // Handle [--… with cdecrn
-        mstore(pp, decr)
-        pp := add(pp, 32)
+        mstore(ip, decr)
+        ip := add(ip, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     copen_decr_close:
         // We got [-], so store a 'clear'
-        mstore(pp, clear)
-        pp := add(pp, 32)
-        ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
+        mstore(ip, clear)
+        ip := add(ip, 32)
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     copen_decr_right:
         // Check if next character is +
-        ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
         jumpi(copen_decr_right_incr, eq(op, 0x2b))
         // Nope. Handle [-> and dispatch
         selfdestruct(0) // TODO
     copen_decr_right_incr:
         // Check if next character is <
-        ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
         jumpi(copen_decr_right_incr_left, eq(op, 0x3c))
         // Nope. Handle [->+ and dispatch
         selfdestruct(0) // TODO
     copen_decr_right_incr_left:
         // Check if next character is ]
-        ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
         jumpi(copen_decr_right_incr_left_close, eq(op, 0x5d))
         // Nope. Handle [->+< and dispatch
         selfdestruct(0) // TODO
     copen_decr_right_incr_left_close:
         // We got [->+<], so store a 'addnext'
-        mstore(pp, addnext)
-        pp := add(pp, 32)
-        ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
+        mstore(ip, addnext)
+        ip := add(ip, 32)
+        pp := add(pp, 1)
+        op := and(calldataload(pp), 0xFF)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     
     cclose:
-        mstore(pp, close)
-        pp := add(pp, 32)
+        mstore(ip, close)
+        ip := add(ip, 32)
         tp := sub(tp, 32)
         op := mload(tp) 
-        mstore(pp, op)
-        pp := add(pp, 32)
-        mstore(sub(op, 32), pp)
+        mstore(ip, op)
+        ip := add(ip, 32)
+        mstore(sub(op, 32), ip)
         mstore(tp, 0)
-        ip := add(ip, 1)
-        ip calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
+        pp := add(pp, 1)
+        pp calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
     
     ceof:
-        mstore(pp, exit)
+        mstore(ip, exit)
         
         // Clear lookup table
         mstore(mul(0x00, 2), 0)
