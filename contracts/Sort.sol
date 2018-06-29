@@ -62,11 +62,8 @@ contract Sort {
         jumpi(trivial, addr1)
         jumpi(reverse, addr2)
         
-        // DEBUG
-        // jumpi(explode, sub(65401, scale))
-        
         // Compute scaling factor (twice what it should be, we mask)
-        scale := div(add(scale, 511), 512)
+        scale := div(add(scale, 255), 256)
         
         ////////////////////////////////////////////////////
         // Second pass: count buckets
@@ -138,18 +135,17 @@ contract Sort {
         jumpi(last, slt(i, 0))
         addr2 := addr1
         addr1 := and(mload(i), 0xFFFF)
-        
-        jumpi(l5, eq(addr1, addr2))
         temp1 := sub(addr1, addr2)
-        jumpi(l5, eq(temp1, 32))
+        jumpi(l5, lt(temp1, 64))
         jumpi(sort2, eq(temp1, 64))
         jumpi(sort3, eq(temp1, 96))
         jumpi(sort4, eq(temp1, 128))
         jumpi(sort5, eq(temp1, 160))
-        jumpi(sort6, eq(temp1, 196))
-        jumpi(sort7, eq(temp1, 228))
+        jumpi(sort6, eq(temp1, 192))
+        jumpi(sort7, eq(temp1, 224))
         jumpi(sort8, eq(temp1, 256))
         jump(explode)
+        jump(l5)
         
     last:
         addr2 := addr1
@@ -161,10 +157,11 @@ contract Sort {
         jumpi(sort3, eq(temp1, 96))
         jumpi(sort4, eq(temp1, 128))
         jumpi(sort5, eq(temp1, 160))
-        jumpi(sort6, eq(temp1, 196))
-        jumpi(sort7, eq(temp1, 228))
+        jumpi(sort6, eq(temp1, 192))
+        jumpi(sort7, eq(temp1, 224))
         jumpi(sort8, eq(temp1, 256))
         jump(explode)
+        jump(l5)
         
     done:
         mstore(sub(0x220, 0x40), 0x20)
@@ -265,7 +262,7 @@ contract Sort {
         jump(l5)
         
     sort7: // [[1 2][0 2][0 1][3 4][5 6][3 5][4 6][4 5][0 4][0 3][1 5][2 6][2 5][1 3][2 4][2 3]]
-        addr2 196 add mload
+        addr2 192 add mload
         addr2 160 add mload
         addr2 128 add mload
         addr2 96 add mload
@@ -288,7 +285,7 @@ contract Sort {
         dup2 dup5 lt skip_7_14 jumpi swap1 swap3 swap1 skip_7_14:
         dup3 dup6 lt skip_7_15 jumpi swap2 swap4 swap2 skip_7_15:
         dup3 dup5 lt skip_7_16 jumpi swap2 swap3 swap2 skip_7_16:
-        addr2 196 add mstore
+        addr2 192 add mstore
         addr2 160 add mstore
         addr2 128 add mstore
         addr2 96 add mstore
@@ -298,8 +295,8 @@ contract Sort {
         jump(l5)
         
     sort8:
-        addr2 228 add mload
-        addr2 196 add mload
+        addr2 224 add mload
+        addr2 192 add mload
         addr2 160 add mload
         addr2 128 add mload
         addr2 96 add mload
@@ -325,8 +322,8 @@ contract Sort {
         dup3 dup6 lt skip_8_17 jumpi swap2 swap4 swap2 skip_8_17:
         dup4 dup7 lt skip_8_18 jumpi swap3 swap5 swap3 skip_8_18:
         dup4 dup6 lt skip_8_19 jumpi swap3 swap4 swap3 skip_8_19:
-        addr2 228 add mstore
-        addr2 196 add mstore
+        addr2 224 add mstore
+        addr2 192 add mstore
         addr2 160 add mstore
         addr2 128 add mstore
         addr2 96 add mstore
