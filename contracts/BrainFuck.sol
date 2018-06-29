@@ -136,9 +136,9 @@ contract BrainFuck {
         op := and(calldataload(pp), 0xFF)
         jumpi(cdecrn, eq(op, 0x2d))
         // Bulk instruction
-        mstore(ip, decrn)
+        mstore(ip, incrn)
         ip := add(ip, 32)
-        mstore(ip, sub(pp, t))
+        mstore(ip, sub(t, pp))
         ip := add(ip, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
     
@@ -285,7 +285,7 @@ contract BrainFuck {
         pp := add(pp, 32)
         jump(mload(pp))
         
-    incrn: // ++…
+    incrn: // ++… or --…
         pp := add(pp, 32)
         mstore8(add(tp, 31), add(mload(tp), mload(pp)))
         pp := add(pp, 32)
@@ -293,12 +293,6 @@ contract BrainFuck {
     
     decr: // -
         mstore8(add(tp, 31), sub(mload(tp), 1))
-        pp := add(pp, 32)
-        jump(mload(pp))
-        
-    decrn: // --…
-        pp := add(pp, 32)
-        mstore8(add(tp, 31), sub(mload(tp), mload(pp)))
         pp := add(pp, 32)
         jump(mload(pp))
         
