@@ -56,11 +56,23 @@ contract Unique {
         // Dispatch large lists
         jumpi(main512, gt(calldatasize, 0x1044))
         
-    main128:
+        //////////////////////////////////////////////////
         // Table size 97
-        ptr := 0xC60
-        i := 68
+        //////////////////////////////////////////////////
         
+    main128:
+        // Store last1, last2 and cursor
+        mstore(0xC60, last1)
+        mstore(0xC80, last2)
+        mstore(0xCA0, calldataload(i))
+        ptr := 0xCC0
+        
+        // Initialize hash table (assume no collisions)
+        mstore(mul(mod(not(last1), 97), 32), not(last1))
+        mstore(mul(mod(not(last2), 97), 32), not(last2))
+        mstore(mul(mod(not(calldataload(i)), 97), 32), not(calldataload(i)))
+        
+        i := add(i, 32)
     oloop128:
         // Read value
         vhash := not(calldataload(i))
@@ -155,50 +167,23 @@ contract Unique {
         mstore(0xC20, 32)
         mstore(0xC40, div(sub(ptr, 0xC60), 32))
         return(0xC20, sub(ptr, 0xC20))
-
-    main512:
+        
+        //////////////////////////////////////////////////
         // Table size 331
-        ptr := 0x29A0
-        i := 68
+        //////////////////////////////////////////////////
         
-        // Write first value
-        vhash := calldataload(i)
-        mstore(ptr, vhash)
-        ptr := add(ptr, 32)
-        last1 := vhash
+    main512:
         
-    repeat5121:
-        i := add(i, 32)
-        vhash := calldataload(i)
-        jumpi(repeat5121, eq(vhash, last1))
-        jumpi(oloop_end512, eq(i, calldatasize))
+        // Store last1, last2 and cursor
+        mstore(0x29A0, last1)
+        mstore(0x29C0, last2)
+        mstore(0x29E0, calldataload(i))
+        ptr := 0x2A00
         
-        // Write second value
-        mstore(ptr, vhash)
-        ptr := add(ptr, 32)
-        last2 := last1
-        last1 := vhash
-        
-    repeat5122:
-        i := add(i, 32)
-        vhash := calldataload(i)
-        jumpi(repeat5122, or(eq(vhash, last1), eq(vhash, last2)))
-        jumpi(oloop_end512, eq(i, calldatasize))
-        
-        // Write third value
-        mstore(ptr, vhash)
-        ptr := add(ptr, 32)
-        
-        // Convert to main loop
-        vhash := not(vhash)
-        last1 := not(last1)
-        last2 := not(last2)
-        // Assume no collisions in first three unique values :/
-        mstore(mul(mod(vhash, 331), 32), vhash)
-        mstore(mul(mod(last1, 331), 32), last1)
-        mstore(mul(mod(last2, 331), 32), last2)
-        
-        i := add(i, 32)
+        // Initialize hash table (assume no collisions)
+        mstore(mul(mod(not(last1), 331), 32), not(last1))
+        mstore(mul(mod(not(last2), 331), 32), not(last2))
+        mstore(mul(mod(not(calldataload(i)), 331), 32), not(calldataload(i)))
         
     oloop512:
         // Read value
@@ -256,6 +241,10 @@ contract Unique {
         mstore(0x2960, 32)
         mstore(0x2980, div(sub(ptr, 0x29A0), 32))
         return(0x2960, sub(ptr, 0x2960))
+        
+        //////////////////////////////////////////////////
+        // Special cases
+        //////////////////////////////////////////////////
         
     main0:
         // Empty list
