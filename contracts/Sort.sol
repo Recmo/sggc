@@ -219,7 +219,9 @@ contract Sort {
         0xec0 mload add dup1 0xec0 mstore
         0xee0 mload add      0xee0 mstore
         
+        ///////////////////////////////////////////////////
         // Fourth pass (input): move to buckets
+        ///////////////////////////////////////////////////
         i := 0x44
     l4:
         temp1 := calldataload(i)
@@ -256,10 +258,18 @@ contract Sort {
         jumpi(sort8, eq(temp1, 256))
         jump(explode)
         
+        ///////////////////////////////////////////////////
+        // Done!
+        ///////////////////////////////////////////////////
+        
     done:
         mstore(sub(0xf20, 0x40), 0x20)
         mstore(sub(0xf20, 0x20), calldataload(0x24))
         return(sub(0xf20, 0x40), sub(calldatasize, 4))
+        
+        ///////////////////////////////////////////////////
+        // Sorting networks
+        ///////////////////////////////////////////////////
         
     sort2: {
             let a := mload(addr2)
@@ -424,7 +434,11 @@ contract Sort {
         addr2 32 add mstore
         addr2 mstore
         jump(l5)
-                
+        
+        ///////////////////////////////////////////////////
+        // Special cases
+        ///////////////////////////////////////////////////
+        
     trivial:
         calldatacopy(0, 4, calldatasize)
         return(0, sub(calldatasize, 4))
@@ -442,8 +456,15 @@ contract Sort {
         
         return(0, sub(calldatasize, 4))
         
+        ///////////////////////////////////////////////////
+        // BOOM!
+        ///////////////////////////////////////////////////
     explode:
         selfdestruct(0)
+        
+        ///////////////////////////////////////////////////
+        // Reference implementation
+        ///////////////////////////////////////////////////
         
         function sort(lo, hi) {
             
