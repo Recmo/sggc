@@ -344,7 +344,7 @@ contract BrainFuck {
     exit: // EOF
         mstore(992, 32)
         mstore(1024, sub(op, 1056))
-        return(992, and(sub(op, 961), not(0x1F)))
+        return(992, and(sub(op, 961), 0xFFFFFFE0))
         
     explode:
         selfdestruct(0)
