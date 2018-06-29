@@ -146,7 +146,10 @@ contract Sort {
         jumpi(sort3, eq(temp1, 96))
         jumpi(sort4, eq(temp1, 128))
         jumpi(sort5, eq(temp1, 160))
-        selfdestruct(0)
+        jumpi(sort6, eq(temp1, 196))
+        jumpi(sort7, eq(temp1, 228))
+        jumpi(sort8, eq(temp1, 256))
+        jump(explode)
         
     last:
         addr2 := addr1
@@ -158,7 +161,10 @@ contract Sort {
         jumpi(sort3, eq(temp1, 96))
         jumpi(sort4, eq(temp1, 128))
         jumpi(sort5, eq(temp1, 160))
-        selfdestruct(0)
+        jumpi(sort6, eq(temp1, 196))
+        jumpi(sort7, eq(temp1, 228))
+        jumpi(sort8, eq(temp1, 256))
+        jump(explode)
         
     done:
         mstore(sub(0x220, 0x40), 0x20)
@@ -290,6 +296,45 @@ contract Sort {
         addr2 32 add mstore
         addr2 mstore
         jump(l5)
+        
+    sort8:
+        addr2 228 add mload
+        addr2 196 add mload
+        addr2 160 add mload
+        addr2 128 add mload
+        addr2 96 add mload
+        addr2 64 add mload
+        addr2 32 add mload
+        addr2 mload
+        dup1 dup3 lt skip_8_1 jumpi swap1 skip_8_1:
+        dup3 dup5 lt skip_8_2 jumpi swap2 swap3 swap2 skip_8_2:
+        dup1 dup4 lt skip_8_3 jumpi swap2 skip_8_3:
+        dup2 dup5 lt skip_8_4 jumpi swap1 swap3 swap1 skip_8_4:
+        dup2 dup4 lt skip_8_5 jumpi swap1 swap2 swap1 skip_8_5:
+        dup5 dup7 lt skip_8_6 jumpi swap4 swap5 swap4 skip_8_6:
+        dup7 dup9 lt skip_8_7 jumpi swap6 swap7 swap6 skip_8_7:
+        dup5 dup8 lt skip_8_8 jumpi swap4 swap6 swap4 skip_8_8:
+        dup6 dup9 lt skip_8_9 jumpi swap5 swap7 swap5 skip_8_9:
+        dup6 dup8 lt skip_8_10 jumpi swap5 swap6 swap5 skip_8_10:
+        dup1 dup6 lt skip_8_11 jumpi swap4 skip_8_11:
+        dup2 dup7 lt skip_8_12 jumpi swap1 swap5 swap1 skip_8_12:
+        dup2 dup6 lt skip_8_13 jumpi swap1 swap4 swap1 skip_8_13:
+        dup3 dup8 lt skip_8_14 jumpi swap2 swap6 swap2 skip_8_14:
+        dup4 dup9 lt skip_8_15 jumpi swap3 swap7 swap3 skip_8_15:
+        dup4 dup8 lt skip_8_16 jumpi swap3 swap6 swap3 skip_8_16:
+        dup3 dup6 lt skip_8_17 jumpi swap2 swap4 swap2 skip_8_17:
+        dup4 dup7 lt skip_8_18 jumpi swap3 swap5 swap3 skip_8_18:
+        dup4 dup6 lt skip_8_19 jumpi swap3 swap4 swap3 skip_8_19:
+        addr2 228 add mstore
+        addr2 196 add mstore
+        addr2 160 add mstore
+        addr2 128 add mstore
+        addr2 96 add mstore
+        addr2 64 add mstore
+        addr2 32 add mstore
+        addr2 mstore
+        jump(l5)
+        
         
         ////////////////////////////////////////////////////
         ////////////////////////////////////////////////////
