@@ -27,8 +27,9 @@ contract Unique {
         jumpi(main0, eq(calldatasize, 0x44)) // YES
         jumpi(main1, eq(calldatasize, 0x64)) // YES
         // One repeating value: YES
+        // Two repeating values: 
         
-        // Detect single repeated pattern
+        // Detect single repeated pattern (last1)
         last1 := calldataload(0x44)
         i := 0x44
     p1loop:
@@ -38,12 +39,12 @@ contract Unique {
             eq(last1, calldataload(i))
         ))
         jumpi(main1, eq(i, calldatasize))
-        
-        // Detect double repeated pattern
         last2 := calldataload(i)
+        
+        // Detect double repeated pattern (last1, last2)
     p2loop:
         i := add(i, 0x20)
-        jumpi(p1loop, and(
+        jumpi(p2loop, and(
             lt(i, calldatasize),
             or(
                 eq(last1, calldataload(i)),
@@ -55,63 +56,11 @@ contract Unique {
         // Dispatch large lists
         jumpi(main512, gt(calldatasize, 0x1044))
         
-    main128: // Table size 97
-        // Output last1, last2 and cursor
-        mstore(0xC60, last1)
-        mstore(0xC80, last2)
-        mstore(0xCA0, calldataload(i))
-        ptr := 0xCC0
+    main128:
+        // Table size 97
+        ptr := 0xC60
+        i := 68
         
-        function store128(value) {
-            value := not(value)
-            
-            // Compute index 1
-            let sindex1 := mul(mod(value, 97), 32)
-            
-            // Read index 1
-            jumpi(store1281, iszero(mload(sindex1)))
-            
-            // Increment and test index 1
-            sindex1 := mod(add(sindex1, 32), 0xC20)
-            jumpi(store1281, iszero(mload(sindex1)))
-            
-            // Compute index 2
-            let sindex2 := mul(mod(mul(value, 0x1b6d296aa8b7284041b9f0e36895d18399d8026b57a51e5af0ed54c3e03bd3a1), 97), 32)
-            
-            // Read index 2
-            jumpi(store1282, iszero(mload(sindex2)))
-            
-        store128loop:
-            // Increment and test index 1
-            sindex1 := mod(add(sindex1, 32), 0xC20)
-            jumpi(store1281, iszero(mload(sindex1)))
-            
-            // Incerment and test index 2
-            sindex2 := mod(add(sindex2, 32), 0xC20)
-            jumpi(store1282, iszero(mload(sindex2)))
-            
-            // Loop
-            jump(store128loop)
-            
-        store1282:
-            mstore(sindex2, value)
-            jump(ret)
-        
-        store1281:
-            mstore(sindex1, value)
-            
-        ret:
-        }
-        
-        i := add(i, 32)
-        jumpi(oloop_end128, eq(i, calldatasize))
-        
-        // Store last1, last2 and cursor (assume no collisions)
-        // mstore(mul(mod(not(last1), 97), 32), not(last1))
-        store128(last1)
-        store128(last2)
-        store128(calldataload(i))
-
     oloop128:
         // Read value
         vhash := not(calldataload(i))
