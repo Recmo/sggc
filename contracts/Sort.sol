@@ -44,6 +44,11 @@ contract Sort {
         // * find upper bound to values
         // * check for sorted input
         // * check for reverse sorted input
+        // TODO: Split into l1_forward, l1_reverse and l1.
+        //       Check first two elements and jumpt to forward or reverse
+        //       TODO: Test if first two elements always differ
+        //       Jump to l1 as soon as a non-sorted pair is found
+        //       Jump to trivial or reverse after n itteration (determine)
         temp1 := calldataload(0x44)
         scale := temp1
         i := 0x64
