@@ -5,7 +5,7 @@
  * https://creativecommons.org/licenses/by-sa/3.0/
  */
 
-pragma solidity 0.4.24;
+pragma solidity ^0.4.23;
 
 contract Unique {
     
