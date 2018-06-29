@@ -256,7 +256,8 @@ contract Sort {
         jumpi(sort6, eq(temp1, 192))
         jumpi(sort7, eq(temp1, 224))
         jumpi(sort8, eq(temp1, 256))
-        jump(explode)
+        sort(addr2, sub(addr1, 32))
+        jump(l5)
         
         ///////////////////////////////////////////////////
         // Done!
