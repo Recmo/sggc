@@ -88,7 +88,7 @@ contract Sort {
         ////////////////////////////////////////////////////
         // Third pass (buckets): running total in buckets
         ////////////////////////////////////////////////////
-        3840 // Start with write offset
+        0xf20 // Start with write offset
         0x0 mload add dup1 0x0 mstore
         0x20 mload add dup1 0x20 mstore
         0x40 mload add dup1 0x40 mstore
@@ -228,12 +228,15 @@ contract Sort {
         ////////////////////////////////////////////////////
         // Max group size: 7
         
-        i := sub(0x00, 32)
-        addr1 := 3840
+        // Add last bucket
+        mstore(sub(0xf20, 32), add(sub(calldatasize, 0x44), sub(0xf20, 32)))
+        
+        i := 0x00
+        addr1 := 0xf20
     l5:
         addr2 := addr1
         i := add(i, 32)
-        jumpi(last, gt(i, sub(3840, 32)))
+        jumpi(done, eq(i, 0xf20))
         addr1 := mload(i)
         temp1 := sub(addr1, addr2)
         jumpi(l5, lt(temp1, 64))
@@ -247,23 +250,10 @@ contract Sort {
         jump(explode)
         jump(l5)
     
-    last:
-        addr1 := add(sub(calldatasize, 0x44), sub(3840, 32))
-        temp1 := sub(addr1, addr2)
-        jumpi(done, lt(temp1, 64))
-        jumpi(sort2, eq(temp1, 64))
-        jumpi(sort3, eq(temp1, 96))
-        jumpi(sort4, eq(temp1, 128))
-        jumpi(sort5, eq(temp1, 160))
-        jumpi(sort6, eq(temp1, 192))
-        jumpi(sort7, eq(temp1, 224))
-        jumpi(sort8, eq(temp1, 256))
-        jump(explode)
-        
     done:
-        mstore(sub(3840, 0x40), 0x20)
-        mstore(sub(3840, 0x20), calldataload(0x24))
-        return(sub(3840, 0x40), sub(calldatasize, 4))
+        mstore(sub(0xf20, 0x40), 0x20)
+        mstore(sub(0xf20, 0x20), calldataload(0x24))
+        return(sub(0xf20, 0x40), sub(calldatasize, 4))
     
     sort2: {
             let a := mload(addr2)
