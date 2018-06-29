@@ -23,8 +23,8 @@
         },
         {
             "gas": 5000000,
-            "input": [",[This is a very long blob of text intended to make the distance between two square brackets at least 256 characters This will help test the efficiency of Brainfuck implementations at finding matching parentheses and break any assumptions about jumps being short-]", "0x08"],
-            "output": ["0x"]
+            "input": [",[This is a very long blob of text intended to make the distance between two square brackets at least 256 characters This will help test the efficiency of Brainfuck implementations at finding matching parentheses and break any assumptions about jumps being short-]+.", "0x08"],
+            "output": ["0x01"]
         },
         {
             "gas": 100000,
