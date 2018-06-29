@@ -248,6 +248,31 @@ contract Sort {
     l5s:
         sort(addr2, addr1)
         
+    done:
+        mstore(sub(3840, 0x40), 0x20)
+        mstore(sub(3840, 0x20), calldataload(0x24))
+        return(sub(3840, 0x40), sub(calldatasize, 4))
+        
+    trivial:
+        calldatacopy(0, 4, calldatasize)
+        return(0, sub(calldatasize, 4))
+        
+    reverse:
+        calldatacopy(0, 4, 0x40)
+        i := 0x44
+        temp1 := sub(calldatasize, 36)
+        
+    lr:
+        mstore(temp1, calldataload(i))
+        i := add(i, 32)
+        temp1 := sub(temp1, 32)
+        jumpi(lr, lt(i, calldatasize))
+        
+        return(0, sub(calldatasize, 4))
+        
+    explode:
+        selfdestruct(0)
+        
         function sort(lo, hi) {
             
             let lolo := lo
@@ -345,31 +370,5 @@ contract Sort {
             sort(hi, hihi)
         ret:
         }
-        
-    done:
-        mstore(sub(3840, 0x40), 0x20)
-        mstore(sub(3840, 0x20), calldataload(0x24))
-        return(sub(3840, 0x40), sub(calldatasize, 4))
-        
-    trivial:
-        calldatacopy(0, 4, calldatasize)
-        return(0, sub(calldatasize, 4))
-        
-    reverse:
-        calldatacopy(0, 4, 0x40)
-        i := 0x44
-        temp1 := sub(calldatasize, 36)
-        
-    lr:
-        mstore(temp1, calldataload(i))
-        i := add(i, 32)
-        temp1 := sub(temp1, 32)
-        jumpi(lr, lt(i, calldatasize))
-        
-        return(0, sub(calldatasize, 4))
-        
-    explode:
-        selfdestruct(0)
-        
     }}
 }
