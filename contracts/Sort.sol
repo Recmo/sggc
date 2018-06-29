@@ -71,7 +71,7 @@ contract Sort {
         0x44
     l2:
         // temp1 := sub(510, and(div(calldataload(i), scale), 0xFFFFFE))
-        scale dup2 calldataload div 0xfffffe and 510 sub
+        scale dup2 calldataload div 0xfffffe and 254 sub
         // mstore8(add(temp1, 31), add(mload(temp1), 1))
         dup1 mload 1 add swap1 31 add mstore8
         // i := add(i, 32)
@@ -87,14 +87,6 @@ contract Sort {
         0x0001000000000000000000000000000000000000000000000000000000000000
         0x0001000100010001000100010001000100010001000100010001000100010001
         0x220
-        0x200 mload 32 mul add dup2 mul dup1 0x200 mstore dup3 swap1 div
-        0x1e0 mload 32 mul add dup2 mul dup1 0x1e0 mstore dup3 swap1 div
-        0x1c0 mload 32 mul add dup2 mul dup1 0x1c0 mstore dup3 swap1 div
-        0x1a0 mload 32 mul add dup2 mul dup1 0x1a0 mstore dup3 swap1 div
-        0x180 mload 32 mul add dup2 mul dup1 0x180 mstore dup3 swap1 div
-        0x160 mload 32 mul add dup2 mul dup1 0x160 mstore dup3 swap1 div
-        0x140 mload 32 mul add dup2 mul dup1 0x140 mstore dup3 swap1 div
-        0x120 mload 32 mul add dup2 mul dup1 0x120 mstore dup3 swap1 div
         0x100 mload 32 mul add dup2 mul dup1 0x100 mstore dup3 swap1 div
         0xe0 mload 32 mul add dup2 mul dup1 0xe0 mstore dup3 swap1 div
         0xc0 mload 32 mul add dup2 mul dup1 0xc0 mstore dup3 swap1 div
@@ -113,7 +105,7 @@ contract Sort {
         i := 0x44
     l4: {
         let value  := calldataload(i)
-        let bucket := sub(510, and(div(value, scale), 0xFFFFFE))
+        let bucket := sub(254, and(div(value, scale), 0xFFFFFE))
         let bval   := mload(bucket)
         let addr   := sub(and(bval, 0xFFFF), 32)
         mstore(bucket, or(and(bval, temp1), addr))
@@ -128,7 +120,7 @@ contract Sort {
         
         // At this point unsorted groups have max 5 elements
         
-        i := 510
+        i := 256
         addr1 := 0x220
     l5:
         i := sub(i, 2)
