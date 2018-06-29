@@ -97,7 +97,7 @@ contract Sort {
         ///////////////////////////////////////////////////
         // Third pass (buckets): running total in buckets
         ///////////////////////////////////////////////////
-        3840 // Start with write offset
+        0xf20 // Start with write offset
         0x0 mload add dup1 0x0 mstore
         0x20 mload add dup1 0x20 mstore
         0x40 mload add dup1 0x40 mstore
@@ -251,11 +251,10 @@ contract Sort {
         jumpi(sort6, eq(temp1, 192))
         jumpi(sort7, eq(temp1, 224))
         jumpi(sort8, eq(temp1, 256))
-        sort(addr2, sub(addr1, 32))
-        jump(l5)
+        jump(explode)
         
     last:
-        addr1 := add(sub(calldatasize, 0x44), sub(3840, 32))
+        addr1 := add(sub(calldatasize, 0x44), sub(0xf20, 32))
         jumpi(l5s, lt(addr2, addr1))
         jump(done)
         
@@ -263,9 +262,9 @@ contract Sort {
         sort(addr2, addr1)
         
     done:
-        mstore(sub(3840, 0x40), 0x20)
-        mstore(sub(3840, 0x20), calldataload(0x24))
-        return(sub(3840, 0x40), sub(calldatasize, 4))
+        mstore(sub(0xf20, 0x40), 0x20)
+        mstore(sub(0xf20, 0x20), calldataload(0x24))
+        return(sub(0xf20, 0x40), sub(calldatasize, 4))
         
         
     sort2: {
