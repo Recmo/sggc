@@ -244,6 +244,13 @@ contract Sort {
         addr1 := mload(i)
         temp1 := sub(addr1, addr2)
         jumpi(l5, lt(temp1, 64))
+        jumpi(sort2, eq(temp1, 64))
+        jumpi(sort3, eq(temp1, 96))
+        jumpi(sort4, eq(temp1, 128))
+        jumpi(sort5, eq(temp1, 160))
+        jumpi(sort6, eq(temp1, 192))
+        jumpi(sort7, eq(temp1, 224))
+        jumpi(sort8, eq(temp1, 256))
         sort(addr2, sub(addr1, 32))
         jump(l5)
         
