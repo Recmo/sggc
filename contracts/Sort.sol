@@ -47,32 +47,17 @@ contract Sort {
         // * find upper bound to values
         // * check for sorted input
         // * check for reverse sorted input
-        0x64
-        calldataload(0x44)
-    l1_equal:                // [i temp1]
-                             // temp2 := calldataload(i)
-        dup2                 // [i temp1 i]
-        calldataload         // [i temp1 temp2]
-        dup1                 // [temp1 i temp2 temp2]
-                             // i := add(i, 32)
-        swap2                // [temp1 temp2 temp2 i]
-        32                   // [temp1 temp2 temp2 i 32]
-        add                  // [temp1 temp2 temp2 i]
-        swap3                // [i temp2 temp2 temp1]
-                             // b1 := eq(temp1, temp2)
-        eq                   // [i temp2 b1]
-                             // b2 := lt(i, calldatasize)
-        dup3                 // [i temp2 b1 i]
-        calldatasize         // [i temp2 b1 i calldatasize]
-        gt                   // [i temp2 b1 b2]
-                             // jumpi(l1_equal, and(b1, b2))
-        and l1_equal jumpi   // [i temp2]
-        =: temp2
-        =: i
+        temp1 := calldataload(0x44)
+        scale := temp1
+        i := 0x64
+    l1_equal: // All entries up untill i are the same
+        temp2 := calldataload(i)
+        i := add(i, 32)
+        jumpi(l1_equal, and(lt(i, calldatasize), eq(temp1, temp2)))
         jumpi(trivial, eq(i, calldatasize))
-        temp1 := calldataload(sub(i, 32))
-        scale := or(temp1, temp2)
+    l1_neq:
         jumpi(l1_reverse, gt(temp1, temp2))
+        scale := temp2
     l1_forward:
         temp1 := temp2
         temp2 := calldataload(i)
@@ -86,8 +71,8 @@ contract Sort {
         temp2 := calldataload(i)
         scale := or(scale, temp2)
         i := add(i, 32)
-        jumpi(l1_reverse, and(lt(i, calldatasize), lt(temp2, add(temp1, 1))))
-        jumpi(reverse, eq(i, calldatasize))
+        jumpi(l1_reverse, and(lt(i, 0xE4), lt(temp2, add(temp1, 1))))
+        jumpi(reverse, eq(i, 0xE4))
     l1:
         temp2 := calldataload(i)
         scale := or(scale, temp2)
