@@ -353,9 +353,17 @@ contract BrainFuck {
     
     scan_left: // [<]
         jumpi(scan_left_done, iszero(and(mload(tp), 0xff)))
-    scan_left_loop:
-        tp := sub(tp, 1)
-        jumpi(scan_left_loop, and(mload(tp), 0xff))
+        // tp := sub(tp, 1)
+        // jumpi(scan_left_loop, and(mload(tp), 0xff))
+        {
+            0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            tp
+        scan_left_loop:
+            dup2 add
+            dup1 mload 0xff and scan_left_loop jumpi
+            =: tp
+            pop
+        }
     scan_left_done:
         pp := add(pp, 32)
         jump(mload(pp))
