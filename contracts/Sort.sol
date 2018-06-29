@@ -258,17 +258,12 @@ contract Sort {
         jumpi(sort6, eq(temp1, 192))
         jumpi(sort7, eq(temp1, 224))
         jumpi(sort8, eq(temp1, 256))
-        mstore(0x00, 0x20)
-        mstore(0x20, 1)
-        mstore(0x40, temp1)
-        return(0x00, 0x60)
         jump(explode)
         
     done:
         mstore(sub(3840, 0x40), 0x20)
         mstore(sub(3840, 0x20), calldataload(0x24))
         return(sub(3840, 0x40), sub(calldatasize, 4))
-    
     
     sort2: {
             let a := mload(addr2)
