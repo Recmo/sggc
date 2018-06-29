@@ -43,11 +43,16 @@ contract BrainFuck {
         
         // Interpret this one immediately
         jumpi(precompile1, eq(calldataload(0x64), 0x2c3e2c3c5b2d3e2b3c5d3e2e0000000000000000000000000000000000000000))
+        // No: -[.-]..
+        // No: >,+.<.
+        // No: >-.<.
         
     cnop:
         ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
-        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+        // op := and(calldataload(ip), 0xFF)
+        // op := xor(cnop, and(mload(add(op, op)), 0xFFFF))
+        // jump(op)
+        ip calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
         
     cright:
         // Check if next char is also >
@@ -141,15 +146,13 @@ contract BrainFuck {
         mstore(pp, output)
         pp := add(pp, 32)
         ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
-        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+        ip calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
     
     cinput:
         mstore(pp, input)
         pp := add(pp, 32)
         ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
-        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+        ip calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
     
     copen:
         // Check if next character is -
@@ -233,8 +236,7 @@ contract BrainFuck {
         mstore(sub(op, 32), pp)
         mstore(tp, 0)
         ip := add(ip, 1)
-        op := and(calldataload(ip), 0xFF)
-        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+        ip calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
     
     ceof:
         mstore(pp, exit)
