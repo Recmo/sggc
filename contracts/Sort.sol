@@ -48,6 +48,7 @@ contract Sort {
         // * check for sorted input
         // * check for reverse sorted input
         temp1 := calldataload(0x44)
+        scale := temp1
         i := 0x64
     l1_equal: // All entries up untill i are the same
         temp2 := calldataload(i)
@@ -55,9 +56,10 @@ contract Sort {
         jumpi(l1_equal, and(lt(i, calldatasize), eq(temp1, temp2)))
         jumpi(trivial, eq(i, calldatasize))
     l1_neq:
-        jumpi(l1_reverse, lt(temp1, temp2))
+        jumpi(l1_reverse, gt(temp1, temp2))
         scale := temp2
     l1_forward:
+        temp1 := temp2
         temp2 := calldataload(i)
         scale := or(scale, temp2)
         i := add(i, 32)
@@ -65,6 +67,7 @@ contract Sort {
         jumpi(trivial, eq(i, calldatasize))
         jump(l1)
     l1_reverse:
+        temp1 := temp2
         temp2 := calldataload(i)
         scale := or(scale, temp2)
         i := add(i, 32)
