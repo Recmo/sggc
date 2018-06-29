@@ -236,7 +236,7 @@ contract Sort {
         // Max group size: 7
         
         // Add one-beyond-last bucket
-        mstore(sub(0xf20, 32), add(sub(calldatasize, 0x44), sub(0xf20, 32)))
+        mstore(sub(0xf20, 32), add(sub(calldatasize, 0x44), 0xf20))
         
         addr1 := mload(0)
         i := 0x00
