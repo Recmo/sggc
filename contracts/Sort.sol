@@ -38,36 +38,45 @@ contract Sort {
         // 160 * 32 = 5120    gas: 317469        189141
         // 256 *  1 = 256
         
-        ///////////////////////////////////////////////////
-        // First pass (input):
-        ///////////////////////////////////////////////////
+        ////////////////////////////////////////////////////
+        // First pass
+        ////////////////////////////////////////////////////
         // * find upper bound to values
         // * check for sorted input
         // * check for reverse sorted input
-        // TODO: Split into l1_forward, l1_reverse and l1.
-        //       Check first two elements and jumpt to forward or reverse
-        //       TODO: Test if first two elements always differ
-        //       Jump to l1 as soon as a non-sorted pair is found
-        //       Jump to trivial or reverse after n itteration (determine)
         temp1 := calldataload(0x44)
         scale := temp1
         i := 0x64
-        addr1 := 1
-        addr2 := 1
-    l1: // [temp1 addr1 addr2 scale i]
+    l1_equal: // All entries up untill i are the same
         temp2 := calldataload(i)
-        addr1 := and(addr1, slt(sub(temp1, 1), temp2))
-        addr2 := and(addr2, gt(add(temp1, 1), temp2))
-        scale := or(scale, temp2)
+        i := add(i, 32)
+        jumpi(l1_equal, and(lt(i, 0xE4), eq(temp1, temp2)))
+        jumpi(trivial, eq(i, 0xE4))
+    l1_neq:
+        jumpi(l1_reverse, gt(temp1, temp2))
+        scale := temp2
+    l1_forward:
         temp1 := temp2
+        temp2 := calldataload(i)
+        scale := or(scale, temp2)
+        i := add(i, 32)
+        jumpi(l1_forward, and(lt(i, 0xE4), lt(temp1, add(temp2, 1))))
+        jumpi(trivial, eq(i, 0xE4))
+        jump(l1)
+    l1_reverse:
+        temp1 := temp2
+        temp2 := calldataload(i)
+        scale := or(scale, temp2)
+        i := add(i, 32)
+        jumpi(l1_reverse, and(lt(i, 0xE4), lt(temp2, add(temp1, 1))))
+        jumpi(reverse, eq(i, 0xE4))
+    l1:
+        temp2 := calldataload(i)
+        scale := or(scale, temp2)
         i := add(i, 32)
         jumpi(l1, lt(i, calldatasize))
-        jumpi(trivial, addr1)
-        jumpi(reverse, addr2)
         
-        // max(input size) = 299
-        
-        // Compute scaling factor
+        // Compute scaling factor (twice what it should be, we mask)
         scale := div(add(scale, 119), 120)
         
         ///////////////////////////////////////////////////
