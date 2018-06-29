@@ -262,9 +262,12 @@ contract BrainFuck {
         jump(mload(pp))
         
     right: // >
-        tp := add(tp, 1)
-        pp := add(pp, 32)
-        jump(mload(pp))
+        // tp := add(tp, 1)
+        // pp := add(pp, 32)
+        // jump(mload(pp))
+        // [t tp ip op pp]
+        swap3 1 swap1 add swap3
+        32 add dup1 mload jump
         
     rightn: // >>… or <<…
         // pp := add(pp, 32)
