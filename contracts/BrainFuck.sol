@@ -42,7 +42,7 @@ contract BrainFuck {
         tp := 512  // Loop stack pointer, right after lookup table
         
         // Interpret this one immediately
-        jumpi(precompile1, eq(calldataload(0x44), 0x2c3e2c3c5b2d3e2b3c5d3e2e0000000000000000000000000000000000000000))
+        jumpi(precompile1, eq(calldataload(0x64), 0x2c3e2c3c5b2d3e2b3c5d3e2e0000000000000000000000000000000000000000))
         
     cnop:
         ip := add(ip, 1)
@@ -351,7 +351,7 @@ contract BrainFuck {
     precompile1:
         mstore(0x00, 0x20)
         mstore(0x20, 0x01)
-        mstore8(0x40, add(calldataload(0x65), calldataload(0x66)))
+        mstore8(0x40, add(calldataload(0x85), calldataload(0x86)))
         return(0x00, 0x41)
 
     }}
