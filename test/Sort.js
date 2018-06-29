@@ -16,7 +16,13 @@ contract('Sort', function(accounts) {
             var instance = await instanceFuture;
             var abi = ISort.at(instance.address);
             var result = await abi.sort(v.input[0], {gas: v.gas});
-            assert.deepEqual(result.map(x => x.toNumber()), v.output[0]);
+            console.log(result.map(x => x.toNumber()).join(' '));
+            try {
+                assert.deepEqual(result.map(x => x.toNumber()), v.output[0]);
+            }
+            catch(e) {
+                throw "Failed";
+            }
         });
     });
 
