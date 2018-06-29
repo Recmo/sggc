@@ -256,19 +256,10 @@ contract Sort {
         jumpi(sort8, eq(temp1, 256))
         jump(explode)
         
-    last:
-        addr1 := add(sub(calldatasize, 0x44), sub(0xf20, 32))
-        jumpi(l5s, lt(addr2, addr1))
-        jump(done)
-        
-    l5s:
-        sort(addr2, addr1)
-        
     done:
         mstore(sub(0xf20, 0x40), 0x20)
         mstore(sub(0xf20, 0x20), calldataload(0x24))
         return(sub(0xf20, 0x40), sub(calldatasize, 4))
-        
         
     sort2: {
             let a := mload(addr2)
