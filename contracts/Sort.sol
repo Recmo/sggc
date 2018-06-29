@@ -222,15 +222,28 @@ contract Sort {
         ///////////////////////////////////////////////////
         // Fourth pass (input): move to buckets
         ///////////////////////////////////////////////////
-        i := 0x44
+        0x44
     l4:
-        temp1 := calldataload(i)
-        addr1 := mul(div(temp1, scale), 32)
-        addr2 := sub(mload(addr1), 32)
-        mstore(addr1, addr2)
-        mstore(addr2, temp1)
-        i := add(i, 32)
-        jumpi(l4, lt(i, calldatasize))
+        // temp1 := calldataload(i)
+        dup1 calldataload
+        // addr1 := mul(div(temp1, scale), 32)
+        scale dup2 div 32 mul
+        // addr2 := sub(mload(addr1), 32)
+        0x20 dup2 mload sub
+        // [i temp1 addr1 addr2]
+        dup1
+        // [i temp1 addr1 addr2 addr2]
+        swap2
+        // [i temp1 addr2 addr2 addr1]
+        mstore
+        // [i temp1 addr2]
+        // mstore(addr2, temp1)
+        mstore
+        // i := add(i, 32)
+        32 add
+        // jumpi(l4, lt(i, calldatasize))
+        dup1 calldatasize gt l4 jumpi
+        pop
         
         ///////////////////////////////////////////////////
         // Fifth pass (buckets): sort buckets
