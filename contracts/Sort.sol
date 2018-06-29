@@ -228,15 +228,15 @@ contract Sort {
         ////////////////////////////////////////////////////
         // Max group size: 7
         
-        // Add last bucket
+        // Add one-beyond-last bucket
         mstore(sub(0xf20, 32), add(sub(calldatasize, 0x44), sub(0xf20, 32)))
         
         i := 0x00
         addr1 := 0xf20
     l5:
-        addr2 := addr1
         i := add(i, 32)
         jumpi(done, eq(i, 0xf20))
+        addr2 := addr1
         addr1 := mload(i)
         temp1 := sub(addr1, addr2)
         jumpi(l5, lt(temp1, 64))
