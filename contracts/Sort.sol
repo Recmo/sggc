@@ -85,6 +85,17 @@ contract Sort {
         dup1 calldatasize gt l2 jumpi
         pop
         
+        if 0 { // DEBUG: Dump the buckets to output
+            i := 0x00
+        ldebug:
+            mstore(add(i, 0x1000), mload(i))
+            i := add(i, 32)
+            jumpi(ldebug, lt(i, mul(120, 32)))
+            mstore(sub(0x1000, 0x40), 0x20)
+            mstore(sub(0x1000, 0x20), 120)
+            return(sub(0x1000, 0x40), add(64, mul(120, 32)))
+        }
+        
         ////////////////////////////////////////////////////
         // Third pass (buckets): running total in buckets
         ////////////////////////////////////////////////////
