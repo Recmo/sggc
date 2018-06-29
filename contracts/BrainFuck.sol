@@ -94,7 +94,7 @@ contract BrainFuck {
         // Bulk instruction
         mstore(ip, rightn)
         ip := add(ip, 32)
-        mstore(ip, sub(0, sub(pp, t)))
+        mstore(ip, sub(t, pp))
         ip := add(ip, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
 
