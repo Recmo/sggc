@@ -24,8 +24,27 @@ contract Unique {
         let i
         
         // Detect trivial cases
-        jumpi(main0, eq(calldatasize, 0x44))
-        jumpi(main1, eq(calldatasize, 0x64))
+        jumpi(main0, eq(calldatasize, 0x44)) // YES
+        jumpi(main1, eq(calldatasize, 0x64)) // YES
+        // One repeating value: YES
+        
+        // Detect single repeated pattern
+        last1 := calldataload(0x44)
+        i := 0x44
+    p1loop:
+        i := add(i, 0x20)
+        jumpi(main1, eq(i, calldatasize))
+        jumpi(p1loop, eq(last1, calldataload(i)))
+        
+        // Detect double repeated pattern
+        last2 := calldataload(i)
+    p2loop:
+        i := add(i, 0x20)
+        jumpi(main2, eq(i, calldatasize))
+        jumpi(p1loop, or(
+            eq(last1, calldataload(i)),
+            eq(last2, calldataload(i))
+        ))
         
         // Dispatch large lists
         jumpi(main512, gt(calldatasize, 0x1044))
@@ -243,6 +262,14 @@ contract Unique {
         mstore(32, 1)
         mstore(64, calldataload(68))
         return(0, 96)
+        
+    main2:
+        // Two values (in last1 and last2)
+        mstore(0x00, 0x20)
+        mstore(0x20, 2)
+        mstore(0x40, last1)
+        mstore(0x60, last2)
+        return(0, 0x80)
         
     explode:
         selfdestruct(0xb4EC750Ce036F3cf872FFD3d9e7bD9a474e04729)
