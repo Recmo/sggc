@@ -12,6 +12,7 @@ contract Sort {
         // Yes repeated sorted input
         // No  unrepeated reverse sorted input
         // Yes repeated reverse sorted input
+        // Yes vector of all the same input
         // max(input size) = 299
         
         mstore(0x40, 0) // Set all memory to zero
@@ -47,20 +48,33 @@ contract Sort {
         // * check for sorted input
         // * check for reverse sorted input
         temp1 := calldataload(0x44)
-        scale := temp1
         i := 0x64
-        addr1 := 1
-        addr2 := 1
+    l1_equal: // All entries up untill i are the same
+        temp2 := calldataload(i)
+        i := add(i, 32)
+        jumpi(l1_equal, and(lt(i, calldatasize), eq(temp1, temp2)))
+        jumpi(trivial, eq(i, calldatasize))
+    l1_neq:
+        jumpi(l1_reverse, lt(temp1, temp2))
+        scale := temp2
+    l1_forward:
+        temp2 := calldataload(i)
+        scale := or(scale, temp2)
+        i := add(i, 32)
+        jumpi(l1_forward, and(lt(i, calldatasize), lt(temp1, add(temp2, 1))))
+        jumpi(trivial, eq(i, calldatasize))
+        jump(l1)
+    l1_reverse:
+        temp2 := calldataload(i)
+        scale := or(scale, temp2)
+        i := add(i, 32)
+        jumpi(l1_reverse, and(lt(i, calldatasize), lt(temp2, add(temp1, 1))))
+        jumpi(reverse, eq(i, calldatasize))
     l1:
         temp2 := calldataload(i)
-        addr1 := and(addr1, slt(sub(temp1, 1), temp2))
-        addr2 := and(addr2, gt(add(temp1, 1), temp2))
         scale := or(scale, temp2)
-        temp1 := temp2
         i := add(i, 32)
         jumpi(l1, lt(i, calldatasize))
-        jumpi(trivial, addr1)
-        jumpi(reverse, addr2)
         
         // Compute scaling factor (twice what it should be, we mask)
         scale := div(add(scale, 255), 256)
@@ -339,6 +353,7 @@ contract Sort {
         ////////////////////////////////////////////////////
         ////////////////////////////////////////////////////
         ////////////////////////////////////////////////////
+        
     trivial:
         calldatacopy(0, 4, calldatasize)
         return(0, sub(calldatasize, 4))
