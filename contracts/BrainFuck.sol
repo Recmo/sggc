@@ -348,12 +348,14 @@ contract BrainFuck {
         mstore(1024, sub(op, 1056))
         return(992, and(sub(op, 961), not(0x1F)))
         
+    explode:
+        selfdestruct(0)
+        
     precompile1:
         mstore(0x00, 0x20)
         mstore(0x20, 0x01)
         mstore8(0x40, add(calldataload(0x85), calldataload(0x86)))
-        return(0x00, 0x41)
-
+        return(0x00, 0x60)
     }}
     
     // Now someone needs to write an ERC20 contract in BrainFuck,
