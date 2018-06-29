@@ -86,7 +86,7 @@ contract Sort {
         
         0x0001000000000000000000000000000000000000000000000000000000000000
         0x0001000100010001000100010001000100010001000100010001000100010001
-        0x220
+        0x120
         0x100 mload 32 mul add dup2 mul dup1 0x100 mstore dup3 swap1 div
         0xe0 mload 32 mul add dup2 mul dup1 0xe0 mstore dup3 swap1 div
         0xc0 mload 32 mul add dup2 mul dup1 0xc0 mstore dup3 swap1 div
@@ -98,6 +98,17 @@ contract Sort {
         0x0 mload 32 mul add dup2 mul dup1 0x0 mstore dup3 swap1 div
         pop pop pop
         
+        if 0 { // DEBUG: Dump the buckets to output
+        i := 0x00
+        ldebug:
+        mstore(add(mul(i, 16), 0x1000), and(mload(i), 0xFFFF))
+        i := add(i, 2)
+        jumpi(ldebug, lt(i, 256))
+        mstore(sub(0x1000, 0x40), 0x20)
+        mstore(sub(0x1000, 0x20), 256)
+        return(sub(0x1000, 0x40), add(64, mul(256, 32)))
+        }
+
         ////////////////////////////////////////////////////
         // Third pass: move to buckets
         ////////////////////////////////////////////////////
@@ -121,7 +132,7 @@ contract Sort {
         // At this point unsorted groups have max 5 elements
         
         i := 256
-        addr1 := 0x220
+        addr1 := 0x120
     l5:
         i := sub(i, 2)
         jumpi(last, slt(i, 0))
@@ -141,7 +152,7 @@ contract Sort {
         
     last:
         addr2 := addr1
-        addr1 := add(sub(calldatasize, 0x44), 0x220)
+        addr1 := add(sub(calldatasize, 0x44), 0x120)
         jumpi(done, eq(addr1, addr2))
         temp1 := sub(addr1, addr2)
         jumpi(done, eq(temp1, 32))
@@ -156,9 +167,9 @@ contract Sort {
         jump(l5)
         
     done:
-        mstore(sub(0x220, 0x40), 0x20)
-        mstore(sub(0x220, 0x20), calldataload(0x24))
-        return(sub(0x220, 0x40), sub(calldatasize, 4))
+        mstore(sub(0x120, 0x40), 0x20)
+        mstore(sub(0x120, 0x20), calldataload(0x24))
+        return(sub(0x120, 0x40), sub(calldatasize, 4))
         
     sort2: {
             let a := mload(addr2)
