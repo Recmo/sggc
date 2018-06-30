@@ -159,12 +159,17 @@ contract BrainFuck {
         ip := add(ip, 32)
         1 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
     
-    copen:
-        // Check if next character is -
-        pp := add(pp, 1)
-        op := and(calldataload(pp), 0xFF)
+    copen: // [t tp ip op pp]
+        // Read next 32 bytes and check for patterns
+        swap1 pop dup1 32 add calldataload swap1
+        
+        // Check for [<]
+        dup2 0xFFFF000000000000000000000000000000000000000000000000000000000000
+        and  0x3C5D000000000000000000000000000000000000000000000000000000000000
+        eq copen_left_close jumpi
+        
         // DISABLED jumpi(copen_decr, eq(op, 0x2d)) // -
-        jumpi(copen_left, eq(op, 0x3c)) // <
+        //jumpi(copen_left, eq(op, 0x3c)) // <
         //DISABLED  jumpi(copen_right, eq(op, 0x3c)) // >
         // Nope. Handle [ and distpach.
         mstore(ip, open)
@@ -172,7 +177,7 @@ contract BrainFuck {
         ip := add(ip, 32)
         mstore(tp, ip)
         tp := add(tp, 32)
-        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+        1 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
     copen_decr:
         t := pp // Count consecutive -'s
         // Check if next character is ]
@@ -245,9 +250,7 @@ contract BrainFuck {
         // We got [<], so store a 'scan_left'
         mstore(ip, scan_left)
         ip := add(ip, 32)
-        pp := add(pp, 1)
-        op := and(calldataload(pp), 0xFF)
-        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+        3 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
     copen_right:
         // Check if next character is ]
         pp := add(pp, 1)
