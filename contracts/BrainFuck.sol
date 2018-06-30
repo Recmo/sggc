@@ -193,6 +193,7 @@ contract BrainFuck {
         eq caddnext jumpi
         */
         
+        
         // No patterns. Handle [ and distpach.
         mstore(ip, open)
         ip := add(ip, 64)
