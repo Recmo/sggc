@@ -166,107 +166,45 @@ contract BrainFuck {
         // Check for [<]
         dup2 0xFFFF000000000000000000000000000000000000000000000000000000000000
         and  0x3C5D000000000000000000000000000000000000000000000000000000000000
-        eq copen_left_close jumpi
+        eq cscan_left jumpi
         
-        // DISABLED jumpi(copen_decr, eq(op, 0x2d)) // -
-        //jumpi(copen_left, eq(op, 0x3c)) // <
-        //DISABLED  jumpi(copen_right, eq(op, 0x3c)) // >
-        // Nope. Handle [ and distpach.
+        /*
+        // Check for [>]
+        dup2 0xFFFF000000000000000000000000000000000000000000000000000000000000
+        and  0x3E5D000000000000000000000000000000000000000000000000000000000000
+        eq cscan_right jumpi
+        
+        // Check for [-]
+        dup2 0xFFFF000000000000000000000000000000000000000000000000000000000000
+        and  0x2D5D000000000000000000000000000000000000000000000000000000000000
+        eq cclear jumpi
+        
+        // Check for [->+<]
+        dup2 0xFFFFFFFFFF000000000000000000000000000000000000000000000000000000
+        and  0x2D3E2B3C5D000000000000000000000000000000000000000000000000000000
+        eq caddnext jumpi
+        */
+        
+        // No patterns. Handle [ and distpach.
         mstore(ip, open)
         ip := add(ip, 32)
         ip := add(ip, 32)
         mstore(tp, ip)
         tp := add(tp, 32)
         1 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
-    copen_decr:
-        t := pp // Count consecutive -'s
-        // Check if next character is ]
-        pp := add(pp, 1)
-        op := and(calldataload(pp), 0xFF)
-        jumpi(copen_decr_close, eq(op, 0x5d))
-        // Check if next character is >
-        jumpi(copen_decr_right, eq(op, 0x3e))
-        // Nope. Handle [- and dispatch
-        mstore(ip, open)
-        ip := add(ip, 32)
-        ip := add(ip, 32)
-        mstore(tp, ip)
-        tp := add(tp, 32)
-        jumpi(cdecrn, eq(op, 0x2d)) // Handle [--… with cdecrn
-        mstore(ip, decr)
-        ip := add(ip, 32)
-        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
-    copen_decr_close:
-        // We got [-], so store a 'clear'
+    cclear:
         mstore(ip, clear)
         ip := add(ip, 32)
-        pp := add(pp, 1)
-        op := and(calldataload(pp), 0xFF)
-        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
-    copen_decr_right:
-        // Check if next character is +
-        pp := add(pp, 1)
-        op := and(calldataload(pp), 0xFF)
-        jumpi(copen_decr_right_incr, eq(op, 0x2b))
-        // Nope. Handle [-> and dispatch
-        jump(explode) // TODO
-    copen_decr_right_incr:
-        // Check if next character is <
-        pp := add(pp, 1)
-        op := and(calldataload(pp), 0xFF)
-        jumpi(copen_decr_right_incr_left, eq(op, 0x3c))
-        // Nope. Handle [->+ and dispatch
-        jump(explode) // TODO
-    copen_decr_right_incr_left:
-        // Check if next character is ]
-        pp := add(pp, 1)
-        op := and(calldataload(pp), 0xFF)
-        jumpi(copen_decr_right_incr_left_close, eq(op, 0x5d))
-        // Nope. Handle [->+< and dispatch
-        jump(explode) // TODO
-    copen_decr_right_incr_left_close:
-        // We got [->+<], so store a 'addnext'
+        3 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
+    caddnext:
         mstore(ip, addnext)
         ip := add(ip, 32)
-        pp := add(pp, 1)
-        op := and(calldataload(pp), 0xFF)
-        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
-    copen_left:
-        // Check if next character is ]
-        pp := add(pp, 1)
-        op := and(calldataload(pp), 0xFF)
-        jumpi(copen_left_close, eq(op, 0x5d))
-        // Nope. Handle [< and dispatch
-        mstore(ip, open)
-        ip := add(ip, 32)
-        ip := add(ip, 32)
-        mstore(tp, ip)
-        tp := add(tp, 32)
-        jumpi(cleftn, eq(op, 0x3c)) // Handle [<<… with cleftn
-        mstore(ip, cleft)
-        ip := add(ip, 32)
-        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
-    copen_left_close:
-        // We got [<], so store a 'scan_left'
+        6 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
+    cscan_left:
         mstore(ip, scan_left)
         ip := add(ip, 32)
         3 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
-    copen_right:
-        // Check if next character is ]
-        pp := add(pp, 1)
-        op := and(calldataload(pp), 0xFF)
-        jumpi(copen_right_close, eq(op, 0x5d))
-        // Nope. Handle [> and dispatch
-        mstore(ip, open)
-        ip := add(ip, 32)
-        ip := add(ip, 32)
-        mstore(tp, ip)
-        tp := add(tp, 32)
-        jumpi(crightn, eq(op, 0x3e)) // Handle [>>… with crightn
-        mstore(ip, cright)
-        ip := add(ip, 32)
-        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
-    copen_right_close:
+    cscan_right:
         jump(explode) // TODO
 
 
