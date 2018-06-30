@@ -50,6 +50,8 @@ contract BrainFuck {
         // No:  [>]          unfinished, disabled
         // No:  [-]          implemented, disabled
         // No:  [->+<]       implemented, disabled, breakouts missing
+        // No:  [.-]
+        // No:  [-<+>]
         // No:  -[.-]..
         // No:  >,+.<.
         // No:  >-.<.
@@ -161,7 +163,7 @@ contract BrainFuck {
     
     copen: // [t tp ip op pp]
         // Read next 32 bytes and check for patterns
-        swap1 pop dup1 32 add calldataload swap1
+        op := calldataload(add(pp, 32))
         
         // Check for [<]
         dup2 0xFFFF000000000000000000000000000000000000000000000000000000000000
