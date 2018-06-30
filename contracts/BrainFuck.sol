@@ -187,8 +187,7 @@ contract BrainFuck {
         
         // No patterns. Handle [ and distpach.
         mstore(ip, open)
-        ip := add(ip, 32)
-        ip := add(ip, 32)
+        ip := add(ip, 64)
         mstore(tp, ip)
         tp := add(tp, 32)
         1 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
@@ -206,7 +205,6 @@ contract BrainFuck {
         3 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
     cscan_right:
         jump(explode) // TODO
-
 
     cclose:
         mstore(ip, close)
