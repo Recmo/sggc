@@ -176,6 +176,11 @@ contract BrainFuck {
         and  0x3C5D000000000000000000000000000000000000000000000000000000000000
         eq cscan_left jumpi
         
+        // Check for [.-]
+        dup2 0xFFFFFF0000000000000000000000000000000000000000000000000000000000
+        and  0x2E2D5D0000000000000000000000000000000000000000000000000000000000
+        eq ccountdown jumpi
+        
         /*
         // Check for [>]
         dup2 0xFFFF000000000000000000000000000000000000000000000000000000000000
@@ -214,6 +219,11 @@ contract BrainFuck {
         3 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
     cscan_right:
         jump(explode) // TODO
+    ccountdown:
+        mstore(ip, countdown)
+        ip := add(ip, 32)
+        4 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
+    
 
     cclose:
         mstore(ip, close)
@@ -322,6 +332,21 @@ contract BrainFuck {
         mstore8(add(tp, 31), 0)
         pp := add(pp, 32)
         jump(mload(pp))
+        
+    countdown: // [.-]
+        // TODO: skip when zero
+        {
+            let i := and(mload(tp), 0xFF)
+        countdown_loop:
+            mstore8(op, i)
+            op := add(op, 1)
+            i := sub(i, 1)
+            jumpi(countdown_loop, i)
+        }
+        mstore8(add(tp, 31), 0)
+        pp := add(pp, 32)
+        jump(mload(pp))
+    
     
     output: // .
         mstore8(op, mload(tp))
