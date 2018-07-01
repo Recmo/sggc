@@ -77,6 +77,7 @@ contract Unique {
         
         // Dispatch large lists
         jumpi(main512, gt(calldatasize, 0x1044))
+        jump(explode)
         
         //////////////////////////////////////////////////
         // Table size 97
@@ -254,6 +255,7 @@ contract Unique {
         // Add to start of list
         mstore(ptr, not(vhash))
         ptr := add(ptr, 32)
+        jumpi(oloop_end512, eq(ptr, 0x2B00))
         
         // Resume loop
         i := add(i, 32)
