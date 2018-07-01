@@ -72,6 +72,9 @@ contract Unique {
         last1 := vhash
         i := iv
         
+        // Check for low values
+        jumpi(trivial, gt(last1, 10000))
+        
         // Dispatch large lists
         jumpi(main512, gt(calldatasize, 0x1044))
         
