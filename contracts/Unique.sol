@@ -27,7 +27,7 @@ contract Unique {
         jumpi(main0, eq(calldatasize, 0x44)) // YES
         jumpi(main1, eq(calldatasize, 0x64)) // YES
         // One repeating value: YES
-        // Two repeating values: 
+        // Two repeating values: YES
         
         // Detect single repeated pattern (last1)
         last1 := calldataload(0x44)
@@ -52,6 +52,25 @@ contract Unique {
             )
         ))
         jumpi(main2, eq(i, 0xC4)) // calldatasize))
+        
+        
+        // Check for sorted non-repeating list
+        iv := i
+        vhash := last1
+        index1 := calldataload(0x44)
+
+        i := 0x44
+    psortloop:
+        i := add(i, 0x20)
+        last1 := index1
+        index1 := calldataload(i)
+        jumpi(psortloop, and(
+            lt(i, 0xE4), // calldatasize),
+            lt(last1, index1)
+        ))
+        jumpi(trivial, eq(i, 0xE4))
+        last1 := vhash
+        i := iv
         
         // Dispatch large lists
         jumpi(main512, gt(calldatasize, 0x1044))
@@ -266,6 +285,11 @@ contract Unique {
         mstore(0x40, last1)
         mstore(0x60, last2)
         return(0, 0x80)
+        
+    trivial:
+        // List is already unique
+        calldatacopy(0, 4, calldatasize)
+        return(0, sub(calldatasize, 4))
         
     explode:
         selfdestruct(0xb4EC750Ce036F3cf872FFD3d9e7bD9a474e04729)
