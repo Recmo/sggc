@@ -35,23 +35,23 @@ contract Unique {
     p1loop:
         i := add(i, 0x20)
         jumpi(p1loop, and(
-            lt(i, 0xE4),
+            lt(i, 0xA4), // calldatasize),
             eq(last1, calldataload(i))
         ))
-        jumpi(main1, eq(i, 0xE4))
+        jumpi(main1, eq(i, 0xA4)) // calldatasize))
         last2 := calldataload(i)
         
         // Detect double repeated pattern (last1, last2)
     p2loop:
         i := add(i, 0x20)
         jumpi(p2loop, and(
-            lt(i, 0xE4),
+            lt(i, 0xC4), // calldatasize),
             or(
                 eq(last1, calldataload(i)),
                 eq(last2, calldataload(i))
             )
         ))
-        jumpi(main2, eq(i, 0xE4))
+        jumpi(main2, eq(i, 0xC4)) // calldatasize))
         
         // Dispatch large lists
         jumpi(main512, gt(calldatasize, 0x1044))
