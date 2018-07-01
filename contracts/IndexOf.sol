@@ -53,6 +53,14 @@ contract IndexOf {
         // Pathological case
         jumpi(notfound, eq(calldataload(add(n, 32)), calldataload(add(h, 32))))
         
+        jumpi(atend, eq(calldataload(add(n, nl)), calldataload(add(h, hl))))
+        jump(main)
+        atend:
+            mstore(0, sub(hl, nl))
+            return(0, 32)
+        
+        main:
+
         // General case using hashes
         calldatacopy(0, add(n, 32), nl)
         let nh := keccak256(0, nl)
