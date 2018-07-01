@@ -84,13 +84,24 @@ contract BrainFuck {
         pp := add(pp, 1)
         op := and(calldataload(pp), 0xFF)
         jumpi(crightn, eq(op, 0x3e))
+        // Check for >>_ and >_>_ (TODO: <>_)
+        jumpi(cright_rightn, eq(mload(sub(ip, 32)), right))
+        jumpi(crightn_rightn, eq(mload(sub(ip, 64)), rightn))
         // Bulk instruction
         mstore(ip, rightn)
         ip := add(ip, 32)
         mstore(ip, sub(pp, t))
         ip := add(ip, 32)
         jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
-
+    cright_rightn:
+        mstore(sub(ip, 32), rightn)
+        mstore(ip, add(sub(pp, t), 1))
+        ip := add(ip, 32)
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+    crightn_rightn:
+        mstore(sub(ip, 32), add(mload(sub(ip, 32)),sub(pp, t)))
+        jump(xor(cnop, and(mload(add(op, op)), 0xFFFF)))
+        
     cleft:
         // Check if next char is also <
         t := pp
