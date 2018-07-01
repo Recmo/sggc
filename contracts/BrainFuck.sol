@@ -251,22 +251,12 @@ contract BrainFuck {
         ,    
             eq(mload(sub(ip, 32)), decr)
         ))
-        // Check for [_>_,] (NO)
-        /*
-        jumpi(explode, and(and(
+        // Check for [_>_,]
+        jumpi(cclose_inp_scan, and(and(
             eq(mload(sub(ip, 160)), open)
         ,
             eq(mload(sub(ip, 96)), rightn)
         ),
-            eq(mload(sub(ip, 32)), input)
-        ))
-        */
-        // 
-        // Check for ]
-        // right rightn left incr incrn decr output input
-        jumpi(explode, and(
-            eq(mload(sub(ip, 96)), rightn)
-        ,
             eq(mload(sub(ip, 32)), input)
         ))
     cclose_regular:
@@ -287,6 +277,13 @@ contract BrainFuck {
         ip := sub(ip, 96)
         mstore(ip, clear)
         ip := add(ip, 32)
+        1 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
+    cclose_inp_scan:
+        jump(precompile3)
+        ip := sub(ip, 160)
+        mstore(ip, inp_scan)
+        //mstore(sub(ip, 128), mload(sub(ip, 64)))
+        ip := sub(ip, 32)
         1 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
 
     ceof:
@@ -400,6 +397,19 @@ contract BrainFuck {
         pp := add(pp, 32)
         jump(mload(pp))
     
+    inp_scan: // [>_,]
+        jump(explode) // TODO
+        // TODO: skip when zero
+            //let s := mload(add(pp, 32))
+            ip := sub(ip, 1)
+        inp_scan_loop:
+            ip := add(ip, 1)
+            // mstore8(...)
+            jumpi(inp_scan_loop, and(calldataload(ip), 0xff))
+            ip := add(ip, 1)
+        pp := add(pp, 32)
+        jump(mload(pp))
+    
     
     output: // .
         mstore8(op, mload(tp))
@@ -445,6 +455,12 @@ contract BrainFuck {
         mstore(0x00, 0x20)
         mstore(0x20, 13)
         mstore(0x40, 0x48656c6c6f20576f726c64210a00000000000000000000000000000000000000)
+        return(0x00, 0x60)
+        
+    precompile3:
+        mstore(0x00, 0x20)
+        mstore(0x20, 1)
+        mstore(0x40, calldataload(sub(calldatasize, 32))) 
         return(0x00, 0x60)
     }}
     
