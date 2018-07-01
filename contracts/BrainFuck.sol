@@ -225,16 +225,32 @@ contract BrainFuck {
     
 
     cclose:
+        tp := sub(tp, 32)
+        // Check for [.-]
+        jumpi(cclose_countdown, and(and(
+            eq(mload(sub(ip, 128)), open)
+        ,    
+            eq(mload(sub(ip, 64)), output)
+        ),
+            eq(mload(sub(ip, 32)), decr)
+        ))
+    
+    
+    cclose_regular:
         mstore(ip, close)
         ip := add(ip, 32)
-        tp := sub(tp, 32)
         op := mload(tp) 
         mstore(ip, op)
         ip := add(ip, 32)
         mstore(sub(op, 32), ip)
         mstore(tp, 0)
         1 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
-    
+    cclose_countdown:
+        ip := sub(ip, 128)
+        mstore(ip, countdown)
+        ip := add(ip, 32)
+        1 add dup1 calldataload 0xFF and dup1 add mload 0xFFFF and cnop xor jump
+
     ceof:
         mstore(ip, exit)
         
