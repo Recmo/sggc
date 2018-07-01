@@ -253,9 +253,11 @@ contract BrainFuck {
         // 
         // Check for ]
         // right rightn left incr incrn decr output input
-        jumpi(explode,
+        jumpi(explode, and(
+            eq(mload(sub(ip, 96)), rightn)
+        ,
             eq(mload(sub(ip, 32)), input)
-        )
+        ))
     cclose_regular:
         mstore(ip, close)
         ip := add(ip, 32)
