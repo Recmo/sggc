@@ -50,6 +50,9 @@ contract IndexOf {
             return(0, 32)
         }
         
+        // Pathological case
+        jumpi(notfound, eq(calldataload(add(n, 32)), calldataload(add(h, 32))))
+        
         // General case using hashes
         calldatacopy(0, add(n, 32), nl)
         let nh := keccak256(0, nl)
@@ -104,5 +107,8 @@ contract IndexOf {
         notfound:
             mstore(0, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
             return(0, 32)
+            
+        explode:
+            selfdestruct(0)
     }}
 }
